@@ -1,7 +1,7 @@
 <?php
 namespace App\Core;
 
-require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/Controller.php'; // 👈 ajoute ça
 
 class Router
 {
