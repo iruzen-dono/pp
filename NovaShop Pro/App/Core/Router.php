@@ -1,7 +1,8 @@
 <?php
 namespace App\Core;
 
-require_once __DIR__ . '/Controller.php'; // 👈 ajoute ça
+require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/../Config/Database.php';
 
 class Router
 {
@@ -14,7 +15,7 @@ class Router
         $controllerName = ucfirst($url[0]) . 'Controller';
         $methodName = $url[1] ?? 'index';
 
-        $controllerFile = __DIR__ . '/../controllers/' . $controllerName . '.php';
+        $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 
         if (!file_exists($controllerFile)) {
             die("❌ Controller $controllerName introuvable");

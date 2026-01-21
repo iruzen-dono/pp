@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../core/Controller.php'; // 👈 IMPORTANT
+require_once __DIR__ . '/../Core/Controller.php'; // 👈 IMPORTANT
 
 use App\Core\Controller;
 

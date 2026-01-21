@@ -1,35 +1,28 @@
 <?php
 namespace App\Models;
 
-use App\Config\Database;
-use PDO;
+use App\Core\Model;
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../Core/Model.php';
 
-class User
+class User extends Model
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Database::getConnection();
-    }
 
     public function create($name, $email, $password)
     {
-        $stmt = $this->db->prepare(
+        $stmt = $this->prepare(
             "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
         );
 
-        return $stmt->execute([$name, $email, $password]);
+        return $this->execute($stmt, [$name, $email, $password]);
     }
 
     public function findByEmail($email)
     {
-        $stmt = $this->db->prepare(
+        $stmt = $this->prepare(
             "SELECT * FROM users WHERE email = ? LIMIT 1"
         );
-        $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->execute($stmt, [$email]);
+        return $this->fetch($stmt);
     }
 }

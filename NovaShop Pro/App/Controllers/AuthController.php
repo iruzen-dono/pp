@@ -1,8 +1,8 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../core/Controller.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Core/Controller.php';
 
 use App\Core\Controller;
 use App\Models\User;
@@ -36,8 +36,12 @@ class AuthController extends Controller
             $user = $userModel->findByEmail($email);
 
             if ($user && password_verify($password, $user['password'])) {
-                session_start();
-                $_SESSION['user'] = $user;
+                $_SESSION['user'] = [
+                    'id' => $user['id'],
+                    'name' => $user['name'],
+                    'email' => $user['email'],
+                    'role' => $user['role']
+                ];
                 header("Location: /");
                 exit;
             }
@@ -52,7 +56,6 @@ class AuthController extends Controller
 
     public function logout()
     {
-        session_start();
         session_destroy();
         header("Location: /");
         exit;
