@@ -1,83 +1,90 @@
 <?php
 /**
  * NovaShop Pro - Diagnostic Système
- * 
  * Accédez à: http://localhost:8000/diagnostic.php
- * Affiche l'état du système et identifie les problèmes
  */
 
-echo "<!DOCTYPE html>";
-echo "<html>";
-echo "<head>";
-echo "<title>NovaShop Pro - Diagnostic</title>";
-echo "<style>";
-echo "body { font-family: Arial; background: #0f0c1d; color: #eee; padding: 20px; }";
-echo ".container { max-width: 900px; margin: 0 auto; }";
-echo "h1 { color: #b388ff; }";
-echo ".check { padding: 10px; margin: 5px 0; border-left: 4px solid; border-radius: 4px; }";
-echo ".ok { background: #1a3a1a; border-color: #00ff00; }";
-echo ".warning { background: #3a3a1a; border-color: #ffff00; }";
-echo ".error { background: #3a1a1a; border-color: #ff0000; }";
-echo "table { width: 100%; border-collapse: collapse; margin-top: 20px; }";
-echo "th, td { padding: 10px; text-align: left; border: 1px solid #333; }";
-echo "th { background: #1a1433; }";
-echo ".status { font-weight: bold; }";
-echo "</style>";
-echo "</head>";
-echo "<body>";
-echo "<div class='container'>";
+$db = null;
+$db_error = '';
 
-echo "<h1>🔧 Diagnostic - NovaShop Pro</h1>";
-echo "<p>Date: " . date('Y-m-d H:i:s') . "</p>";
+// Tentative de connexion DB
+if (file_exists(__DIR__ . '/../App/Config/Database.php')) {
+    try {
+        require_once __DIR__ . '/../App/Config/Database.php';
+        $db = \App\Config\Database::getConnection();
+    } catch (Throwable $e) {
+        $db_error = $e->getMessage();
+    }
+}
 
-// ==========================================
-// VÉRIFICATIONS PHP
-// ==========================================
+// Démarrer session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>NovaShop Pro - Diagnostic</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0f0c1d; color: #eee; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #b388ff; margin-bottom: 10px; }
+        h2 { color: #b388ff; margin-top: 30px; border-bottom: 2px solid #b388ff; padding-bottom: 10px; }
+        .check { padding: 10px; margin: 5px 0; border-left: 4px solid; border-radius: 4px; background: #1a1433; }
+        .check.ok { background: #1a3a1a; border-color: #00ff00; }
+        .check.warning { background: #3a3a1a; border-color: #ffff00; }
+        .check.error { background: #3a1a1a; border-color: #ff0000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1a1433; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #333; }
+        th { background: #2a1a4a; font-weight: bold; }
+        tr:hover { background: #2a1a4a; }
+        .footer { color: #888; font-size: 12px; text-align: center; margin-top: 40px; }
+    </style>
+</head>
+<body>
+<div class="container">
 
-echo "<h2>📌 Configuration PHP</h2>";
+<h1>🔧 Diagnostic - NovaShop Pro</h1>
+<p>Date: <?php echo date('Y-m-d H:i:s'); ?></p>
 
-$checks = [];
+<h2>📌 Configuration PHP</h2>
 
-// Version PHP
+<?php
 $php_version = phpversion();
-$checks['PHP Version'] = [
-    'required' => '8.0+',
-    'actual' => $php_version,
-    'ok' => version_compare($php_version, '8.0.0', '>=')
-];
+$php_ok = version_compare($php_version, '8.0.0', '>=');
+?>
+<div class="check <?php echo $php_ok ? 'ok' : 'error'; ?>">
+    <strong><?php echo $php_ok ? '✅' : '❌'; ?> Version PHP</strong><br>
+    Requis: 8.0+ | Actuel: <?php echo $php_version; ?>
+</div>
 
-// Extensions requises
+<?php
 $extensions = ['pdo', 'pdo_mysql', 'session', 'json', 'mbstring'];
 foreach ($extensions as $ext) {
-    $checks["Extension: $ext"] = [
-        'required' => 'Installée',
-        'actual' => extension_loaded($ext) ? 'Oui' : 'Non',
-        'ok' => extension_loaded($ext)
-    ];
+    $loaded = extension_loaded($ext);
+    ?>
+    <div class="check <?php echo $loaded ? 'ok' : 'error'; ?>">
+        <strong><?php echo $loaded ? '✅' : '❌'; ?> Extension: <?php echo $ext; ?></strong><br>
+        Requis: Installée | Actuel: <?php echo $loaded ? 'Oui' : 'Non'; ?>
+    </div>
+    <?php
 }
+?>
 
-// Sécurité
-$checks['display_errors'] = [
-    'required' => 'Off (prod)',
-    'actual' => ini_get('display_errors') ? 'On' : 'Off',
-    'ok' => !ini_get('display_errors')
-];
+<?php
+$display_errors = ini_get('display_errors');
+?>
+<div class="check <?php echo !$display_errors ? 'ok' : 'warning'; ?>">
+    <strong><?php echo !$display_errors ? '✅' : '⚠️'; ?> display_errors</strong><br>
+    Requis: Off (prod) | Actuel: <?php echo $display_errors ? 'On' : 'Off'; ?>
+</div>
 
-foreach ($checks as $name => $data) {
-    $class = $data['ok'] ? 'ok' : 'error';
-    $status = $data['ok'] ? '✅' : '❌';
-    echo "<div class='check $class'>";
-    echo "<strong>$status $name</strong><br>";
-    echo "Requis: {$data['required']} | Actuel: {$data['actual']}";
-    echo "</div>";
-}
+<h2>📁 Structure des fichiers</h2>
 
-// ==========================================
-// VÉRIFICATIONS FICHIERS
-// ==========================================
-
-echo "<h2>📁 Structure des fichiers</h2>";
-
+<?php
 $files = [
     'index.php' => 'Point d\'entrée',
     '../App/Core/App.php' => 'Classe App',
@@ -86,180 +93,195 @@ $files = [
     '../App/Core/Controller.php' => 'Classe Controller',
     '../App/Config/Database.php' => 'Connexion BD',
     '../App/Controllers/HomeController.php' => 'HomeController',
-    '../App/Controllers/AuthController.php' => 'AuthController',
     '../App/Models/User.php' => 'Modèle User',
     '../App/Views/Layouts/header.php' => 'Layout header',
     'Assets/Css/Style.css' => 'Stylesheet',
 ];
-
-echo "<table>";
-echo "<tr><th>Fichier</th><th>Status</th><th>Description</th></tr>";
-
-$base_path = __DIR__;
-foreach ($files as $file => $desc) {
-    $path = $base_path . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
-    $exists = file_exists($path);
-    $status = $exists ? '✅ Existe' : '❌ Manquant';
-    $class = $exists ? 'ok' : 'error';
-    echo "<tr class='$class'>";
-    echo "<td>$file</td>";
-    echo "<td>$status</td>";
-    echo "<td>$desc</td>";
-    echo "</tr>";
-}
-
-echo "</table>";
-
-// ==========================================
-// VÉRIFICATIONS BASE DE DONNÉES
-// ==========================================
-
-echo "<h2>🗄️ Base de données</h2>";
-
-try {
-    require_once __DIR__ . '/../App/Config/Database.php';
-    
-    use App\Config\Database;
-    
-    $db = Database::getConnection();
-    
-    echo "<div class='check ok'>";
-    echo "<strong>✅ Connexion MySQL</strong><br>";
-    echo "Connecté à: localhost / novashop";
-    echo "</div>";
-    
-    // Vérifier les tables
-    $tables = ['users', 'products', 'categories', 'orders', 'order_items'];
-    
-    echo "<table>";
-    echo "<tr><th>Table</th><th>Status</th><th>Lignes</th></tr>";
-    
-    foreach ($tables as $table) {
-        try {
-            $result = $db->query("SELECT COUNT(*) as count FROM $table");
-            $count = $result->fetch()['count'];
-            $status = '✅ Existe';
-            $class = 'ok';
-        } catch (Exception $e) {
-            $count = '?';
-            $status = '❌ Manquante';
-            $class = 'error';
-        }
-        
-        echo "<tr class='$class'>";
-        echo "<td>$table</td>";
-        echo "<td>$status</td>";
-        echo "<td>$count</td>";
-        echo "</tr>";
-    }
-    
-    echo "</table>";
-    
-} catch (Exception $e) {
-    echo "<div class='check error'>";
-    echo "<strong>❌ Erreur de connexion</strong><br>";
-    echo "Erreur: " . htmlspecialchars($e->getMessage());
-    echo "</div>";
-}
-
-// ==========================================
-// VÉRIFICATIONS SESSIONS
-// ==========================================
-
-echo "<h2>🔐 Sessions</h2>";
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-$session_ok = isset($_SESSION);
-$user_logged = isset($_SESSION['user']);
-
-echo "<div class='check " . ($session_ok ? 'ok' : 'error') . "'>";
-echo "<strong>" . ($session_ok ? '✅' : '❌') . " Sessions PHP</strong><br>";
-echo "Statut: " . ($session_ok ? 'Activées' : 'Désactivées');
-echo "</div>";
-
-echo "<div class='check " . ($user_logged ? 'ok' : 'warning') . "'>";
-echo "<strong>" . ($user_logged ? '✅' : '⚠️') . " Utilisateur connecté</strong><br>";
-echo "Status: " . ($user_logged ? 'Oui (' . htmlspecialchars($_SESSION['user']['email']) . ')' : 'Non');
-echo "</div>";
-
-// ==========================================
-// VÉRIFICATIONS PERMISSIONS
-// ==========================================
-
-echo "<h2>🔑 Permissions des fichiers</h2>";
-
-$dirs = [
-    '' => '0755',
-    '../App/Views' => '0755',
-    'Assets' => '0777',
-];
-
-echo "<table>";
-echo "<tr><th>Dossier</th><th>Permissions</th><th>Accessible</th></tr>";
-
-$base_path = __DIR__;
-foreach ($dirs as $dir => $required_perms) {
-    $path = $base_path . ($dir ? DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $dir) : '');
-    $is_readable = is_readable($path);
-    $is_writable = is_writable($path);
-    $status = $is_readable ? '✅ Oui' : '❌ Non';
-    $class = $is_readable ? 'ok' : 'error';
-    
-    echo "<tr class='$class'>";
-    echo "<td>$dir</td>";
-    echo "<td>Requis: $required_perms</td>";
-    echo "<td>$status</td>";
-    echo "</tr>";
-}
-
-echo "</table>";
-
-// ==========================================
-// RECOMMANDATIONS
-// ==========================================
-
-echo "<h2>💡 Recommandations</h2>";
-
-$recommendations = [
-    'Démarrer MySQL' => !isset($db),
-    'Créer la base de données' => false, // On ne peut pas vérifier facilement
-    'Vérifier les permissions' => false,
-    'Valider les formulaires côté serveur' => true,
-    'Implémenter CSRF tokens' => true,
-    'Ajouter rate limiting' => true,
-    'Configurer HTTPS en production' => true,
-];
-
-foreach ($recommendations as $rec => $priority) {
-    $class = $priority ? 'warning' : 'ok';
-    echo "<div class='check $class'>";
-    echo "<strong>$rec</strong>";
-    echo "</div>";
-}
-
-// ==========================================
-// INFORMATIONS SYSTÈME
-// ==========================================
-
-echo "<h2>ℹ️ Informations système</h2>";
-
-echo "<table>";
-echo "<tr><th>Info</th><th>Valeur</th></tr>";
-echo "<tr><td>Serveur</td><td>" . $_SERVER['SERVER_SOFTWARE'] . "</td></tr>";
-echo "<tr><td>PHP SAPI</td><td>" . php_sapi_name() . "</td></tr>";
-echo "<tr><td>OS</td><td>" . php_uname() . "</td></tr>";
-echo "<tr><td>Répertoire courant</td><td>" . __DIR__ . "</td></tr>";
-echo "<tr><td>Mémoire utilisée</td><td>" . round(memory_get_usage() / 1024 / 1024, 2) . " MB</td></tr>";
-echo "<tr><td>Max upload</td><td>" . ini_get('upload_max_filesize') . "</td></tr>";
-echo "</table>";
-
-echo "<hr style='margin: 40px 0; border: 1px solid #333;'>";
-echo "<p style='color: #888; font-size: 12px;'>Généré par NovaShop Pro Diagnostic - " . date('Y-m-d H:i:s') . "</p>";
-
-echo "</div>";
-echo "</body>";
-echo "</html>";
 ?>
+
+<table>
+    <tr>
+        <th>Fichier</th>
+        <th>Status</th>
+        <th>Description</th>
+    </tr>
+    <?php
+    foreach ($files as $file => $desc) {
+        $path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
+        $exists = file_exists($path);
+        ?>
+        <tr class="<?php echo $exists ? 'ok' : 'error'; ?>">
+            <td><?php echo htmlspecialchars($file); ?></td>
+            <td><?php echo $exists ? '✅ Existe' : '❌ Manquant'; ?></td>
+            <td><?php echo htmlspecialchars($desc); ?></td>
+        </tr>
+        <?php
+    }
+    ?>
+</table>
+
+<h2>🗄️ Base de données</h2>
+
+<?php
+if ($db !== null) {
+    ?>
+    <div class="check ok">
+        <strong>✅ Connexion MySQL</strong><br>
+        Connecté à: localhost / novashop
+    </div>
+
+    <table>
+        <tr>
+            <th>Table</th>
+            <th>Status</th>
+            <th>Lignes</th>
+        </tr>
+        <?php
+        $tables = ['users', 'products', 'categories', 'orders', 'order_items'];
+        foreach ($tables as $table) {
+            try {
+                $result = $db->query("SELECT COUNT(*) as count FROM " . $table);
+                $row = $result->fetch(PDO::FETCH_ASSOC);
+                $count = $row['count'] ?? 0;
+                ?>
+                <tr class="ok">
+                    <td><?php echo htmlspecialchars($table); ?></td>
+                    <td>✅ Existe</td>
+                    <td><?php echo htmlspecialchars((string)$count); ?></td>
+                </tr>
+                <?php
+            } catch (Throwable $e) {
+                ?>
+                <tr class="error">
+                    <td><?php echo htmlspecialchars($table); ?></td>
+                    <td>❌ Manquante</td>
+                    <td>?</td>
+                </tr>
+                <?php
+            }
+        }
+        ?>
+    </table>
+    <?php
+} else {
+    ?>
+    <div class="check error">
+        <strong>❌ Erreur de connexion</strong><br>
+        Erreur: <?php echo htmlspecialchars($db_error ?: 'Connexion impossible'); ?>
+    </div>
+    <?php
+}
+?>
+
+<h2>🔐 Sessions</h2>
+
+<?php
+$session_ok = session_status() === PHP_SESSION_ACTIVE;
+?>
+<div class="check <?php echo $session_ok ? 'ok' : 'error'; ?>">
+    <strong><?php echo $session_ok ? '✅' : '❌'; ?> Sessions PHP</strong><br>
+    Statut: <?php echo $session_ok ? 'Activées' : 'Désactivées'; ?>
+</div>
+
+<?php
+$user_logged = isset($_SESSION['user']);
+?>
+<div class="check <?php echo $user_logged ? 'ok' : 'warning'; ?>">
+    <strong><?php echo $user_logged ? '✅' : '⚠️'; ?> Utilisateur connecté</strong><br>
+    Status: <?php echo $user_logged ? 'Oui (' . htmlspecialchars($_SESSION['user']['email'] ?? 'Email inconnu') . ')' : 'Non'; ?>
+</div>
+
+<h2>🔑 Permissions des fichiers</h2>
+
+<?php
+$dirs = [
+    '' => 'Public (cette dir)',
+    '../App/Views' => 'Views',
+    'Assets' => 'Assets',
+];
+?>
+
+<table>
+    <tr>
+        <th>Dossier</th>
+        <th>Chemin</th>
+        <th>Accessible</th>
+    </tr>
+    <?php
+    foreach ($dirs as $dir => $label) {
+        $path = __DIR__ . ($dir ? DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $dir) : '');
+        $is_readable = is_readable($path);
+        ?>
+        <tr class="<?php echo $is_readable ? 'ok' : 'error'; ?>">
+            <td><?php echo htmlspecialchars($label); ?></td>
+            <td><?php echo htmlspecialchars($dir ?: '/'); ?></td>
+            <td><?php echo $is_readable ? '✅ Oui' : '❌ Non'; ?></td>
+        </tr>
+        <?php
+    }
+    ?>
+</table>
+
+<h2>💡 Recommandations</h2>
+
+<?php
+$recommendations = [
+    ['text' => 'Démarrer MySQL', 'priority' => $db === null],
+    ['text' => 'Valider les formulaires côté serveur', 'priority' => true],
+    ['text' => 'Implémenter CSRF tokens', 'priority' => true],
+    ['text' => 'Ajouter rate limiting', 'priority' => true],
+    ['text' => 'Configurer HTTPS en production', 'priority' => true],
+];
+
+foreach ($recommendations as $rec) {
+    $class = $rec['priority'] ? 'warning' : 'ok';
+    $status = $rec['priority'] ? '⚠️' : '✅';
+    ?>
+    <div class="check <?php echo $class; ?>">
+        <strong><?php echo $status; ?> <?php echo htmlspecialchars($rec['text']); ?></strong>
+    </div>
+    <?php
+}
+?>
+
+<h2>ℹ️ Informations système</h2>
+
+<table>
+    <tr>
+        <th>Info</th>
+        <th>Valeur</th>
+    </tr>
+    <tr>
+        <td>Serveur</td>
+        <td><?php echo htmlspecialchars($_SERVER['SERVER_SOFTWARE'] ?? 'N/A'); ?></td>
+    </tr>
+    <tr>
+        <td>PHP SAPI</td>
+        <td><?php echo htmlspecialchars(php_sapi_name()); ?></td>
+    </tr>
+    <tr>
+        <td>OS</td>
+        <td><?php echo htmlspecialchars(php_uname()); ?></td>
+    </tr>
+    <tr>
+        <td>Répertoire courant</td>
+        <td><?php echo htmlspecialchars(__DIR__); ?></td>
+    </tr>
+    <tr>
+        <td>Mémoire utilisée</td>
+        <td><?php echo round(memory_get_usage() / 1024 / 1024, 2); ?> MB</td>
+    </tr>
+    <tr>
+        <td>Max upload</td>
+        <td><?php echo htmlspecialchars(ini_get('upload_max_filesize')); ?></td>
+    </tr>
+</table>
+
+<hr>
+<div class="footer">
+    <p>Généré par NovaShop Pro Diagnostic - <?php echo date('Y-m-d H:i:s'); ?></p>
+</div>
+
+</div>
+</body>
+</html>
