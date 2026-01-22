@@ -17,15 +17,23 @@ class Router
             'products' => 'Product',
             'login' => 'Auth',
             'register' => 'Auth',
+            'logout' => 'Auth',
             'cart' => 'Cart',
-            'order' => 'Order',
+            'orders' => 'Order',
             'admin' => 'Admin',
             'home' => 'Home',
         ];
 
         $baseName = $controllerMap[$urlPart] ?? ucfirst($urlPart);
         $controllerName = $baseName . 'Controller';
-        $methodName = $url[1] ?? ($urlPart === 'login' ? 'login' : ($urlPart === 'register' ? 'register' : 'index'));
+        
+        // Déterminer la méthode par défaut selon l'URL
+        $defaultMethod = 'index';
+        if ($urlPart === 'login') $defaultMethod = 'login';
+        if ($urlPart === 'register') $defaultMethod = 'register';
+        if ($urlPart === 'logout') $defaultMethod = 'logout';
+        
+        $methodName = $url[1] ?? $defaultMethod;
 
         $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 
