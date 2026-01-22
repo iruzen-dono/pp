@@ -12,11 +12,16 @@ class Database
     {
         if (self::$instance === null) {
             try {
+                $options = [
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+                ];
+
                 self::$instance = new PDO(
                     "mysql:host=localhost;dbname=novashop;charset=utf8mb4",
                     "root",
                     "0000",
-                    [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+                    $options
                 );
                 self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 // Force compatibility avec MariaDB 12+

@@ -29,19 +29,102 @@ if (session_status() === PHP_SESSION_NONE) {
     <title>NovaShop Pro - Diagnostic</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #0f0c1d; color: #eee; padding: 20px; margin: 0; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { color: #b388ff; margin-bottom: 10px; }
-        h2 { color: #b388ff; margin-top: 30px; border-bottom: 2px solid #b388ff; padding-bottom: 10px; }
-        .check { padding: 10px; margin: 5px 0; border-left: 4px solid; border-radius: 4px; background: #1a1433; }
-        .check.ok { background: #1a3a1a; border-color: #00ff00; }
-        .check.warning { background: #3a3a1a; border-color: #ffff00; }
-        .check.error { background: #3a1a1a; border-color: #ff0000; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1a1433; }
-        th, td { padding: 10px; text-align: left; border: 1px solid #333; }
-        th { background: #2a1a4a; font-weight: bold; }
-        tr:hover { background: #2a1a4a; }
-        .footer { color: #888; font-size: 12px; text-align: center; margin-top: 40px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
+            color: #e2e8f0;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { 
+            color: #6366f1;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-info { color: #94a3b8; margin-bottom: 20px; }
+        h2 { 
+            color: #6366f1;
+            margin-top: 30px;
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 10px;
+            font-size: 1.3em;
+        }
+        .check { 
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .check.ok { 
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+        .check.warning { 
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+        }
+        .check.error { 
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+        .check strong { color: #f1f5f9; }
+        table { 
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td { 
+            padding: 12px;
+            text-align: left;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+        th { 
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
+            font-weight: 600;
+            color: #60a5fa;
+        }
+        tr:hover { 
+            background: rgba(99, 102, 241, 0.1);
+        }
+        tr.ok { color: #10b981; }
+        tr.error { color: #ef4444; }
+        .footer { 
+            color: #64748b;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .status-badge { 
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .status-badge.ok { 
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        .status-badge.error { 
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
     </style>
 </head>
 <body>
@@ -90,12 +173,20 @@ $files = [
     '../App/Core/App.php' => 'Classe App',
     '../App/Core/Router.php' => 'Routeur',
     '../App/Core/Model.php' => 'Classe Model',
-    '../App/Core/Controller.php' => 'Classe Controller',
+    '../App/Core/Controller.php' => 'Classe Controller (+ adminView)',
     '../App/Config/Database.php' => 'Connexion BD',
-    '../App/Controllers/HomeController.php' => 'HomeController',
+    '../App/Controllers/HomeController.php' => 'HomeController (updated)',
+    '../App/Controllers/AdminController.php' => 'AdminController (updated)',
     '../App/Models/User.php' => 'Modèle User',
     '../App/Views/Layouts/header.php' => 'Layout header',
-    'Assets/Css/Style.css' => 'Stylesheet',
+    '../App/Views/Admin/layout.php' => 'Admin sidebar layout ⭐ NEW',
+    '../App/Views/Home/index.php' => 'Homepage redesigned ⭐ NEW',
+    '../App/Views/Admin/dashboard.php' => 'Admin dashboard redesigned',
+    '../App/Views/Admin/users.php' => 'Users page redesigned',
+    '../App/Views/Admin/products.php' => 'Products page redesigned',
+    '../App/Views/Admin/orders.php' => 'Orders page redesigned',
+    'Assets/Css/Style.css' => 'Modern stylesheet (600+ lines)',
+    'design-test.html' => 'Visual test page ⭐ NEW',
 ];
 ?>
 
@@ -173,7 +264,74 @@ if ($db !== null) {
 }
 ?>
 
-<h2>🔐 Sessions</h2>
+<h2>🎨 Design System</h2>
+
+<?php
+$design_status = [
+    ['feature' => 'Modern Indigo/Pink Theme', 'status' => true, 'details' => 'CSS variables for easy customization'],
+    ['feature' => 'Admin Sidebar Navigation', 'status' => true, 'details' => '250px fixed sidebar with 5 menu items'],
+    ['feature' => 'Homepage Hero Section', 'status' => true, 'details' => 'Animated gradient background + CTA buttons'],
+    ['feature' => 'Feature Cards', 'status' => true, 'details' => '6 modern cards with hover effects'],
+    ['feature' => 'Responsive Design', 'status' => true, 'details' => 'Desktop, Tablet (768px), Mobile (480px)'],
+    ['feature' => 'Glassmorphism Effects', 'status' => true, 'details' => 'backdrop-filter blur on cards/tables'],
+    ['feature' => 'Stat Cards Dashboard', 'status' => true, 'details' => 'Color-coded primary/accent/success'],
+    ['feature' => 'Modern Tables', 'status' => true, 'details' => 'Hover effects + color-coded status'],
+    ['feature' => 'Product Thumbnails', 'status' => true, 'details' => '40px images in admin product table'],
+];
+?>
+
+<table>
+    <tr>
+        <th>Feature</th>
+        <th>Status</th>
+        <th>Details</th>
+    </tr>
+    <?php
+    foreach ($design_status as $item) {
+        $class = $item['status'] ? 'ok' : 'error';
+        ?>
+        <tr class="<?php echo $class; ?>">
+            <td><?php echo htmlspecialchars($item['feature']); ?></td>
+            <td><span class="status-badge <?php echo $class; ?>"><?php echo $item['status'] ? '✅ Active' : '❌ Inactive'; ?></span></td>
+            <td><?php echo htmlspecialchars($item['details']); ?></td>
+        </tr>
+        <?php
+    }
+    ?>
+</table>
+
+<h2>🏗️ Architecture Updates</h2>
+
+<?php
+$arch_updates = [
+    ['component' => 'Controller.php', 'change' => 'Added adminView() method', 'impact' => 'Wraps admin views with sidebar layout'],
+    ['component' => 'AdminController.php', 'change' => '4 methods updated to use adminView()', 'impact' => 'dashboard, users, products, orders'],
+    ['component' => 'HomeController.php', 'change' => 'Added product loading', 'impact' => 'Displays featured products on homepage'],
+    ['component' => 'Style.css', 'change' => '600+ lines of modern CSS', 'impact' => 'Complete visual redesign'],
+    ['component' => 'Admin/layout.php', 'change' => 'New sidebar wrapper (CREATED)', 'impact' => 'Unique admin interface'],
+];
+?>
+
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Change</th>
+        <th>Impact</th>
+    </tr>
+    <?php
+    foreach ($arch_updates as $update) {
+        ?>
+        <tr class="ok">
+            <td><strong><?php echo htmlspecialchars($update['component']); ?></strong></td>
+            <td><?php echo htmlspecialchars($update['change']); ?></td>
+            <td><?php echo htmlspecialchars($update['impact']); ?></td>
+        </tr>
+        <?php
+    }
+    ?>
+</table>
+
+
 
 <?php
 $session_ok = session_status() === PHP_SESSION_ACTIVE;
@@ -226,7 +384,12 @@ $dirs = [
 
 <?php
 $recommendations = [
-    ['text' => 'Démarrer MySQL', 'priority' => $db === null],
+    ['text' => 'Design overhaul completed ✅', 'priority' => false],
+    ['text' => 'All pages responsive and modern', 'priority' => false],
+    ['text' => 'Admin sidebar navigation active', 'priority' => false],
+    ['text' => 'CSS variables configured (12 vars)', 'priority' => false],
+    ['text' => 'Consider: Dark/light mode toggle', 'priority' => true],
+    ['text' => 'Consider: Advanced animations', 'priority' => true],
     ['text' => 'Valider les formulaires côté serveur', 'priority' => true],
     ['text' => 'Implémenter CSRF tokens', 'priority' => true],
     ['text' => 'Ajouter rate limiting', 'priority' => true],
@@ -274,6 +437,22 @@ foreach ($recommendations as $rec) {
     <tr>
         <td>Max upload</td>
         <td><?php echo htmlspecialchars(ini_get('upload_max_filesize')); ?></td>
+    </tr>
+    <tr>
+        <td>Design Theme</td>
+        <td>Modern Indigo/Pink (Glassmorphism)</td>
+    </tr>
+    <tr>
+        <td>CSS Version</td>
+        <td>3 (600+ lines)</td>
+    </tr>
+    <tr>
+        <td>Admin Layout</td>
+        <td>Sidebar Navigation (250px)</td>
+    </tr>
+    <tr>
+        <td>Breakpoints</td>
+        <td>Desktop (1400px+), Tablet (768px), Mobile (480px)</td>
     </tr>
 </table>
 

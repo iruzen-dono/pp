@@ -1,5 +1,5 @@
 <div style="max-width: 500px; margin: 0 auto;">
-    <h1>🔐 Connexion</h1>
+    <h1>� Connexion</h1>
     <p class="subtitle">Accédez à votre compte NovaShop</p>
 
     <?php if (!empty($error)): ?>

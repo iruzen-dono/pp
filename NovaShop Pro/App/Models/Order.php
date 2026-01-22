@@ -28,12 +28,12 @@ class Order extends Model
         return $this->fetchAll($stmt);
     }
 
-    public function create($userId)
+    public function create($userId, $total = 0)
     {
         $stmt = $this->prepare(
-            "INSERT INTO orders (user_id, total, status) VALUES (?, 0, 'pending')"
+            "INSERT INTO orders (user_id, total, status) VALUES (?, ?, 'pending')"
         );
-        $this->execute($stmt, [$userId]);
+        $this->execute($stmt, [$userId, $total]);
         return $this->db->lastInsertId();
     }
 

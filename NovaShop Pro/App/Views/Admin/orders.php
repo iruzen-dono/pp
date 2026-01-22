@@ -1,51 +1,97 @@
-<div class="admin-orders" style="max-width: 1000px; margin: 0 auto;">
-    <a href="/admin/dashboard" class="btn btn-secondary" style="margin-bottom: 20px;">← Retour au dashboard</a>
+<h1 class="admin-title">🛒 Gestion des Commandes</h1>
 
-    <h1>📋 Gestion des commandes</h1>
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success">✅ Commande supprimée avec succès</div>
+<?php endif; ?>
 
-    <div style="background: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-top: 20px;">
+<!-- STATISTIQUES COMMANDES -->
+<?php 
+$pending_count = 0;
+$completed_count = 0;
+$total_revenue = 0;
+
+if (!empty($orders) && is_array($orders)) {
+    foreach ($orders as $order) {
+        if (($order['status'] ?? '') === 'EN ATTENTE') {
+            $pending_count++;
+        } elseif (($order['status'] ?? '') === 'COMPLÉTÉE') {
+            $completed_count++;
+        }
+        $total_revenue += (float)($order['total'] ?? 0);
+    }
+}
+?>
+
+<div class="admin-stats" style="margin-bottom: 3rem;">
+    <div class="stat-card stat-card-primary">
+        <p class="stat-label">⏳ En Attente</p>
+        <p class="stat-value"><?php echo $pending_count; ?></p>
+    </div>
+    
+    <div class="stat-card stat-card-success">
+        <p class="stat-label">✅ Complétées</p>
+        <p class="stat-value"><?php echo $completed_count; ?></p>
+    </div>
+    
+    <div class="stat-card stat-card-accent">
+        <p class="stat-label">💰 Revenu Total</p>
+        <p class="stat-value" style="font-size: 1.8rem;"><?php echo number_format($total_revenue, 2, ',', ' '); ?>€</p>
+    </div>
+</div>
+
+<!-- TABLEAU COMMANDES -->
+<?php if (!empty($orders) && is_array($orders)): ?>
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th>Commande</th>
+                    <th>Commande #</th>
                     <th>Client</th>
                     <th>Total</th>
                     <th>Statut</th>
                     <th>Date</th>
-                    <th>Actions</th>
+                    <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><strong>#1</strong></td>
-                    <td>Jean Dupont</td>
-                    <td><span style="color: var(--success-color); font-weight: bold;">179.97€</span></td>
-                    <td><span style="background: #ffc107; color: #000; padding: 4px 8px; border-radius: 3px; font-weight: bold;">⏳ En attente</span></td>
-                    <td>22/01/2026</td>
-                    <td>
-                        <a href="#" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;">Détails</a>
-                        <a href="#" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Mettre à jour</a>
-                    </td>
-                </tr>
+                <?php foreach ($orders as $order): ?>
+                    <tr>
+                        <td><strong>#<?php echo htmlspecialchars($order['id'] ?? ''); ?></strong></td>
+                        <td><?php echo htmlspecialchars($order['user_id'] ?? 'N/A'); ?></td>
+                        <td>
+                            <span style="color: var(--accent); font-weight: 700;">
+                                <?php echo number_format($order['total'] ?? 0, 2, ',', ' '); ?>€
+                            </span>
+                        </td>
+                        <td>
+                            <?php 
+                            $status = $order['status'] ?? 'EN ATTENTE';
+                            $statusColor = $status === 'COMPLÉTÉE' ? 'var(--success)' : 'var(--warning)';
+                            $statusBg = $status === 'COMPLÉTÉE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)';
+                            ?>
+                            <span style="background: <?php echo $statusBg; ?>; color: <?php echo $statusColor; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem;">
+                                <?php echo htmlspecialchars($status); ?>
+                            </span>
+                        </td>
+                        <td style="color: var(--gray-400); font-size: 0.9rem;">
+                            <?php 
+                            if (!empty($order['created_at'])) {
+                                $date = new \DateTime($order['created_at']);
+                                echo $date->format('d/m/Y H:i');
+                            }
+                            ?>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="/orders/<?php echo $order['id']; ?>" class="btn btn-info" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;">👁️</a>
+                            <a href="/admin/deleteOrder/<?php echo $order['id']; ?>" onclick="return confirm('⚠️ Confirmer la suppression de cette commande ?')" class="btn btn-danger" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">🗑️</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-
-    <div style="background: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-top: 30px;">
-        <h3>📊 Résumé des commandes</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
-            <div style="text-align: center;">
-                <p style="color: #aaa; font-size: 14px; margin-bottom: 5px;">EN ATTENTE</p>
-                <p style="font-size: 24px; color: #ffc107; font-weight: bold;">1</p>
-            </div>
-            <div style="text-align: center;">
-                <p style="color: #aaa; font-size: 14px; margin-bottom: 5px;">COMPLÉTÉES</p>
-                <p style="font-size: 24px; color: #4caf50; font-weight: bold;">0</p>
-            </div>
-            <div style="text-align: center;">
-                <p style="color: #aaa; font-size: 14px; margin-bottom: 5px;">TOTAL REVENUS</p>
-                <p style="font-size: 24px; color: var(--success-color); font-weight: bold;">179.97€</p>
-            </div>
-        </div>
+<?php else: ?>
+    <div class="alert alert-info" style="text-align: center;">
+        Aucune commande trouvée.
     </div>
-</div>
+<?php endif; ?>

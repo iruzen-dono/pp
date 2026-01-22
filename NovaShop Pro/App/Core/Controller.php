@@ -10,4 +10,13 @@ class Controller
         require_once __DIR__ . '/../Views/' . $view . '.php';
         require_once __DIR__ . '/../Views/Layouts/footer.php';
     }
+
+    protected function adminView($view, $data = [])
+    {
+        extract($data);
+        ob_start();
+        require_once __DIR__ . '/../Views/' . $view . '.php';
+        $content = ob_get_clean();
+        require_once __DIR__ . '/../Views/Admin/layout.php';
+    }
 }

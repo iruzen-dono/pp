@@ -1,5 +1,5 @@
 <div class="cart" style="max-width: 900px; margin: 0 auto;">
-    <h1>🛒 Votre Panier</h1>
+    <h1>⊙ Votre Panier</h1>
 
     <?php if (empty($_SESSION['cart'])): ?>
         <div class="alert alert-info">ℹ️ Votre panier est vide.</div>

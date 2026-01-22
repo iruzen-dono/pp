@@ -21,12 +21,23 @@ class Product extends Model
         return $this->fetch($stmt);
     }
 
-    public function create($name, $description, $price, $category_id)
+    public function create($data)
     {
-        $stmt = $this->prepare(
-            "INSERT INTO products (name, description, price, category_id) VALUES (?, ?, ?, ?)"
-        );
-        return $this->execute($stmt, [$name, $description, $price, $category_id]);
+        // Accepte un tableau de données
+        if (is_array($data)) {
+            $stmt = $this->prepare(
+                "INSERT INTO products (name, description, image_url, price, category_id, stock) VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            return $this->execute($stmt, [
+                $data['name'] ?? '',
+                $data['description'] ?? '',
+                $data['image_url'] ?? '',
+                $data['price'] ?? 0,
+                $data['category_id'] ?? 1,
+                $data['stock'] ?? 0
+            ]);
+        }
+        return false;
     }
 
     public function update($id, $name, $description, $price, $category_id)

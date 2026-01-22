@@ -1,9 +1,13 @@
-<div class="admin-users" style="max-width: 1000px; margin: 0 auto;">
-    <a href="/admin/dashboard" class="btn btn-secondary" style="margin-bottom: 20px;">← Retour au dashboard</a>
+<h1 class="admin-title">👥 Gestion des Utilisateurs</h1>
 
-    <h1>👥 Gestion des utilisateurs</h1>
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success">
+        ✓ Utilisateur supprimé avec succès
+    </div>
+<?php endif; ?>
 
-    <div style="background: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-top: 20px;">
+<?php if (!empty($users) && is_array($users)): ?>
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
@@ -11,36 +15,41 @@
                     <th>Nom</th>
                     <th>Email</th>
                     <th>Rôle</th>
-                    <th>Date d'inscription</th>
-                    <th>Actions</th>
+                    <th>Inscription</th>
+                    <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Admin User</td>
-                    <td>admin@novashop.local</td>
-                    <td><span style="background: var(--primary-color); color: var(--dark-bg); padding: 4px 8px; border-radius: 3px; font-weight: bold;">ADMIN</span></td>
-                    <td>22/01/2026</td>
-                    <td>
-                        <a href="#" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;">Éditer</a>
-                        <a href="#" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Supprimer</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Jean Dupont</td>
-                    <td>client@novashop.local</td>
-                    <td><span style="background: #666; color: white; padding: 4px 8px; border-radius: 3px; font-weight: bold;">USER</span></td>
-                    <td>22/01/2026</td>
-                    <td>
-                        <a href="#" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;">Éditer</a>
-                        <a href="#" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Supprimer</a>
-                    </td>
-                </tr>
+                <?php foreach ($users as $user): ?>
+                    <tr>
+                        <td>#<?php echo htmlspecialchars($user['id'] ?? ''); ?></td>
+                        <td>
+                            <strong><?php echo htmlspecialchars($user['name'] ?? ''); ?></strong>
+                        </td>
+                        <td><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
+                        <td>
+                            <span style="background: <?php echo ($user['role'] ?? 'user') === 'admin' ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)'; ?>; color: <?php echo ($user['role'] ?? 'user') === 'admin' ? 'var(--primary)' : 'var(--gray-400)'; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem; display: inline-block;">
+                                <?php echo strtoupper($user['role'] ?? 'user'); ?>
+                            </span>
+                        </td>
+                        <td style="color: var(--gray-400); font-size: 0.9rem;">
+                            <?php 
+                            if (!empty($user['created_at'])) {
+                                $date = new \DateTime($user['created_at']);
+                                echo $date->format('d/m/Y H:i');
+                            }
+                            ?>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="/admin/deleteUser/<?php echo $user['id']; ?>" onclick="return confirm('⚠️ Confirmer la suppression de cet utilisateur ?')" class="btn btn-danger" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">🗑️</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-
-    <p style="color: #aaa; font-size: 14px; margin-top: 20px;">📌 Fonctionnalités avancées (édition, suppression) à venir</p>
-</div>
+<?php else: ?>
+    <div class="alert alert-info" style="text-align: center;">
+        Aucun utilisateur trouvé.
+    </div>
+<?php endif; ?>

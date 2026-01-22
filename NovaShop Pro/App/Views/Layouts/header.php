@@ -8,21 +8,21 @@
 </head>
 <body>
     <header class="navbar">
-        <a href="/" class="logo">NovaShop 🛍️</a>
+        <a href="/" class="logo"><span style="color: var(--accent);">◆</span> NovaShop</a>
         <nav>
             <a href="/">Accueil</a>
             <a href="/products">Produits</a>
-            <a href="/cart">🛒 Panier</a>
+            <a href="/cart"><span style="color: var(--accent);">⊙</span> Panier</a>
             
             <?php if (isset($_SESSION['user'])): ?>
-                <a href="/orders">📋 Mes commandes</a>
+                <a href="/orders"><span style="color: var(--accent);">□</span> Mes commandes</a>
                 <?php if ($_SESSION['user']['role'] === 'admin'): ?>
-                    <a href="/admin/dashboard">⚙️ Admin</a>
+                    <a href="/admin/dashboard"><span style="color: var(--accent);">⚙</span> Admin</a>
                 <?php endif; ?>
-                <a href="/logout">👋 Déconnexion</a>
+                <a href="/logout"><span style="color: var(--accent);">→</span> Déconnexion</a>
             <?php else: ?>
-                <a href="/login">🔐 Connexion</a>
-                <a href="/register">📝 S'inscrire</a>
+                <a href="/login"><span style="color: var(--accent);">🔒</span> Connexion</a>
+                <a href="/register"><span style="color: var(--accent);">✚</span> S'inscrire</a>
             <?php endif; ?>
         </nav>
     </header>

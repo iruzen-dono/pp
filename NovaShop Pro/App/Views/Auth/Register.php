@@ -1,5 +1,5 @@
 <div style="max-width: 500px; margin: 0 auto;">
-    <h1>📝 Créer un compte</h1>
+    <h1>✚ Créer un compte</h1>
     <p class="subtitle">Rejoignez NovaShop en quelques secondes</p>
 
     <form method="POST">
