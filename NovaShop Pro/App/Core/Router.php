@@ -2,23 +2,35 @@
 namespace App\Core;
 
 require_once __DIR__ . '/Controller.php';
-require_once __DIR__ . '/../Config/Database.php';
 
 class Router
 {
     public function dispatch()
     {
-        $url = $_GET['url'] ?? 'home/index';
+        $url = $_GET['url'] ?? 'home';
 
         $url = explode('/', filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL));
 
-        $controllerName = ucfirst($url[0]) . 'Controller';
-        $methodName = $url[1] ?? 'index';
+        // Normaliser les noms (products -> Product, login -> Auth, etc.)
+        $urlPart = $url[0];
+        $controllerMap = [
+            'products' => 'Product',
+            'login' => 'Auth',
+            'register' => 'Auth',
+            'cart' => 'Cart',
+            'order' => 'Order',
+            'admin' => 'Admin',
+            'home' => 'Home',
+        ];
+
+        $baseName = $controllerMap[$urlPart] ?? ucfirst($urlPart);
+        $controllerName = $baseName . 'Controller';
+        $methodName = $url[1] ?? ($urlPart === 'login' ? 'login' : ($urlPart === 'register' ? 'register' : 'index'));
 
         $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 
         if (!file_exists($controllerFile)) {
-            die("❌ Controller $controllerName introuvable");
+            die("❌ Controller $controllerName introuvable (URL: $urlPart)");
         }
 
         require_once $controllerFile;

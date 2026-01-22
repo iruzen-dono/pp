@@ -1,7 +1,7 @@
 <h2>Connexion</h2>
 
-<?php if (!empty($error)): ?>
-    <p style="color:red;"><?= $error ?></p>
+<?php if (!empty($data['error'])): ?>
+    <p style="color:red;"><?= htmlspecialchars($data['error']) ?></p>
 <?php endif; ?>
 
 <form method="POST">

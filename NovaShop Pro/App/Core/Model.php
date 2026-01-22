@@ -1,6 +1,8 @@
 <?php
 namespace App\Core;
 
+require_once __DIR__ . '/../Config/Database.php';
+
 use App\Config\Database;
 use PDO;
 
