@@ -1,26 +1,41 @@
-<div class="orders">
-    <h2>📋 Mes Commandes</h2>
+<div class="orders" style="max-width: 900px; margin: 0 auto;">
+    <h1>📋 Mes Commandes</h1>
 
     <?php if (empty($orders)): ?>
-        <p>Vous n'avez aucune commande. <a href="/products">Commencer à acheter</a></p>
+        <div class="alert alert-info">ℹ️ Vous n'avez aucune commande pour le moment.</div>
+        <p style="text-align: center; margin-top: 30px;">
+            <a href="/products" class="btn btn-primary">Commencer à acheter →</a>
+        </p>
     <?php else: ?>
-        <table border="1" cellpadding="10">
-            <tr>
-                <th>ID</th>
-                <th>Total</th>
-                <th>Statut</th>
-                <th>Date</th>
-                <th>Action</th>
-            </tr>
-            <?php foreach ($orders as $order): ?>
+        <table>
+            <thead>
                 <tr>
-                    <td><?= htmlspecialchars($order['id']) ?></td>
-                    <td><?= htmlspecialchars($order['total']) ?>€</td>
-                    <td><?= htmlspecialchars($order['status']) ?></td>
-                    <td><?= htmlspecialchars($order['created_at'] ?? 'N/A') ?></td>
-                    <td><a href="/orders/show?id=<?= $order['id'] ?>">Détails</a></td>
+                    <th>Commande</th>
+                    <th>Total</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Action</th>
                 </tr>
-            <?php endforeach; ?>
+            </thead>
+            <tbody>
+                <?php foreach ($orders as $order): ?>
+                    <tr>
+                        <td><strong>#<?= htmlspecialchars($order['id']) ?></strong></td>
+                        <td><span style="color: var(--success-color); font-weight: bold;"><?= number_format($order['total'], 2, ',', ' ') ?>€</span></td>
+                        <td>
+                            <?php 
+                            $statusColor = $order['status'] === 'pending' ? '#ffc107' : ($order['status'] === 'completed' ? '#4caf50' : '#f44336');
+                            $statusText = $order['status'] === 'pending' ? '⏳ En attente' : ($order['status'] === 'completed' ? '✅ Complétée' : '❌ Annulée');
+                            ?>
+                            <span style="color: <?= $statusColor ?>; font-weight: bold;"><?= $statusText ?></span>
+                        </td>
+                        <td style="font-size: 14px; color: #aaa;"><?= date('d/m/Y', strtotime($order['created_at'] ?? 'now')) ?></td>
+                        <td>
+                            <a href="/orders/show?id=<?= $order['id'] ?>" class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px;">Détails</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
     <?php endif; ?>
 </div>

@@ -1,0 +1,103 @@
+═══════════════════════════════════════════════════════════════════════════
+  🧪 PLAN DE TEST - NOVASHOP PRO
+═══════════════════════════════════════════════════════════════════════════
+
+📅 Date: 22 janvier 2026
+🌐 URL: http://localhost:8000
+🔐 Comptes de test:
+   - Admin: admin@novashop.local / admin123
+   - Client: client@novashop.local / client123
+
+───────────────────────────────────────────────────────────────────────────
+  ✅ TESTS À EFFECTUER
+───────────────────────────────────────────────────────────────────────────
+
+## 1. PAGE D'ACCUEIL
+   [ ] Affichage correct
+   [ ] Bouton "Découvrir les produits" fonctionnel
+   [ ] Design responsive
+
+## 2. CATALOGUE PRODUITS
+   [ ] Affichage des 6 produits
+   [ ] Grille responsive
+   [ ] Images/icônes affichées
+   [ ] Prix corrects
+   [ ] Descriptions tronquées
+
+## 3. DÉTAILS PRODUIT
+   [ ] Accès via "Voir détails"
+   [ ] Tous les détails affichés
+   [ ] Formulaire "Ajouter au panier" présent
+   [ ] Bouton "Retour" fonctionnel
+
+## 4. PANIER
+   [ ] Ajouter un produit au panier
+   [ ] Vérifier que le produit apparaît
+   [ ] Affichage correct du prix total
+   [ ] Bouton "Supprimer" fonctionne
+   [ ] Panier vide affiche le message correct
+   [ ] Lien "Continuer vos achats" fonctionne
+
+## 5. AUTHENTIFICATION - INSCRIPTION
+   [ ] Accès page /register
+   [ ] Formulaire affiche correctement
+   [ ] Créer un compte avec:
+       - Nom: Test User
+       - Email: test@example.com
+       - Mot de passe: test123456
+   [ ] Vérifier que le compte est créé en BDD
+   [ ] Redirection vers /login après création
+
+## 6. AUTHENTIFICATION - CONNEXION
+   [ ] Accès page /login
+   [ ] Connexion échouée avec mauvais identifiants
+   [ ] Message d'erreur affiché
+   [ ] Connexion réussie avec admin@novashop.local
+   [ ] Vérifier que la session est active
+   [ ] Navigation change (affiche "Déconnexion", "Admin")
+
+## 7. COMMANDES (CONNECTÉ)
+   [ ] Accès page /orders
+   [ ] Affichage des commandes existantes
+   [ ] Lien "Détails" fonctionne
+   [ ] Page de détails affiche les infos
+
+## 8. CRÉER UNE COMMANDE
+   [ ] Ajouter 2 produits au panier
+   [ ] Cliquer "Valider la commande"
+   [ ] Page de confirmation affichée
+   [ ] Cliquer "Confirmer la commande"
+   [ ] Vérifier que la commande est créée en BDD
+   [ ] Redirection vers page commande
+
+## 9. PANEL ADMIN (SI ADMIN)
+   [ ] Accès /admin/dashboard
+   [ ] Vérifier que non-admin ne peut pas y accéder
+   [ ] Affichage du dashboard admin
+
+## 10. DÉCONNEXION
+   [ ] Cliquer "Déconnexion"
+   [ ] Session détruite
+   [ ] Redirection vers accueil
+   [ ] Navigation revient à "Connexion / S'inscrire"
+
+## 11. RESPONSIVE DESIGN
+   [ ] Tester sur mobile (375px)
+   [ ] Tester sur tablette (768px)
+   [ ] Tester sur desktop (1200px+)
+   [ ] Tous les éléments visibles et accessibles
+
+───────────────────────────────────────────────────────────────────────────
+  📊 RÉSUMÉ DES TESTS
+───────────────────────────────────────────────────────────────────────────
+
+Tests réussis: _____ / 50
+Bugs trouvés: _____
+Corrections requises: _____
+
+───────────────────────────────────────────────────────────────────────────
+  🐛 BUGS DÉTECTÉS
+───────────────────────────────────────────────────────────────────────────
+
+(À compléter après les tests)
+

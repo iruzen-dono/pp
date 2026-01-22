@@ -1,16 +1,22 @@
 <div class="products">
-    <h2>📦 Produits</h2>
+    <h2>📦 Catalogue Produits</h2>
+    <p class="subtitle">Découvrez notre sélection de produits de qualité</p>
 
     <?php if (empty($products)): ?>
-        <p>Aucun produit disponible.</p>
+        <div class="alert alert-info">ℹ️ Aucun produit disponible pour le moment.</div>
     <?php else: ?>
         <div class="products-grid">
             <?php foreach ($products as $product): ?>
-                <div class="product-card" style="border: 1px solid #b388ff; padding: 15px; margin: 10px; border-radius: 8px;">
-                    <h3><?= htmlspecialchars($product['name']) ?></h3>
-                    <p><?= htmlspecialchars($product['description']) ?></p>
-                    <p><strong>Prix: <?= htmlspecialchars($product['price']) ?>€</strong></p>
-                    <a href="/products/show?id=<?= $product['id'] ?>">Voir détails</a>
+                <div class="product-card">
+                    <div class="product-image">📦</div>
+                    <div class="product-info">
+                        <h3 class="product-name"><?= htmlspecialchars($product['name']) ?></h3>
+                        <p class="product-price"><?= htmlspecialchars($product['price']) ?>€</p>
+                        <p class="product-description"><?= htmlspecialchars(substr($product['description'], 0, 80)) ?>...</p>
+                        <div class="product-actions">
+                            <a href="/products/show?id=<?= $product['id'] ?>" class="btn btn-primary">Voir détails</a>
+                        </div>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>

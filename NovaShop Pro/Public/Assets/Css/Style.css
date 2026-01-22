@@ -1,60 +1,509 @@
-body {
+/* ==========================================
+   NOVASHOP PRO - MAIN STYLESHEET
+   ========================================== */
+
+* {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f0c1d;
-    color: #eee;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+:root {
+    --primary-color: #b388ff;
+    --secondary-color: #1a1433;
+    --dark-bg: #0f0c1d;
+    --light-text: #eee;
+    --border-color: #2a2447;
+    --success-color: #4caf50;
+    --danger-color: #f44336;
+}
+
+/* ==========================================
+   BODY & GLOBAL
+   ========================================== */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--dark-bg);
+    color: var(--light-text);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ==========================================
+   NAVIGATION BAR
+   ========================================== */
+
 .navbar {
-    background: #1a1433;
+    background: var(--secondary-color);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .logo {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
-    color: #b388ff;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.logo:hover {
+    color: #c9a8ff;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
 }
 
 .navbar a {
-    color: #eee;
-    margin-left: 20px;
+    color: var(--light-text);
     text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .navbar a:hover {
-    color: #b388ff;
+    color: var(--primary-color);
 }
 
+/* ==========================================
+   MAIN CONTAINER
+   ========================================== */
+
 .container {
-    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+main {
+    flex: 1;
+}
+
+/* ==========================================
+   HEADINGS & TEXT
+   ========================================== */
+
+h1, h2, h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 28px;
+}
+
+h3 {
+    font-size: 22px;
 }
 
 .title {
     font-size: 36px;
-    color: #b388ff;
+    color: var(--primary-color);
 }
 
 .subtitle {
-    font-size: 18px;
+    font-size: 16px;
+    color: #aaa;
     margin-bottom: 30px;
-    color: #ccc;
 }
 
-.hero p {
-    background: #1a1433;
-    padding: 15px;
-    border-left: 4px solid #b388ff;
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+button, .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button[type="submit"], .btn-primary {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+button[type="submit"]:hover, .btn-primary:hover {
+    background: #c9a8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(179, 136, 255, 0.3);
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: var(--light-text);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+/* ==========================================
+   FORMS
+   ========================================== */
+
+form {
+    background: var(--secondary-color);
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--light-text);
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(179, 136, 255, 0.2);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* ==========================================
+   PRODUCTS GRID
+   ========================================== */
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.product-card {
+    background: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 20px rgba(179, 136, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #2a2447 0%, #1a1433 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--primary-color);
+}
+
+.product-info {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.product-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--success-color);
     margin-bottom: 10px;
 }
 
-.footer {
-    background: #1a1433;
+.product-description {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+
+.product-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.product-actions a,
+.product-actions button {
+    flex: 1;
+    padding: 10px;
     text-align: center;
+    font-size: 14px;
+}
+
+/* ==========================================
+   CART
+   ========================================== */
+
+.cart-container {
+    background: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 15px;
-    margin-top: 50px;
-    color: #888;
+    background: var(--dark-bg);
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.cart-item-info h4 {
+    margin-bottom: 5px;
+}
+
+.cart-item-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+.cart-total {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: right;
+    padding-top: 15px;
+    border-top: 2px solid var(--border-color);
+    margin-top: 15px;
+    color: var(--primary-color);
+}
+
+/* ==========================================
+   TABLES
+   ========================================== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+thead {
+    background: var(--secondary-color);
+    border-bottom: 2px solid var(--border-color);
+}
+
+th {
+    padding: 15px;
+    text-align: left;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:hover {
+    background: var(--secondary-color);
+}
+
+/* ==========================================
+   ALERTS & MESSAGES
+   ========================================== */
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid var(--success-color);
+    color: #4caf50;
+}
+
+.alert-danger, .alert-error {
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid var(--danger-color);
+    color: #f44336;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid #ffc107;
+    color: #ffc107;
+}
+
+.alert-info {
+    background: rgba(33, 150, 243, 0.2);
+    border: 1px solid #2196f3;
+    color: #2196f3;
+}
+
+.hero p {
+    background: var(--secondary-color);
+    padding: 15px;
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+
+.footer {
+    background: var(--secondary-color);
+    border-top: 1px solid var(--border-color);
+    padding: 30px;
+    text-align: center;
+    color: #aaa;
+    margin-top: auto;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .container {
+        padding: 20px 10px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    form {
+        padding: 20px;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 15px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    nav {
+        gap: 10px;
+    }
+
+    .container {
+        padding: 15px 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    button, .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
 }
