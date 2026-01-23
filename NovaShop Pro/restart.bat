@@ -1,8 +1,75 @@
 @echo off
 REM ==========================================
 REM NovaShop Pro - Clean Restart Script
-REM Après les fixes appliqués
+REM Auto-Detection de MariaDB/MySQL
+REM Compatible avec tous les chemins d'installation
 REM ==========================================
+
+setlocal enabledelayedexpansion
+set DB_USER=root
+set DB_PASS=0000
+
+REM ==========================================
+REM ÉTAPE 1: Détection automatique de MySQL/MariaDB
+REM ==========================================
+
+set MYSQL_PATH=
+
+REM Essayer où mysql commande directement (si dans PATH)
+where mysql.exe >nul 2>&1
+if !errorlevel! equ 0 (
+    for /f "delims=" %%i in ('where mysql.exe') do set MYSQL_PATH=%%i
+    goto found_mysql
+)
+
+REM Chercher MariaDB (versions multiples)
+for /d %%G in ("C:\Program Files\MariaDB*") do (
+    if exist "%%G\bin\mysql.exe" (
+        set MYSQL_PATH=%%G\bin\mysql.exe
+        goto found_mysql
+    )
+)
+
+REM Chercher MySQL (versions multiples)
+for /d %%G in ("C:\Program Files\MySQL*") do (
+    if exist "%%G\bin\mysql.exe" (
+        set MYSQL_PATH=%%G\bin\mysql.exe
+        goto found_mysql
+    )
+)
+
+REM Chercher en Program Files (x86) pour MariaDB
+for /d %%G in ("C:\Program Files (x86)\MariaDB*") do (
+    if exist "%%G\bin\mysql.exe" (
+        set MYSQL_PATH=%%G\bin\mysql.exe
+        goto found_mysql
+    )
+)
+
+REM Chercher en Program Files (x86) pour MySQL
+for /d %%G in ("C:\Program Files (x86)\MySQL*") do (
+    if exist "%%G\bin\mysql.exe" (
+        set MYSQL_PATH=%%G\bin\mysql.exe
+        goto found_mysql
+    )
+)
+
+REM Pas trouvé - afficher erreur
+echo.
+echo ❌ ERREUR: MySQL/MariaDB non trouvé!
+echo.
+echo Solutions:
+echo 1. Installer MariaDB: https://mariadb.org/download
+echo 2. Ou installer MySQL: https://dev.mysql.com/downloads/mysql/
+echo 3. Assurez-vous que le chemin d'installation est standard
+echo    (C:\Program Files\MariaDB* ou C:\Program Files\MySQL*)
+echo.
+pause
+goto end
+
+:found_mysql
+echo ✅ Trouvé: !MYSQL_PATH!
+echo.
 
 echo.
 echo 🧹 Nettoyage et redémarrage de NovaShop Pro...
@@ -42,21 +109,21 @@ echo.
 echo 🔄 Reinitialisation de la base de donnees...
 echo.
 
-REM Vérifier que MySQL est lancé
-mysql -u root -p0000 -e "SELECT 1" >nul 2>&1
+REM Vérifier que MariaDB est lancé
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% -e "SELECT 1" >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Erreur: MySQL n'est pas accessible
-    echo Assurez-vous que MySQL est lancé!
+    echo ❌ Erreur: MariaDB n'est pas accessible
+    echo Assurez-vous que le service MariaDB est lancé!
     pause
     goto end
 )
 
 REM Supprimer et recréer la BD
-mysql -u root -p0000 -e "DROP DATABASE IF EXISTS novashop;" >nul 2>&1
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% -e "DROP DATABASE IF EXISTS novashop;" >nul 2>&1
 echo ✅ Ancienne BD supprimée
 
 REM Recréer la BD avec données
-mysql -u root -p0000 < setup.sql
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% < setup.sql
 if errorlevel 1 (
     echo ❌ Erreur lors de la creation de la BD
     pause
@@ -107,11 +174,11 @@ echo 🔄 Reset complet...
 echo.
 
 REM Supprimer BD
-mysql -u root -p0000 -e "DROP DATABASE IF EXISTS novashop;" >nul 2>&1
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% -e "DROP DATABASE IF EXISTS novashop;" >nul 2>&1
 echo ✅ BD supprimee
 
 REM Recréer BD
-mysql -u root -p0000 < setup.sql
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% < setup.sql
 if errorlevel 1 (
     echo ❌ Erreur lors de la creation de la BD
     pause
@@ -122,9 +189,9 @@ if errorlevel 1 (
 
 echo.
 echo 💾 Etat de la BD:
-mysql -u root -p0000 -e "SELECT COUNT(*) as 'Utilisateurs' FROM novashop.users;"
-mysql -u root -p0000 -e "SELECT COUNT(*) as 'Produits' FROM novashop.products;"
-mysql -u root -p0000 -e "SELECT COUNT(*) as 'Catégories' FROM novashop.categories;"
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% -e "SELECT COUNT(*) as 'Utilisateurs' FROM novashop.users;"
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% -e "SELECT COUNT(*) as 'Produits' FROM novashop.products;"
+"%MYSQL_PATH%" -u %DB_USER% -p%DB_PASS% -e "SELECT COUNT(*) as 'Catégories' FROM novashop.categories;"
 echo.
 
 echo ✅ Reset complet termine!

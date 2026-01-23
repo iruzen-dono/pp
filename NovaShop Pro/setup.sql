@@ -4,13 +4,20 @@
 -- Exécuter ce script pour initialiser la base de données
 
 -- Créer la base de données
-CREATE DATABASE IF NOT EXISTS novashop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE IF EXISTS novashop;
+CREATE DATABASE novashop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE novashop;
 
 -- ==========================================
 -- TABLE: Utilisateurs
 -- ==========================================
-CREATE TABLE IF NOT EXISTS users (
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -23,7 +30,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- ==========================================
 -- TABLE: Catégories
 -- ==========================================
-CREATE TABLE IF NOT EXISTS categories (
+CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
@@ -34,7 +41,7 @@ CREATE TABLE IF NOT EXISTS categories (
 -- ==========================================
 -- TABLE: Produits
 -- ==========================================
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     description TEXT,
@@ -52,7 +59,7 @@ CREATE TABLE IF NOT EXISTS products (
 -- ==========================================
 -- TABLE: Commandes
 -- ==========================================
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     total DECIMAL(10, 2) DEFAULT 0,
@@ -67,7 +74,7 @@ CREATE TABLE IF NOT EXISTS orders (
 -- ==========================================
 -- TABLE: Articles de commande
 -- ==========================================
-CREATE TABLE IF NOT EXISTS order_items (
+CREATE TABLE order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -103,11 +110,6 @@ INSERT INTO products (name, description, price, category_id, stock) VALUES
 ('Jeans Premium', 'Jeans confortable et durable', 79.99, 2, 40),
 ('Guide PHP Moderne', 'Apprendre PHP 8+ avec exemple pratiques', 39.99, 3, 25),
 ('Lampe LED', 'Lampe LED économe en énergie', 49.99, 4, 30);
-
--- Insérer un utilisateur de test
-INSERT INTO users (name, email, password, role) VALUES
-('Admin User', 'admin@novashop.local', '$2y$10$abc123...', 'admin'),
-('User Test', 'user@novashop.local', '$2y$10$xyz789...', 'user');
 
 -- ==========================================
 -- VÉRIFICATION
