@@ -18,7 +18,7 @@ class ProductController extends Controller
 
     public function show()
     {
-        $productId = $_GET['id'] ?? null;
+        $productId = $_GET['params'][0] ?? $_GET['id'] ?? null;
 
         if (!$productId) {
             header("Location: /products");
@@ -29,7 +29,7 @@ class ProductController extends Controller
         $product = $productModel->getById($productId);
 
         if (!$product) {
-            die("❌ Produit non trouvé");
+            die("❌ Produit non trouvé (ID: $productId)");
         }
 
         $this->view('products/show', compact('product'));

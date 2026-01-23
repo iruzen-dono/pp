@@ -15,6 +15,7 @@ class Router
         $urlPart = $url[0];
         $controllerMap = [
             'products' => 'Product',
+            'product' => 'Product',
             'login' => 'Auth',
             'register' => 'Auth',
             'logout' => 'Auth',

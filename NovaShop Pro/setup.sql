@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     description TEXT,
+    image_url VARCHAR(500),
     price DECIMAL(10, 2) NOT NULL,
     category_id INT,
     stock INT DEFAULT 0,
@@ -81,6 +82,11 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- ==========================================
 -- DONNÉES DE TEST
 -- ==========================================
+
+-- Insérer des utilisateurs admin et test
+INSERT INTO users (name, email, password, role) VALUES
+('Admin NovaShop', 'admin@novashop.local', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36P4/LaC', 'admin'),
+('Client Test', 'user@novashop.local', '$2y$10$V8VbVIo0IqHXaMp8rVJI/OjpPH7W7LV7/YDJ4EpHWBaQX3L1dCIKi', 'user');
 
 -- Insérer des catégories
 INSERT INTO categories (name, description) VALUES

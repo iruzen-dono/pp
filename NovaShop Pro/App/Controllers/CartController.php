@@ -2,8 +2,10 @@
 namespace App\Controllers;
 
 require_once __DIR__ . '/../Core/Controller.php';
+require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
 use App\Core\Controller;
+use App\Middleware\AuthMiddleware;
 
 class CartController extends Controller
 {
@@ -14,6 +16,7 @@ class CartController extends Controller
 
     public function add()
     {
+        AuthMiddleware::check();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_SESSION['cart'])) {
                 $_SESSION['cart'] = [];
@@ -37,6 +40,7 @@ class CartController extends Controller
 
     public function remove()
     {
+        AuthMiddleware::check();
         $productId = $_GET['id'] ?? null;
 
         if ($productId && isset($_SESSION['cart'][$productId])) {

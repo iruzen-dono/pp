@@ -1,26 +1,55 @@
-<div class="products">
-    <h2>📦 Catalogue Produits</h2>
-    <p class="subtitle">Découvrez notre sélection de produits de qualité</p>
+<div class="container">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="/">Accueil</a>
+        <span>/</span>
+        <span class="current">Produits</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>Tous nos produits</h2>
+        <button id="filterBtn" class="btn btn-secondary btn-small">🔍 Filtrer</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="search" placeholder="Rechercher un produit...">
+        <button>Chercher</button>
+    </div>
 
     <?php if (empty($products)): ?>
         <div class="alert alert-info">ℹ️ Aucun produit disponible pour le moment.</div>
     <?php else: ?>
         <div class="products-grid">
             <?php foreach ($products as $product): ?>
-                <div class="product-card">
-                    <div class="product-image" style="background-color: #1a1728; overflow: hidden; border-radius: 6px 6px 0 0;">
+                <div class="product-card animate-on-scroll">
+                    <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">🤍</button>
+                    
+                    <div class="product-image">
                         <?php if (!empty($product['image_url'])): ?>
-                            <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="width: 100%; height: 200px; object-fit: cover;">
+                            <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                         <?php else: ?>
-                            <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; font-size: 48px; background: linear-gradient(135deg, #b388ff, #5c3a9d);">📦</div>
+                            <div style="font-size: 4rem; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">📦</div>
                         <?php endif; ?>
                     </div>
                     <div class="product-info">
                         <h3 class="product-name"><?= htmlspecialchars($product['name']) ?></h3>
-                        <p class="product-price"><?= number_format($product['price'], 2, ',', ' ') ?>€</p>
-                        <p class="product-description"><?= htmlspecialchars(substr($product['description'], 0, 80)) ?>...</p>
+                        <div class="product-price"><?= number_format($product['price'], 2, ',', ' ') ?>€</div>
+                        
+                        <!-- Rating Stars -->
+                        <div class="rating-container" style="margin: 0.5rem 0;">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                            <span class="rating-text">(12 avis)</span>
+                            <input type="hidden" name="rating" value="4">
+                        </div>
+
+                        <p class="product-description"><?= htmlspecialchars(substr($product['description'], 0, 100)) ?>...</p>
                         <div class="product-actions">
-                            <a href="/products/show?id=<?= $product['id'] ?>" class="btn btn-primary">Voir détails</a>
+                            <a href="/product/<?= $product['id'] ?>" class="btn btn-primary btn-small">Voir détails</a>
                         </div>
                     </div>
                 </div>
