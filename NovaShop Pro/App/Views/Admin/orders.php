@@ -59,21 +59,21 @@ if (!empty($orders) && is_array($orders)) {
                         <td><strong>#<?php echo htmlspecialchars($order['id'] ?? ''); ?></strong></td>
                         <td><?php echo htmlspecialchars($order['user_id'] ?? 'N/A'); ?></td>
                         <td>
-                            <span style="color: var(--accent); font-weight: 700;">
+                            <span style="color: #d4a574; font-weight: 700;">
                                 <?php echo number_format($order['total'] ?? 0, 2, ',', ' '); ?>€
                             </span>
                         </td>
                         <td>
                             <?php 
                             $status = $order['status'] ?? 'EN ATTENTE';
-                            $statusColor = $status === 'COMPLÉTÉE' ? 'var(--success)' : 'var(--warning)';
-                            $statusBg = $status === 'COMPLÉTÉE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)';
+                            $statusColor = $status === 'COMPLÉTÉE' ? '#86efac' : '#fbbf24';
+                            $statusBg = $status === 'COMPLÉTÉE' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(251, 191, 36, 0.2)';
                             ?>
                             <span style="background: <?php echo $statusBg; ?>; color: <?php echo $statusColor; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem;">
                                 <?php echo htmlspecialchars($status); ?>
                             </span>
                         </td>
-                        <td style="color: var(--gray-400); font-size: 0.9rem;">
+                        <td style="color: #a0a0a0; font-size: 0.9rem;">
                             <?php 
                             if (!empty($order['created_at'])) {
                                 $date = new \DateTime($order['created_at']);

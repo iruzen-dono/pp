@@ -16,43 +16,45 @@
 
 <!-- FEATURED CAROUSEL -->
 <?php if (isset($products) && count($products) > 0): ?>
-<section class="container" style="margin: 5rem 0;">
-    <h2 class="section-title">Produits Vedettes</h2>
-    <p class="section-subtitle">Nos meilleures ventes cette semaine</p>
-    
-    <div class="carousel">
-        <div class="carousel-track">
-            <?php foreach (array_slice($products, 0, min(5, count($products))) as $index => $product): ?>
-            <div class="carousel-slide">
-                <div class="product-card">
-                    <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">🤍</button>
-                    <div class="product-image">
-                        <?php if (!empty($product['image_url'])): ?>
-                            <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                        <?php else: ?>
-                            <div style="font-size: 4rem; display: flex; align-items: center; justify-content: center; height: 100%;">📦</div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
-                        <div class="product-price"><?php echo number_format($product['price'], 2, ',', ' '); ?>€</div>
-                        <div class="product-actions">
-                            <a href="/product/<?= $product['id'] ?>" class="btn btn-primary btn-small">Voir détails</a>
+<div class="featured-carousel">
+    <div class="carousel-container">
+        <button class="carousel-arrow carousel-arrow-left" id="prevBtn">❮</button>
+        
+        <div class="carousel-viewer">
+            <div class="carousel-slides" id="productsGrid">
+                <?php foreach (array_slice($products, 0, min(8, count($products))) as $index => $product): ?>
+                <div class="carousel-slide" data-index="<?= $index ?>">
+                    <div class="featured-product">
+                        <div class="featured-product-image">
+                            <?php if (!empty($product['image_url'])): ?>
+                                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <?php else: ?>
+                                <div style="font-size: 5rem;">📦</div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="featured-product-content">
+                            <h3 class="featured-product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
+                            <div class="featured-product-price"><?php echo number_format($product['price'], 2, ',', ' '); ?>€</div>
+                            <p class="featured-product-desc"><?php echo htmlspecialchars(substr($product['description'], 0, 150) . '...'); ?></p>
+                            <div class="featured-product-actions">
+                                <a href="/product/<?= $product['id'] ?>" class="btn btn-primary">Voir détails</a>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
         </div>
-        <button class="carousel-prev">❮</button>
-        <button class="carousel-next">❯</button>
-        <div class="carousel-dots">
-            <?php for ($i = 0; $i < min(5, count($products)); $i++): ?>
-                <span class="dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>"></span>
-            <?php endfor; ?>
-        </div>
+        
+        <button class="carousel-arrow carousel-arrow-right" id="nextBtn">❯</button>
     </div>
-</section>
+    
+    <div class="carousel-indicators">
+        <?php for ($i = 0; $i < min(8, count($products)); $i++): ?>
+            <button class="carousel-dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>"></button>
+        <?php endfor; ?>
+    </div>
+</div>
 <?php endif; ?>
 
 <!-- FEATURES SECTION -->
@@ -100,51 +102,53 @@
 </section>
 
 <!-- PRODUCTS SECTION -->
-<section class="container" style="margin: 5rem 0;">
-    <h2 class="section-title">Tous nos produits</h2>
-    <p class="section-subtitle">Une large sélection pour tous vos besoins</p>
-    
-    <div class="search-bar" style="margin-bottom: 2rem;">
-        <input type="search" placeholder="Rechercher un produit..." id="searchInput">
-        <button onclick="filterProductsByName()">Chercher</button>
-    </div>
-    
-    <div class="products-grid">
-        <?php if (isset($products) && count($products) > 0): ?>
-            <?php foreach ($products as $product): ?>
-                <div class="product-card animate-on-scroll" data-product-name="<?= strtolower($product['name']) ?>">
-                    <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">🤍</button>
-                    <div class="product-image">
-                        <?php if (!empty($product['image_url'])): ?>
-                            <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" loading="lazy">
-                        <?php else: ?>
-                            <div style="font-size: 4rem; display: flex; align-items: center; justify-content: center; height: 100%;">📦</div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
-                        <div class="product-price"><?php echo number_format($product['price'], 2, ',', ' '); ?>€</div>
-                        
-                        <!-- Rating Stars -->
-                        <div class="rating-container" data-rating="4">
-                            <span class="star" data-rating="1">★</span>
-                            <span class="star" data-rating="2">★</span>
-                            <span class="star" data-rating="3">★</span>
-                            <span class="star active" data-rating="4">★</span>
-                            <span class="star" data-rating="5">★</span>
-                            <span class="rating-text" style="font-size: 0.85rem; color: #666;">4/5 (12 avis)</span>
+<section class="products-section">
+    <div class="container">
+        <h2 class="section-title">Tous nos produits</h2>
+        <p class="section-subtitle">Une large sélection pour tous vos besoins</p>
+        
+        <div class="search-bar" style="margin-bottom: 2rem;">
+            <input type="search" placeholder="Rechercher un produit..." id="searchInput">
+            <button onclick="filterProductsByName()">Chercher</button>
+        </div>
+        
+        <div class="products-grid">
+            <?php if (isset($products) && count($products) > 0): ?>
+                <?php foreach ($products as $product): ?>
+                    <div class="product-card animate-on-scroll" data-product-name="<?= strtolower($product['name']) ?>">
+                        <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">🤍</button>
+                        <div class="product-image">
+                            <?php if (!empty($product['image_url'])): ?>
+                                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" loading="lazy">
+                            <?php else: ?>
+                                <div style="font-size: 4rem; display: flex; align-items: center; justify-content: center; height: 100%;">📦</div>
+                            <?php endif; ?>
                         </div>
+                        <div class="product-info">
+                            <h3 class="product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
+                            <div class="product-price"><?php echo number_format($product['price'], 2, ',', ' '); ?>€</div>
+                            
+                            <!-- Rating Stars -->
+                            <div class="rating-container" data-rating="4">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star active" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                                <span class="rating-text">(12 avis)</span>
+                            </div>
 
-                        <p class="product-description"><?php echo htmlspecialchars(substr($product['description'], 0, 100) . '...'); ?></p>
-                        <div class="product-actions">
-                            <a href="/product/<?= $product['id'] ?>" class="btn btn-primary btn-small">Voir détails</a>
+                            <p class="product-description"><?php echo htmlspecialchars(substr($product['description'], 0, 100) . '...'); ?></p>
+                            <div class="product-actions">
+                                <a href="/product/<?= $product['id'] ?>" class="btn btn-primary btn-small">Voir détails</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p class="text-center" style="grid-column: 1/-1; padding: 2rem;">Aucun produit disponible pour le moment</p>
-        <?php endif; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="text-center" style="grid-column: 1/-1; padding: 2rem;">Aucun produit disponible pour le moment</p>
+            <?php endif; ?>
+        </div>
     </div>
 </section>
 
@@ -160,6 +164,87 @@
 </section>
 
 <script>
+// Featured Carousel - One product at a time
+document.addEventListener('DOMContentLoaded', function() {
+    const slidesContainer = document.getElementById('productsGrid');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dots = document.querySelectorAll('.carousel-dot');
+    
+    if (!slidesContainer) return;
+    
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const totalSlides = slides.length;
+    let autoScrollInterval = null;
+    
+    function goToSlide(index) {
+        currentIndex = (index + totalSlides) % totalSlides;
+        const offset = currentIndex * 100;
+        slidesContainer.style.transform = `translateX(-${offset}%)`;
+        
+        // Update dots
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIndex);
+        });
+    }
+    
+    function nextSlide() {
+        goToSlide(currentIndex + 1);
+    }
+    
+    function prevSlide() {
+        goToSlide(currentIndex - 1);
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            prevSlide();
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                autoScrollInterval = null;
+            }
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            nextSlide();
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                autoScrollInterval = null;
+            }
+        });
+    }
+    
+    // Auto-scroll every 2 seconds
+    autoScrollInterval = setInterval(nextSlide, 2000);
+    
+    // Dots click
+    dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+            const slideIndex = parseInt(this.getAttribute('data-slide'));
+            goToSlide(slideIndex);
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = setInterval(nextSlide, 2000);
+        });
+    });
+    
+    // Pause on hover
+    slidesContainer.addEventListener('mouseenter', () => {
+        if (autoScrollInterval) {
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = null;
+        }
+    });
+    
+    slidesContainer.addEventListener('mouseleave', () => {
+        autoScrollInterval = setInterval(nextSlide, 2000);
+    });
+});
+
 function filterProductsByName() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
     const productCards = document.querySelectorAll('.product-card[data-product-name]');

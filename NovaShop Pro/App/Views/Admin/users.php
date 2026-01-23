@@ -1,4 +1,4 @@
-<h1 class="admin-title">👥 Gestion des Utilisateurs</h1>
+<h1>👥 Gestion des Utilisateurs</h1>
 
 <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success">
@@ -28,11 +28,11 @@
                         </td>
                         <td><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
                         <td>
-                            <span style="background: <?php echo ($user['role'] ?? 'user') === 'admin' ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)'; ?>; color: <?php echo ($user['role'] ?? 'user') === 'admin' ? 'var(--primary)' : 'var(--gray-400)'; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem; display: inline-block;">
+                            <span style="background: <?php echo ($user['role'] ?? 'user') === 'admin' ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)'; ?>; color: <?php echo ($user['role'] ?? 'user') === 'admin' ? '#93c5fd' : '#a0a0a0'; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem; display: inline-block;">
                                 <?php echo strtoupper($user['role'] ?? 'user'); ?>
                             </span>
                         </td>
-                        <td style="color: var(--gray-400); font-size: 0.9rem;">
+                        <td style="color: #a0a0a0; font-size: 0.9rem;">
                             <?php 
                             if (!empty($user['created_at'])) {
                                 $date = new \DateTime($user['created_at']);

@@ -124,12 +124,12 @@ class AdminController extends Controller
         $userId = $_GET['params'][0] ?? null;
         
         if (!$userId) {
-            header('Location: /admin/users');
+            header('Location: /admin/users?error=no_id');
             exit;
         }
         
         // Éviter la suppression de l'admin actuel
-        if ($userId == $_SESSION['user']['id']) {
+        if (isset($_SESSION['user']) && $userId == $_SESSION['user']['id']) {
             header('Location: /admin/users?error=cannot_delete_self');
             exit;
         }

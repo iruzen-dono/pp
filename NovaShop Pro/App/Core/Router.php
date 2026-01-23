@@ -38,17 +38,23 @@ class Router
         
         // Si url[1] est numérique, c'est un ID (pas une méthode)
         $methodName = $defaultMethod;
+        $params = [];
+        
         if (!empty($url[1])) {
             if (!is_numeric($url[1])) {
+                // C'est une méthode
                 $methodName = $url[1];
-                $_GET['params'] = array_slice($url, 2);
+                // Les paramètres commencent à url[2]
+                if (!empty($url[2])) {
+                    $params = array_slice($url, 2);
+                }
             } else {
                 // C'est un ID, le passer comme premier param
-                $_GET['params'] = array_slice($url, 1);
+                $params = array_slice($url, 1);
             }
-        } else {
-            $_GET['params'] = [];
         }
+        
+        $_GET['params'] = $params;
 
         $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 

@@ -1,4 +1,4 @@
-<h1 class="admin-title">📦 Gestion des Produits</h1>
+<h1>📦 Gestion des Produits</h1>
 
 <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success">✅ Produit créé/supprimé avec succès</div>
@@ -15,12 +15,12 @@
 <?php endif; ?>
 
 <!-- FORMULAIRE AJOUTER PRODUIT -->
-<div class="admin-form" style="margin-bottom: 3rem;">
-    <h2 style="color: var(--primary); margin-top: 0; margin-bottom: 1.5rem;">➕ Ajouter un Produit</h2>
+<div class="admin-form">
+    <h2>➕ Ajouter un Produit</h2>
     <form method="POST" action="/admin/products" enctype="multipart/form-data">
         <input type="hidden" name="action" value="create">
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="form-grid">
             <div class="form-group">
                 <label>Nom du Produit</label>
                 <input type="text" name="name" required>
@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="form-grid">
             <div class="form-group">
                 <label>Catégorie</label>
                 <select name="category_id" required>
@@ -63,7 +63,7 @@
 </div>
 
 <!-- TABLEAU PRODUITS -->
-<h2 style="margin-bottom: 1.5rem; color: var(--gray-100);">Produits (<?php echo count($products ?? []); ?>)</h2>
+<h2>Produits (<?php echo count($products ?? []); ?>)</h2>
 
 <?php if (!empty($products) && is_array($products)): ?>
     <div class="table-container">
@@ -87,13 +87,13 @@
                                 <?php if (!empty($product['image_url'])): ?>
                                     <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 40px; height: 40px; object-fit: cover; border-radius: 0.5rem;">
                                 <?php else: ?>
-                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">📦</div>
+                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #d4a574, #c59461); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">📦</div>
                                 <?php endif; ?>
                                 <strong><?php echo htmlspecialchars($product['name'] ?? ''); ?></strong>
                             </div>
                         </td>
                         <td>
-                            <span style="color: var(--success); font-weight: 700;">
+                            <span style="color: #86efac; font-weight: 700;">
                                 <?php echo number_format($product['price'] ?? 0, 2, ',', ' '); ?>€
                             </span>
                         </td>
@@ -104,7 +104,7 @@
                             ?>
                         </td>
                         <td>
-                            <span style="background: <?php echo ($product['stock'] ?? 0) > 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'; ?>; color: <?php echo ($product['stock'] ?? 0) > 0 ? 'var(--success)' : 'var(--danger)'; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem;">
+                            <span style="background: <?php echo ($product['stock'] ?? 0) > 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'; ?>; color: <?php echo ($product['stock'] ?? 0) > 0 ? '#86efac' : '#fca5a5'; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem;">
                                 <?php echo $product['stock'] ?? 0; ?> unités
                             </span>
                         </td>

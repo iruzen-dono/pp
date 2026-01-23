@@ -92,8 +92,8 @@ CREATE TABLE order_items (
 
 -- Insérer des utilisateurs admin et test
 INSERT INTO users (name, email, password, role) VALUES
-('Admin NovaShop', 'admin@novashop.local', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36P4/LaC', 'admin'),
-('Client Test', 'user@novashop.local', '$2y$10$V8VbVIo0IqHXaMp8rVJI/OjpPH7W7LV7/YDJ4EpHWBaQX3L1dCIKi', 'user');
+('Admin NovaShop', 'admin@novashop.local', '$2y$10$ioclv8MtI9/7d/PCuak2AuD62.0FFY8Rq6pVG3Ccr79GD4rXV0Dmi', 'admin'),
+('Client Test', 'user@novashop.local', '$2y$10$njIGZ/pnkst9/ihIIysVGuR3dfRN4r1Xr17gPqgAf8mxF6G8fc9cq', 'user');
 
 -- Insérer des catégories
 INSERT INTO categories (name, description) VALUES
