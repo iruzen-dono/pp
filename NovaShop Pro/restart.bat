@@ -50,6 +50,7 @@ echo %INFO% Vérification de PHP...
 echo.
 
 where php.exe >nul 2>&1
+echo [DEBUG] PHP check done, errorlevel=!errorlevel!
 if !errorlevel! equ 0 (
     echo %SUCCESS% PHP est déjà installé
     set "FOUND_PHP=1"
@@ -59,7 +60,8 @@ if !errorlevel! equ 0 (
 echo %WARN% PHP non trouvé! Installation automatique...
 echo.
 call :install_php
-if !errorlevel! equ 0 (
+set "PHP_ERROR=!errorlevel!"
+if "!PHP_ERROR!" equ "0" (
     set "FOUND_PHP=1"
 ) else (
     echo %ERROR% Impossible d'installer PHP
@@ -76,6 +78,7 @@ echo %INFO% Vérification de MariaDB/MySQL...
 echo.
 
 where mysql.exe >nul 2>&1
+echo [DEBUG] MySQL check done, errorlevel=!errorlevel!
 if !errorlevel! equ 0 (
     echo %SUCCESS% MySQL/MariaDB est déjà installé
     set "FOUND_MYSQL=1"
@@ -83,6 +86,7 @@ if !errorlevel! equ 0 (
 )
 
 for /d %%G in ("C:\Program Files\MariaDB*") do (
+    echo [DEBUG] Checking folder: %%G
     if exist "%%G\bin\mysql.exe" (
         echo %SUCCESS% MariaDB trouvé: %%G
         set "FOUND_MYSQL=1"
@@ -94,12 +98,12 @@ for /d %%G in ("C:\Program Files\MariaDB*") do (
 echo %WARN% MariaDB non trouvé! Installation automatique...
 echo.
 call :install_mariadb
-if !errorlevel! equ 0 (
+set "MARIADB_ERROR=!errorlevel!"
+if "!MARIADB_ERROR!" equ "0" (
     set "FOUND_MYSQL=1"
 ) else (
     echo %ERROR% Impossible d'installer MariaDB
     pause
-    endlocal
     exit /b 1
 )
 
@@ -493,6 +497,7 @@ if !errorlevel! neq 0 (
     echo   • L'utilisateur !DB_USER! existe
     echo   • Le mot de passe configuré est correct
     echo.
+    endlocal
     exit /b 1
 )
 
@@ -506,6 +511,7 @@ echo %INFO% Création des tables...
 !MYSQL_CMD! -u !DB_USER! -p!DB_PASS! novashop < "%~dp0setup.sql" >nul 2>&1
 if !errorlevel! neq 0 (
     echo %ERROR% Erreur lors de la création des tables
+    endlocal
     exit /b 1
 )
 
