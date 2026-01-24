@@ -3,6 +3,8 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    initHeaderInteractions();
+    initAuthInteractions();
     initDarkMode();
     initScrollAnimations();
     initCarousel();
@@ -13,7 +15,119 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// DARK MODE TOGGLE
+// ADVANCED HEADER INTERACTIONS
+// ============================================
+
+function initHeaderInteractions() {
+    // Hamburger Menu Toggle
+    const hamburger = document.getElementById('hamburgerMenu');
+    const navMenu = document.querySelector('.navbar-menu');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu on link click
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+    }
+
+    // User Dropdown Menu
+    const userMenuTrigger = document.getElementById('userMenuTrigger');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    if (userMenuTrigger && userDropdown) {
+        userMenuTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            userMenuTrigger.classList.toggle('active');
+            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+                userMenuTrigger.classList.remove('active');
+                userDropdown.style.display = 'none';
+            }
+        });
+
+        // Close dropdown on link click
+        userDropdown.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                userMenuTrigger.classList.remove('active');
+                userDropdown.style.display = 'none';
+            });
+        });
+    }
+
+    // Scroll effect on header
+    const header = document.querySelector('.navbar-header');
+    if (header) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    }
+
+    // Scroll to top button
+    initScrollToTop();
+
+    // Update cart badge
+    updateCartBadge();
+}
+
+// ============================================
+// SCROLL TO TOP BUTTON
+// ============================================
+
+function initScrollToTop() {
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    if (!scrollTopBtn) return;
+
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 500) {
+            scrollTopBtn.classList.add('show');
+        } else {
+            scrollTopBtn.classList.remove('show');
+        }
+    });
+
+    scrollTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// ============================================
+// CART BADGE UPDATE
+// ============================================
+
+function updateCartBadge() {
+    const cartBadge = document.getElementById('cartBadge');
+    if (!cartBadge) return;
+
+    // Check if cart count exists in localStorage or session
+    const cartCount = localStorage.getItem('cartCount') || sessionStorage.getItem('cartCount') || 0;
+    
+    if (cartCount > 0) {
+        cartBadge.textContent = cartCount;
+        cartBadge.style.display = 'inline-flex';
+    }
+}
+
+// ============================================
+// DARK MODE TOGGLE - ENHANCED
 // ============================================
 
 function initDarkMode() {
@@ -24,7 +138,6 @@ function initDarkMode() {
     
     if (isDarkMode) {
         document.documentElement.setAttribute('data-theme', 'dark');
-        darkModeToggle.textContent = '☀️';
     }
 
     darkModeToggle.addEventListener('click', function() {
@@ -33,12 +146,93 @@ function initDarkMode() {
         if (isDark) {
             document.documentElement.removeAttribute('data-theme');
             localStorage.setItem('darkMode', 'false');
-            this.textContent = '🌙';
         } else {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('darkMode', 'true');
-            this.textContent = '☀️';
         }
+    });
+}
+
+// ============================================
+// AUTHENTICATION PAGE INTERACTIONS
+// ============================================
+
+function initAuthInteractions() {
+    // Password Toggle
+    initPasswordToggle();
+    
+    // Password Strength Indicator
+    initPasswordStrength();
+}
+
+function initPasswordToggle() {
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = this.closest('.input-password-wrapper').querySelector('.form-input');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                this.textContent = '👁️';
+            }
+        });
+    });
+}
+
+function initPasswordStrength() {
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    if (!passwordInput || !strengthBar || !strengthText) return;
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        let text = 'Très faible';
+        let color = '#c74136'; // danger
+        
+        // Length check
+        if (password.length >= 8) strength += 20;
+        if (password.length >= 12) strength += 20;
+        
+        // Complexity checks
+        if (/[a-z]/.test(password)) strength += 20; // lowercase
+        if (/[A-Z]/.test(password)) strength += 20; // uppercase
+        if (/[0-9]/.test(password)) strength += 10; // numbers
+        if (/[^a-zA-Z0-9]/.test(password)) strength += 10; // special chars
+        
+        // Cap at 100
+        strength = Math.min(strength, 100);
+        
+        // Determine strength level
+        if (strength < 30) {
+            text = 'Très faible';
+            color = '#c74136';
+        } else if (strength < 50) {
+            text = 'Faible';
+            color = '#d4a574';
+        } else if (strength < 70) {
+            text = 'Moyen';
+            color = '#4a7c5e';
+        } else if (strength < 85) {
+            text = 'Fort';
+            color = '#2d5a3d';
+        } else {
+            text = 'Très fort';
+            color = '#1a3a28';
+        }
+        
+        // Update bar
+        strengthBar.style.width = strength + '%';
+        strengthBar.style.backgroundColor = color;
+        strengthText.textContent = text;
+        strengthText.style.color = color;
     });
 }
 

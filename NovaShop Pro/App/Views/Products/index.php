@@ -6,114 +6,68 @@
         <span class="current">Produits</span>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2>Produits Vedettes</h2>
-        <div style="display: flex; gap: 1rem; align-items: center;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem;">
-                <input type="checkbox" id="autoScrollToggle" style="width: 18px; height: 18px; cursor: pointer;">
-                Auto-scroll
-            </label>
-        </div>
+    <div class="products-page-header">
+        <h2>Nos Produits Vedettes</h2>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="search" placeholder="🔍 Rechercher un produit..." aria-label="Rechercher">
+        <button type="button">Chercher</button>
     </div>
 </div>
 
 <?php if (!empty($products)): ?>
-<div class="carousel-section">
-    <button id="prevBtn" class="carousel-control carousel-prev">❮</button>
-    <div class="carousel-track" id="productsGrid">
+<div class="container">
+    <div class="products-grid" id="productsGrid">
         <?php foreach ($products as $product): ?>
-        <div class="carousel-item">
-            <div class="carousel-product">
-                <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">🤍</button>
-                <div class="carousel-product-image">
+        <a href="/products/<?= $product['id'] ?>" class="product-card">
+            <div class="product-card-inner">
+                <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>" aria-label="Ajouter aux favoris" type="button" tabindex="-1">🤍</button>
+                <div class="product-card-image">
                     <?php if (!empty($product['image_url'])): ?>
                         <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                     <?php else: ?>
-                        <div style="font-size: 2rem;">📦</div>
+                        <div class="placeholder-icon">📦</div>
                     <?php endif; ?>
                 </div>
-                <div class="carousel-product-info">
-                    <h3 class="carousel-product-name"><?= htmlspecialchars($product['name']) ?></h3>
-                    <div class="carousel-product-price"><?= number_format($product['price'], 2, ',', ' ') ?>€</div>
+                <div class="product-card-content">
+                    <h3 class="product-card-name"><?= htmlspecialchars($product['name']) ?></h3>
+                    <div class="product-card-price"><?= number_format($product['price'], 2, ',', ' ') ?>€</div>
+                    <div class="product-card-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-value">4.5</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
         <?php endforeach; ?>
     </div>
-    <button id="nextBtn" class="carousel-control carousel-next">❯</button>
+</div>
+<?php else: ?>
+<div class="container">
+    <div class="no-products">
+        <p>📦 Aucun produit trouvé</p>
+    </div>
 </div>
 <?php endif; ?>
 
-<div class="container">
-    <!-- Search Bar -->
-    <div class="search-bar">
-        <input type="search" placeholder="Rechercher un produit...">
-        <button>Chercher</button>
-    </div>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const track = document.getElementById('productsGrid');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const autoScrollToggle = document.getElementById('autoScrollToggle');
-    
-    if (!track) {
-        console.error('Track not found');
-        return;
-    }
-    
-    if (!prevBtn || !nextBtn) {
-        console.error('Buttons not found', {prevBtn, nextBtn});
-        return;
-    }
-    
-    let autoScrollInterval = null;
-    const scrollStep = 120;
-    
-    function scroll(direction) {
-        console.log('Scrolling:', direction);
-        track.scrollLeft += direction * scrollStep;
-    }
-    
-    prevBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Prev clicked');
-        scroll(-1);
-        if (autoScrollToggle?.checked) clearInterval(autoScrollInterval);
-    });
-    
-    nextBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Next clicked');
-        scroll(1);
-        if (autoScrollToggle?.checked) clearInterval(autoScrollInterval);
-    });
-    
-    function startAuto() {
-        autoScrollInterval = setInterval(() => scroll(1), 3500);
-    }
-    
-    function stopAuto() {
-        clearInterval(autoScrollInterval);
-    }
-    
-    if (autoScrollToggle) {
-        autoScrollToggle.addEventListener('change', function() {
-            this.checked ? startAuto() : stopAuto();
+    // Wishlist button handling
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const productId = this.dataset.productId;
+            const isFilled = this.textContent === '❤️';
+            
+            this.textContent = isFilled ? '🤍' : '❤️';
+            this.style.transform = 'scale(1.2)';
+            setTimeout(() => { this.style.transform = 'scale(1)'; }, 200);
+            
+            // TODO: Send AJAX request to add/remove from wishlist
         });
-    }
-    
-    track.addEventListener('mouseenter', stopAuto);
-    track.addEventListener('mouseleave', function() {
-        if (autoScrollToggle?.checked) startAuto();
     });
 });
 </script>
-
-<style>
-/* Empty - all CSS in Style.css */
-</style>
