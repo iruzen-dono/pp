@@ -29,24 +29,94 @@ if errorlevel 1 (
 echo %SUCCESS% Admin OK
 echo.
 
-REM VERIFY PHP
-echo %INFO% Verification PHP...
-if exist "C:\php-8.2\php.exe" (
-    echo %SUCCESS% PHP found
+REM VERIFY PHP - Search extensively
+echo %INFO% Searching for PHP...
+set "PHP_OK=0"
+
+REM Try PATH first
+php --version >nul 2>&1
+if errorlevel 0 (
+    echo %SUCCESS% PHP found in PATH
     set "PHP_OK=1"
-) else (
-    echo %ERROR% PHP missing
-    set "PHP_OK=0"
+    goto php_done
 )
 
-REM VERIFY MYSQL
-echo %INFO% Verification MariaDB...
-if exist "C:\Program Files\MariaDB\bin\mysql.exe" (
-    echo %SUCCESS% MariaDB found
+REM Try common locations
+for %%P in (
+    "C:\php-8.2\php.exe"
+    "C:\php-8.1\php.exe"
+    "C:\php-8.0\php.exe"
+    "C:\php\php.exe"
+    "C:\PHP\php.exe"
+    "C:\Program Files\php\php.exe"
+    "C:\Program Files (x86)\php\php.exe"
+    "C:\php-nts\php.exe"
+    "C:\xampp\php\php.exe"
+    "C:\wamp64\bin\php\*\php.exe"
+) do (
+    if exist "%%P" (
+        echo %SUCCESS% PHP found at: %%P
+        set "PHP_OK=1"
+        goto php_done
+    )
+)
+
+REM Try wildcard search
+for /r C:\ %%F in (php.exe) do (
+    if exist "%%F" (
+        echo %SUCCESS% PHP found at: %%F
+        set "PHP_OK=1"
+        goto php_done
+    )
+)
+
+:php_done
+if "!PHP_OK!"=="0" (
+    echo %ERROR% PHP not found
+)
+
+REM VERIFY MYSQL - Search extensively
+echo %INFO% Searching for MariaDB/MySQL...
+set "MYSQL_OK=0"
+
+REM Try PATH first
+mysql --version >nul 2>&1
+if errorlevel 0 (
+    echo %SUCCESS% MySQL found in PATH
     set "MYSQL_OK=1"
-) else (
-    echo %ERROR% MariaDB missing
-    set "MYSQL_OK=0"
+    goto mysql_done
+)
+
+REM Try common locations
+for %%P in (
+    "C:\Program Files\MariaDB\bin\mysql.exe"
+    "C:\Program Files (x86)\MariaDB\bin\mysql.exe"
+    "C:\mariadb\bin\mysql.exe"
+    "C:\MariaDB\bin\mysql.exe"
+    "C:\mysql\bin\mysql.exe"
+    "C:\MySQL\bin\mysql.exe"
+    "C:\xampp\mysql\bin\mysql.exe"
+    "C:\wamp64\bin\mysql\*\mysql.exe"
+) do (
+    if exist "%%P" (
+        echo %SUCCESS% MySQL found at: %%P
+        set "MYSQL_OK=1"
+        goto mysql_done
+    )
+)
+
+REM Try wildcard search
+for /r C:\ %%F in (mysql.exe) do (
+    if exist "%%F" (
+        echo %SUCCESS% MySQL found at: %%F
+        set "MYSQL_OK=1"
+        goto mysql_done
+    )
+)
+
+:mysql_done
+if "!MYSQL_OK!"=="0" (
+    echo %ERROR% MySQL not found
 )
 
 echo.
