@@ -64,7 +64,7 @@ if !errorlevel! equ 0 (
 ) else (
     echo %ERROR% Impossible d'installer PHP
     pause
-    exit /b 1
+    goto end
 )
 
 :check_mysql
@@ -99,6 +99,7 @@ if !errorlevel! equ 0 (
 ) else (
     echo %ERROR% Impossible d'installer MariaDB
     pause
+    endlocal
     exit /b 1
 )
 
@@ -516,6 +517,7 @@ if !errorlevel! neq 0 (
 )
 
 echo %SUCCESS% Base de données initialisée!
+endlocal
 exit /b 0
 
 REM ==========================================
@@ -534,6 +536,7 @@ if !errorlevel! equ 0 (
     choco install php -y >nul 2>&1
     if !errorlevel! equ 0 (
         echo %SUCCESS% PHP installé avec Chocolatey!
+        endlocal
         exit /b 0
     )
 )
@@ -582,6 +585,7 @@ if !DOWNLOAD_SUCCESS! equ 0 (
     echo   5. Relancez ce script
     echo.
     pause
+    endlocal
     exit /b 1
 )
 
@@ -596,6 +600,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 
 if errorlevel 1 (
     echo %ERROR% Erreur lors de l'extraction de PHP
+    endlocal
     exit /b 1
 )
 
@@ -614,10 +619,10 @@ php --version >nul 2>&1
 if errorlevel 1 (
     echo %WARN% PHP détecté mais PATH nécessite un redémarrage
     pause
-    exit /b 0
 )
 
 echo %SUCCESS% PHP 8.2 installé avec succès!
+endlocal
 exit /b 0
 
 REM ==========================================
@@ -636,6 +641,7 @@ if !errorlevel! equ 0 (
     choco install mariadb -y >nul 2>&1
     if !errorlevel! equ 0 (
         echo %SUCCESS% MariaDB installé avec Chocolatey!
+        endlocal
         exit /b 0
     )
 )
@@ -683,6 +689,7 @@ if !DOWNLOAD_SUCCESS! equ 0 (
     echo   4. Relancez ce script
     echo.
     pause
+    endlocal
     exit /b 1
 )
 
@@ -704,6 +711,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 
 if errorlevel 1 (
     echo %ERROR% Erreur lors de l'extraction de MariaDB
+    endlocal
     exit /b 1
 )
 
@@ -722,10 +730,10 @@ mysql --version >nul 2>&1
 if errorlevel 1 (
     echo %WARN% MariaDB détecté mais PATH nécessite un redémarrage
     pause
-    exit /b 0
 )
 
 echo %SUCCESS% MariaDB installé avec succès!
+endlocal
 exit /b 0
 
 REM ==========================================
