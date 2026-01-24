@@ -663,28 +663,67 @@ REM ==========================================
 :install_php
 setlocal enabledelayedexpansion
 
-echo %INFO% Téléchargement de PHP 8.2...
+echo %INFO% Installation de PHP 8.2...
 echo.
+
+REM Essayer d'abord avec Chocolatey si disponible
+where choco.exe >nul 2>&1
+if !errorlevel! equ 0 (
+    echo %INFO% Chocolatey trouvé, installation via Chocolatey...
+    choco install php -y >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo %SUCCESS% PHP installé avec Chocolatey!
+        set FOUND_PHP=1
+        exit /b 0
+    )
+)
 
 REM Créer le dossier PHP
 if not exist "C:\php-8.2" mkdir "C:\php-8.2"
 
-REM Télécharger PHP avec PowerShell
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-"try { ^
-    $ProgressPreference = 'SilentlyContinue'; ^
-    $url = 'https://windows.php.net/downloads/releases/php-8.2.18-nts-Win32-x64.zip'; ^
-    $dest = 'C:\php-8.2.zip'; ^
-    Write-Host '[INFO] Téléchargement en cours...'; ^
-    Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
-    Write-Host '[OK] Téléchargement terminé'; ^
-} catch { ^
-    Write-Host '[ERREUR] Impossible de télécharger PHP: ' $_.Exception.Message; ^
-    exit 1; ^
-}" 
+REM Télécharger PHP avec plusieurs URLs de secours
+echo %INFO% Téléchargement de PHP 8.2 (cette opération peut prendre quelques minutes)...
+echo.
 
-if errorlevel 1 (
-    echo %ERROR% Erreur lors du téléchargement de PHP
+set "PHP_URLS[0]=https://windows.php.net/downloads/releases/php-8.2.21-nts-Win32-x64.zip"
+set "PHP_URLS[1]=https://windows.php.net/downloads/releases/php-8.1.27-nts-Win32-x64.zip"
+set "PHP_URLS[2]=https://windows.php.net/downloads/releases/php-8.0.30-nts-Win32-x64.zip"
+
+set "DOWNLOAD_SUCCESS=0"
+
+for /l %%i in (0,1,2) do (
+    if !DOWNLOAD_SUCCESS! equ 0 (
+        echo %INFO% Tentative %%i (essai de téléchargement)...
+        
+        powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+        "try { ^
+            $ProgressPreference = 'SilentlyContinue'; ^
+            $url = '!PHP_URLS[%%i]!'; ^
+            $dest = 'C:\php-8.2.zip'; ^
+            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
+            exit 0; ^
+        } catch { ^
+            exit 1; ^
+        }"
+        
+        if !errorlevel! equ 0 (
+            echo %SUCCESS% Téléchargement réussi!
+            set "DOWNLOAD_SUCCESS=1"
+        )
+    )
+)
+
+if !DOWNLOAD_SUCCESS! equ 0 (
+    echo %ERROR% Impossible de télécharger PHP automatiquement
+    echo.
+    echo %INFO% Téléchargement manuel:
+    echo   1. Visitez: https://windows.php.net/download/
+    echo   2. Téléchargez: php-8.2.x-nts-Win32-x64.zip (ou version 8.0+)
+    echo   3. Créez dossier: C:\php-8.2
+    echo   4. Extraire le ZIP dedans
+    echo   5. Relancez ce script
+    echo.
+    pause
     exit /b 1
 )
 
@@ -709,14 +748,16 @@ del "C:\php-8.2.zip" >nul 2>&1
 
 REM Ajouter au PATH
 echo %INFO% Configuration du PATH...
-setx PATH "C:\php-8.2;!PATH!" /M
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"$env:Path = 'C:\php-8.2;' + $env:Path; ^
+[Environment]::SetEnvironmentVariable('Path', $env:Path, 'Machine')"
 
 REM Vérifier l'installation
 echo %INFO% Vérification de PHP...
 php --version >nul 2>&1
 if errorlevel 1 (
-    echo %WARN% Redémarrage en cours pour appliquer les modifications...
-    echo Veuillez relancer restart.bat après le redémarrage
+    echo %WARN% PHP détecté mais PATH nécessite un redémarrage
+    echo Veuillez relancer ce script après redémarrage de l'invite de commandes
     pause
     exit /b 0
 )
@@ -731,28 +772,67 @@ REM ==========================================
 :install_mariadb
 setlocal enabledelayedexpansion
 
-echo %INFO% Téléchargement de MariaDB...
+echo %INFO% Installation de MariaDB...
 echo.
 
-REM Créer le dossier temporaire
+REM Essayer d'abord avec Chocolatey si disponible
+where choco.exe >nul 2>&1
+if !errorlevel! equ 0 (
+    echo %INFO% Chocolatey trouvé, installation via Chocolatey...
+    choco install mariadb -y >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo %SUCCESS% MariaDB installé avec Chocolatey!
+        set FOUND_MYSQL=1
+        exit /b 0
+    )
+)
+
+REM Créer les dossiers
 if not exist "C:\mariadb-install" mkdir "C:\mariadb-install"
 
-REM Télécharger MariaDB (version portable/zip)
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-"try { ^
-    $ProgressPreference = 'SilentlyContinue'; ^
-    $url = 'https://archive.mariadb.org/mariadb-10.6.12/winx64-packages/mariadb-10.6.12-winx64.zip'; ^
-    $dest = 'C:\mariadb-install\mariadb.zip'; ^
-    Write-Host '[INFO] Téléchargement en cours...'; ^
-    Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
-    Write-Host '[OK] Téléchargement terminé'; ^
-} catch { ^
-    Write-Host '[ERREUR] Impossible de télécharger MariaDB'; ^
-    exit 1; ^
-}"
+REM Télécharger MariaDB avec URLs de secours
+echo %INFO% Téléchargement de MariaDB (cette opération peut prendre quelques minutes)...
+echo.
 
-if errorlevel 1 (
-    echo %ERROR% Erreur lors du téléchargement de MariaDB
+set "MARIADB_URLS[0]=https://archive.mariadb.org/mariadb-10.11.6/winx64-packages/mariadb-10.11.6-winx64.zip"
+set "MARIADB_URLS[1]=https://archive.mariadb.org/mariadb-10.6.15/winx64-packages/mariadb-10.6.15-winx64.zip"
+set "MARIADB_URLS[2]=https://archive.mariadb.org/mariadb-10.5.22/winx64-packages/mariadb-10.5.22-winx64.zip"
+
+set "DOWNLOAD_SUCCESS=0"
+
+for /l %%i in (0,1,2) do (
+    if !DOWNLOAD_SUCCESS! equ 0 (
+        echo %INFO% Tentative %%i (essai de téléchargement)...
+        
+        powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+        "try { ^
+            $ProgressPreference = 'SilentlyContinue'; ^
+            $url = '!MARIADB_URLS[%%i]!'; ^
+            $dest = 'C:\mariadb-install\mariadb.zip'; ^
+            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
+            exit 0; ^
+        } catch { ^
+            exit 1; ^
+        }"
+        
+        if !errorlevel! equ 0 (
+            echo %SUCCESS% Téléchargement réussi!
+            set "DOWNLOAD_SUCCESS=1"
+        )
+    )
+)
+
+if !DOWNLOAD_SUCCESS! equ 0 (
+    echo %ERROR% Impossible de télécharger MariaDB automatiquement
+    echo.
+    echo %INFO% Téléchargement manuel:
+    echo   1. Visitez: https://mariadb.org/download/
+    echo   2. Téléchargez MariaDB MSI (version 10.5+)
+    echo   3. Installez avec chemin standard: C:\Program Files\MariaDB
+    echo   4. Configurez avec utilisateur: root, mot de passe: vide
+    echo   5. Relancez ce script
+    echo.
+    pause
     exit /b 1
 )
 
@@ -761,9 +841,13 @@ echo %INFO% Extraction de MariaDB...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 "try { ^
     Expand-Archive -Path 'C:\mariadb-install\mariadb.zip' -DestinationPath 'C:\mariadb-install' -Force; ^
-    Get-ChildItem 'C:\mariadb-install' -Directory | ForEach-Object { ^
-        Move-Item -Path $_.FullName\* -Destination 'C:\Program Files\MariaDB' -Force -ErrorAction SilentlyContinue; ^
-    }; ^
+    $folders = Get-ChildItem 'C:\mariadb-install' -Directory; ^
+    foreach ($folder in $folders) { ^
+        if ($folder.Name -match 'mariadb') { ^
+            Copy-Item -Path $folder.FullName\* -Destination 'C:\Program Files\MariaDB' -Recurse -Force -ErrorAction SilentlyContinue; ^
+            Remove-Item -Path $folder.FullName -Recurse -Force -ErrorAction SilentlyContinue; ^
+        } ^
+    } ^
     Write-Host '[OK] Extraction terminée'; ^
 } catch { ^
     Write-Host '[ERREUR] Impossible d''extraire MariaDB'; ^
@@ -775,25 +859,21 @@ if errorlevel 1 (
     exit /b 1
 )
 
+REM Nettoyer
+rmdir /s /q "C:\mariadb-install" >nul 2>&1
+
 REM Ajouter au PATH
 echo %INFO% Configuration du PATH pour MariaDB...
-if exist "C:\Program Files\MariaDB\bin" (
-    setx PATH "C:\Program Files\MariaDB\bin;!PATH!" /M
-)
-
-REM Installer le service MariaDB
-echo %INFO% Installation du service MariaDB...
-if exist "C:\Program Files\MariaDB\bin\mysqld.exe" (
-    "C:\Program Files\MariaDB\bin\mysqld.exe" --install MariaDB
-    net start MariaDB >nul 2>&1
-)
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"$env:Path = 'C:\Program Files\MariaDB\bin;' + $env:Path; ^
+[Environment]::SetEnvironmentVariable('Path', $env:Path, 'Machine')"
 
 REM Vérifier l'installation
 echo %INFO% Vérification de MariaDB...
 mysql --version >nul 2>&1
 if errorlevel 1 (
-    echo %WARN% Redémarrage en cours pour appliquer les modifications...
-    echo Veuillez relancer restart.bat après le redémarrage
+    echo %WARN% MariaDB détecté mais PATH nécessite un redémarrage
+    echo Veuillez relancer ce script après redémarrage de l'invite de commandes
     pause
     exit /b 0
 )
