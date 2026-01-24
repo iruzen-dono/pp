@@ -22,98 +22,98 @@ echo ╚════════════════════════
 echo.
 
 REM ==========================================
-REM ETAPE 0a: Configuration MySQL/MariaDB
+REM ETAPE 0: Vérifier administrateur
 REM ==========================================
 
-echo %INFO% Configuration MySQL/MariaDB requise
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %ERROR% Ce script doit être exécuté en tant qu'administrateur!
+    echo.
+    echo Clic droit sur restart.bat ^> Exécuter en tant qu'administrateur
+    echo.
+    pause
+    exit /b 1
+)
+
+REM ==========================================
+REM ETAPE 1: Vérifier et installer PHP
+REM ==========================================
+
+echo %INFO% Vérification de PHP...
+echo.
+
+where php.exe >nul 2>&1
+if !errorlevel! equ 0 (
+    echo %SUCCESS% PHP est déjà installé
+    set FOUND_PHP=1
+    goto check_mysql
+)
+
+echo %WARN% PHP non trouvé! Installation automatique...
+echo.
+call :install_php
+if !errorlevel! neq 0 (
+    echo %ERROR% Impossible d'installer PHP
+    pause
+    exit /b 1
+)
+
+:check_mysql
+REM ==========================================
+REM ETAPE 2: Vérifier et installer MariaDB
+REM ==========================================
+
+echo %INFO% Vérification de MariaDB/MySQL...
+echo.
+
+set MYSQL_PATH=
+set FOUND_MYSQL=0
+
+where mysql.exe >nul 2>&1
+if !errorlevel! equ 0 (
+    echo %SUCCESS% MySQL/MariaDB est déjà installé
+    set FOUND_MYSQL=1
+    goto ask_credentials
+)
+
+for /d %%G in ("C:\Program Files\MariaDB*") do (
+    if exist "%%G\bin\mysql.exe" (
+        echo %SUCCESS% MariaDB trouvé: %%G
+        set FOUND_MYSQL=1
+        set "MYSQL_PATH=%%G"
+        goto ask_credentials
+    )
+)
+
+echo %WARN% MariaDB non trouvé! Installation automatique...
+echo.
+call :install_mariadb
+if !errorlevel! neq 0 (
+    echo %ERROR% Impossible d'installer MariaDB
+    pause
+    exit /b 1
+)
+
+:ask_credentials
+
+REM ==========================================
+REM ETAPE 3: Demander les identifiants MySQL
+REM ==========================================
+
+echo %INFO% Configuration des identifiants MySQL/MariaDB
 echo.
 set /p DB_USER="Nom d'utilisateur MySQL (défaut: root): "
 if "!DB_USER!"=="" set "DB_USER=root"
 
-set /p DB_PASS="Mot de passe MySQL: "
-if "!DB_PASS!"=="" set "DB_PASS=0000"
+set /p DB_PASS="Mot de passe MySQL (défaut: vide): "
+if "!DB_PASS!"=="" set "DB_PASS="
 
 echo.
 echo %INFO% Identifiants configurés: !DB_USER!
 echo.
 
 REM ==========================================
-REM ETAPE 0: Detection PHP et MySQL/MariaDB
-REM ==========================================
-
-echo %INFO% Vérification des dépendances...
-echo.
-
-set MYSQL_PATH=
-set FOUND_MYSQL=0
-set FOUND_PHP=0
-
-REM Vérifier PHP
-where php.exe >nul 2>&1
-if !errorlevel! equ 0 (
-    echo %SUCCESS% PHP trouvé
-    set FOUND_PHP=1
-) else (
-    echo %WARN% PHP non trouvé (MySQL CLI sera utilisé)
-)
-
-echo.
-
-REM Vérifier si mysql est dans PATH
-where mysql.exe >nul 2>&1
-if !errorlevel! equ 0 (
-    for /f "delims=" %%i in ('where mysql.exe') do set MYSQL_PATH=%%i
-    set FOUND_MYSQL=1
-    goto check_mysql_service
-)
-
-REM Chercher MariaDB
-for /d %%G in ("C:\Program Files\MariaDB*") do (
-    if exist "%%G\bin\mysql.exe" (
-        set MYSQL_PATH=%%G\bin\mysql.exe
-        set FOUND_MYSQL=1
-        goto check_mysql_service
-    )
-)
-
-REM Chercher MySQL
-for /d %%G in ("C:\Program Files\MySQL*") do (
-    if exist "%%G\bin\mysql.exe" (
-        set MYSQL_PATH=%%G\bin\mysql.exe
-        set FOUND_MYSQL=1
-        goto check_mysql_service
-    )
-)
-
-REM Chercher dans Program Files (x86)
-for /d %%G in ("C:\Program Files (x86)\MariaDB*") do (
-    if exist "%%G\bin\mysql.exe" (
-        set MYSQL_PATH=%%G\bin\mysql.exe
-        set FOUND_MYSQL=1
-        goto check_mysql_service
-    )
-)
-
-if !FOUND_MYSQL! equ 0 (
-    echo.
-    echo %ERROR% MySQL/MariaDB introuvable!
-    echo.
-    echo 📋 Solutions:
-    echo    1. Télécharger MariaDB: https://mariadb.org/download
-    echo    2. Ou installer MySQL: https://dev.mysql.com/downloads/mysql/
-    echo    3. Installer avec chemin standard (C:\Program Files\MariaDB ou C:\Program Files\MySQL)
-    echo    4. Ajouter bin au PATH Windows
-    echo.
-    pause
-    goto end
-)
-
-:check_mysql_service
-echo %SUCCESS% Trouvé: !MYSQL_PATH!
-echo.
-
-REM ==========================================
-REM ETAPE 2: Menu principal
+REM ETAPE 4: Menu principal
 REM ==========================================
 
 echo.
@@ -142,7 +142,7 @@ echo.
 echo %ERROR% Choix invalide!
 pause
 cls
-goto check_mysql_service
+goto ask_credentials
 
 REM ==========================================
 REM SETUP COMPLET - Pour clonage initial
@@ -655,6 +655,151 @@ if !errorlevel! neq 0 (
 )
 
 echo %SUCCESS% Base de données initialisée!
+exit /b 0
+
+REM ==========================================
+REM FONCTION: Installer PHP automatiquement
+REM ==========================================
+:install_php
+setlocal enabledelayedexpansion
+
+echo %INFO% Téléchargement de PHP 8.2...
+echo.
+
+REM Créer le dossier PHP
+if not exist "C:\php-8.2" mkdir "C:\php-8.2"
+
+REM Télécharger PHP avec PowerShell
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"try { ^
+    $ProgressPreference = 'SilentlyContinue'; ^
+    $url = 'https://windows.php.net/downloads/releases/php-8.2.18-nts-Win32-x64.zip'; ^
+    $dest = 'C:\php-8.2.zip'; ^
+    Write-Host '[INFO] Téléchargement en cours...'; ^
+    Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
+    Write-Host '[OK] Téléchargement terminé'; ^
+} catch { ^
+    Write-Host '[ERREUR] Impossible de télécharger PHP: ' $_.Exception.Message; ^
+    exit 1; ^
+}" 
+
+if errorlevel 1 (
+    echo %ERROR% Erreur lors du téléchargement de PHP
+    exit /b 1
+)
+
+REM Extraire le ZIP
+echo %INFO% Extraction de PHP...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"try { ^
+    Expand-Archive -Path 'C:\php-8.2.zip' -DestinationPath 'C:\php-8.2' -Force; ^
+    Write-Host '[OK] Extraction terminée'; ^
+} catch { ^
+    Write-Host '[ERREUR] Impossible d''extraire PHP'; ^
+    exit 1; ^
+}"
+
+if errorlevel 1 (
+    echo %ERROR% Erreur lors de l'extraction de PHP
+    exit /b 1
+)
+
+REM Nettoyer le ZIP
+del "C:\php-8.2.zip" >nul 2>&1
+
+REM Ajouter au PATH
+echo %INFO% Configuration du PATH...
+setx PATH "C:\php-8.2;!PATH!" /M
+
+REM Vérifier l'installation
+echo %INFO% Vérification de PHP...
+php --version >nul 2>&1
+if errorlevel 1 (
+    echo %WARN% Redémarrage en cours pour appliquer les modifications...
+    echo Veuillez relancer restart.bat après le redémarrage
+    pause
+    exit /b 0
+)
+
+echo %SUCCESS% PHP 8.2 installé avec succès!
+set FOUND_PHP=1
+exit /b 0
+
+REM ==========================================
+REM FONCTION: Installer MariaDB automatiquement
+REM ==========================================
+:install_mariadb
+setlocal enabledelayedexpansion
+
+echo %INFO% Téléchargement de MariaDB...
+echo.
+
+REM Créer le dossier temporaire
+if not exist "C:\mariadb-install" mkdir "C:\mariadb-install"
+
+REM Télécharger MariaDB (version portable/zip)
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"try { ^
+    $ProgressPreference = 'SilentlyContinue'; ^
+    $url = 'https://archive.mariadb.org/mariadb-10.6.12/winx64-packages/mariadb-10.6.12-winx64.zip'; ^
+    $dest = 'C:\mariadb-install\mariadb.zip'; ^
+    Write-Host '[INFO] Téléchargement en cours...'; ^
+    Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
+    Write-Host '[OK] Téléchargement terminé'; ^
+} catch { ^
+    Write-Host '[ERREUR] Impossible de télécharger MariaDB'; ^
+    exit 1; ^
+}"
+
+if errorlevel 1 (
+    echo %ERROR% Erreur lors du téléchargement de MariaDB
+    exit /b 1
+)
+
+REM Extraire MariaDB
+echo %INFO% Extraction de MariaDB...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"try { ^
+    Expand-Archive -Path 'C:\mariadb-install\mariadb.zip' -DestinationPath 'C:\mariadb-install' -Force; ^
+    Get-ChildItem 'C:\mariadb-install' -Directory | ForEach-Object { ^
+        Move-Item -Path $_.FullName\* -Destination 'C:\Program Files\MariaDB' -Force -ErrorAction SilentlyContinue; ^
+    }; ^
+    Write-Host '[OK] Extraction terminée'; ^
+} catch { ^
+    Write-Host '[ERREUR] Impossible d''extraire MariaDB'; ^
+    exit 1; ^
+}"
+
+if errorlevel 1 (
+    echo %ERROR% Erreur lors de l'extraction de MariaDB
+    exit /b 1
+)
+
+REM Ajouter au PATH
+echo %INFO% Configuration du PATH pour MariaDB...
+if exist "C:\Program Files\MariaDB\bin" (
+    setx PATH "C:\Program Files\MariaDB\bin;!PATH!" /M
+)
+
+REM Installer le service MariaDB
+echo %INFO% Installation du service MariaDB...
+if exist "C:\Program Files\MariaDB\bin\mysqld.exe" (
+    "C:\Program Files\MariaDB\bin\mysqld.exe" --install MariaDB
+    net start MariaDB >nul 2>&1
+)
+
+REM Vérifier l'installation
+echo %INFO% Vérification de MariaDB...
+mysql --version >nul 2>&1
+if errorlevel 1 (
+    echo %WARN% Redémarrage en cours pour appliquer les modifications...
+    echo Veuillez relancer restart.bat après le redémarrage
+    pause
+    exit /b 0
+)
+
+echo %SUCCESS% MariaDB installé avec succès!
+set FOUND_MYSQL=1
 exit /b 0
 
 :end
