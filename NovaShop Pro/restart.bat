@@ -39,6 +39,7 @@ if %errorlevel% neq 0 (
     echo Clic droit sur restart.bat ^> Exécuter en tant qu'administrateur
     echo.
     pause
+    endlocal
     exit /b 1
 )
 
@@ -49,9 +50,13 @@ REM ==========================================
 echo %INFO% Vérification de PHP...
 echo.
 
-where php.exe >nul 2>&1
-echo [DEBUG] PHP check done, errorlevel=!errorlevel!
-if !errorlevel! equ 0 (
+if exist "C:\php-8.2\php.exe" (
+    set "PHP_PATH=C:\php-8.2\php.exe"
+) else (
+    set "PHP_PATH="
+)
+
+if defined PHP_PATH (
     echo %SUCCESS% PHP est déjà installé
     set "FOUND_PHP=1"
     goto check_mysql
@@ -77,22 +82,16 @@ REM ==========================================
 echo %INFO% Vérification de MariaDB/MySQL...
 echo.
 
-where mysql.exe >nul 2>&1
-echo [DEBUG] MySQL check done, errorlevel=!errorlevel!
-if !errorlevel! equ 0 (
+if exist "C:\Program Files\MariaDB\bin\mysql.exe" (
+    set "MYSQL_PATH=C:\Program Files\MariaDB\bin"
+) else (
+    set "MYSQL_PATH="
+)
+
+if defined MYSQL_PATH (
     echo %SUCCESS% MySQL/MariaDB est déjà installé
     set "FOUND_MYSQL=1"
     goto ask_credentials
-)
-
-for /d %%G in ("C:\Program Files\MariaDB*") do (
-    echo [DEBUG] Checking folder: %%G
-    if exist "%%G\bin\mysql.exe" (
-        echo %SUCCESS% MariaDB trouvé: %%G
-        set "FOUND_MYSQL=1"
-        set "MYSQL_PATH=%%G\bin"
-        goto ask_credentials
-    )
 )
 
 echo %WARN% MariaDB non trouvé! Installation automatique...
@@ -750,4 +749,5 @@ echo.
 echo À bientôt!
 echo.
 pause
+endlocal
 exit /b 0
