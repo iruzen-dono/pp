@@ -11,24 +11,53 @@ REM Couleurs
 set "SUCCESS=[OK]"
 set "ERROR=[ERREUR]"
 set "INFO=[INFO]"
+set "WARN=[ATTENTION]"
 
 cls
 echo.
 echo ╔════════════════════════════════════════════════════════════════╗
 echo ║         🌟 NovaShop Pro - Configuration Complète 🌟            ║
-echo ║                    Clonage & Initialisation                    ║
+echo ║                    Clonage ^& Initialisation                    ║
 echo ╚════════════════════════════════════════════════════════════════╝
 echo.
 
 REM ==========================================
-REM ETAPE 1: Detection MySQL/MariaDB
+REM ETAPE 0a: Configuration MySQL/MariaDB
 REM ==========================================
 
-echo %INFO% Détection de MySQL/MariaDB...
+echo %INFO% Configuration MySQL/MariaDB requise
+echo.
+set /p DB_USER="Nom d'utilisateur MySQL (défaut: root): "
+if "!DB_USER!"=="" set "DB_USER=root"
+
+set /p DB_PASS="Mot de passe MySQL: "
+if "!DB_PASS!"=="" set "DB_PASS=0000"
+
+echo.
+echo %INFO% Identifiants configurés: !DB_USER!
+echo.
+
+REM ==========================================
+REM ETAPE 0: Detection PHP et MySQL/MariaDB
+REM ==========================================
+
+echo %INFO% Vérification des dépendances...
 echo.
 
 set MYSQL_PATH=
 set FOUND_MYSQL=0
+set FOUND_PHP=0
+
+REM Vérifier PHP
+where php.exe >nul 2>&1
+if !errorlevel! equ 0 (
+    echo %SUCCESS% PHP trouvé
+    set FOUND_PHP=1
+) else (
+    echo %WARN% PHP non trouvé (MySQL CLI sera utilisé)
+)
+
+echo.
 
 REM Vérifier si mysql est dans PATH
 where mysql.exe >nul 2>&1
@@ -134,37 +163,71 @@ echo.
 pause
 
 echo %INFO% Étape 1/3: Création de la base de données...
-php "%~dp0start_novashop.php"
-if errorlevel 1 (
-    echo %ERROR% Erreur lors de l'initialisation BD!
+
+if !FOUND_PHP! equ 1 (
+    set "DB_HOST=localhost"
+    set "DB_USER=!DB_USER!"
+    set "DB_PASS=!DB_PASS!"
+    php "%~dp0start_novashop.php"
+    if errorlevel 1 (
+        echo %WARN% PHP a échoué, essai avec MySQL CLI...
+        if !FOUND_MYSQL! equ 1 (
+            call :init_db_mysql
+            if errorlevel 1 (
+                echo %ERROR% Erreur lors de l'initialisation BD!
+                pause
+                goto end
+            )
+        ) else (
+            echo %ERROR% PHP et MySQL non disponibles!
+            pause
+            goto end
+        )
+    )
+) else if !FOUND_MYSQL! equ 1 (
+    call :init_db_mysql
+    if errorlevel 1 (
+        echo %ERROR% Erreur lors de l'initialisation BD!
+        pause
+        goto end
+    )
+) else (
+    echo %ERROR% PHP et MySQL non trouvés!
+    echo Exécutez setup_auto.bat pour installer les dépendances
     pause
     goto end
 )
+
 echo %SUCCESS% BD initialisée avec 35 produits premium!
 echo.
 
 echo %INFO% Étape 2/3: Téléchargement des images produits...
-php "%~dp0Public/Assets/Images/download_images.php" 2>nul
-if errorlevel 1 (
-    echo %INFO% Note: Images optionnelles (peuvent être ajoutées manuellement)
+if !FOUND_PHP! equ 1 (
+    php "%~dp0Public/Assets/Images/download_images.php" 2>nul
 )
 echo %SUCCESS% Téléchargement terminé!
 echo.
 
-echo %INFO% Étape 3/3: Démarrage du serveur...
-echo.
-echo 🌐 Serveur disponible sur: http://localhost:8000
-echo.
-echo Identifiants admin:
-echo   Email: admin@novashop.local
-echo   Mot de passe: admin123
-echo.
-echo Appuyez sur Ctrl+C pour arrêter le serveur
-echo.
-pause
+if !FOUND_PHP! equ 1 (
+    echo %INFO% Étape 3/3: Démarrage du serveur...
+    echo.
+    echo 🌐 Serveur disponible sur: http://localhost:8000
+    echo.
+    echo Identifiants admin:
+    echo   Email: admin@novashop.local
+    echo   Mot de passe: admin123
+    echo.
+    echo Appuyez sur Ctrl+C pour arrêter le serveur
+    echo.
+    pause
 
-cd /d "%~dp0\Public"
-php -S localhost:8000 router.php
+    cd /d "%~dp0Public"
+    php -S localhost:8000 router.php
+) else (
+    echo %WARN% PHP non disponible. Impossible de démarrer le serveur.
+    echo Installez PHP avec setup_auto.bat
+    pause
+)
 goto end
 
 REM ==========================================
@@ -213,9 +276,36 @@ if /i not "%confirm%"=="O" (
 
 echo.
 echo %INFO% Réinitialisation en cours...
-php "%~dp0start_novashop.php"
-if errorlevel 1 (
-    echo %ERROR% Erreur lors de l'initialisation!
+
+if !FOUND_PHP! equ 1 (
+    set "DB_HOST=localhost"
+    set "DB_USER=!DB_USER!"
+    set "DB_PASS=!DB_PASS!"
+    php "%~dp0start_novashop.php"
+    if errorlevel 1 (
+        echo %WARN% PHP a échoué, essai avec MySQL CLI...
+        if !FOUND_MYSQL! equ 1 (
+            call :init_db_mysql
+            if errorlevel 1 (
+                echo %ERROR% Erreur lors de l'initialisation!
+                pause
+                goto end
+            )
+        ) else (
+            echo %ERROR% PHP et MySQL non disponibles!
+            pause
+            goto end
+        )
+    )
+) else if !FOUND_MYSQL! equ 1 (
+    call :init_db_mysql
+    if errorlevel 1 (
+        echo %ERROR% Erreur lors de l'initialisation!
+        pause
+        goto end
+    )
+) else (
+    echo %ERROR% PHP et MySQL non trouvés!
     pause
     goto end
 )
@@ -329,9 +419,36 @@ if exist "%~dp0\Public\Assets\Images\products\*" (
 
 REM Réinitialiser BD
 echo %INFO% Recréation de la base de données...
-php "%~dp0start_novashop.php"
-if errorlevel 1 (
-    echo %ERROR% Erreur lors du reset!
+
+if !FOUND_PHP! equ 1 (
+    set "DB_HOST=localhost"
+    set "DB_USER=!DB_USER!"
+    set "DB_PASS=!DB_PASS!"
+    php "%~dp0start_novashop.php"
+    if errorlevel 1 (
+        echo %WARN% PHP a échoué, essai avec MySQL CLI...
+        if !FOUND_MYSQL! equ 1 (
+            call :init_db_mysql
+            if errorlevel 1 (
+                echo %ERROR% Erreur lors du reset!
+                pause
+                goto end
+            )
+        ) else (
+            echo %ERROR% PHP et MySQL non disponibles!
+            pause
+            goto end
+        )
+    )
+) else if !FOUND_MYSQL! equ 1 (
+    call :init_db_mysql
+    if errorlevel 1 (
+        echo %ERROR% Erreur lors du reset!
+        pause
+        goto end
+    )
+) else (
+    echo %ERROR% PHP et MySQL non trouvés!
     pause
     goto end
 )
@@ -489,6 +606,56 @@ echo [ERREUR] Choix invalide
 echo.
 pause
 goto end
+
+REM ==========================================
+REM FONCTION: Initialiser BD avec MySQL CLI
+REM ==========================================
+:init_db_mysql
+setlocal enabledelayedexpansion
+
+echo %INFO% Initialisation de la BD avec MySQL CLI...
+
+if defined MYSQL_PATH (
+    set "MYSQL_CMD=!MYSQL_PATH!"
+) else (
+    set "MYSQL_CMD=mysql.exe"
+)
+
+REM Tester la connexion
+!MYSQL_CMD! -u !DB_USER! -p!DB_PASS! -e "SELECT 1" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo %ERROR% Impossible de se connecter à MySQL/MariaDB
+    echo.
+    echo   Vérifiez que:
+    echo   • MariaDB est en cours d'exécution
+    echo   • L'utilisateur !DB_USER! existe
+    echo   • Le mot de passe configuré est correct
+    echo.
+    exit /b 1
+)
+
+echo %INFO% Suppression de la base de données existante...
+!MYSQL_CMD! -u !DB_USER! -p!DB_PASS! -e "DROP DATABASE IF EXISTS novashop" >nul 2>&1
+
+echo %INFO% Création de la nouvelle base de données...
+!MYSQL_CMD! -u !DB_USER! -p!DB_PASS! -e "CREATE DATABASE novashop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" >nul 2>&1
+
+echo %INFO% Création des tables...
+!MYSQL_CMD! -u !DB_USER! -p!DB_PASS! novashop < "%~dp0setup.sql" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo %ERROR% Erreur lors de la création des tables
+    exit /b 1
+)
+
+echo %INFO% Insertion des données premium...
+!MYSQL_CMD! -u !DB_USER! -p!DB_PASS! novashop < "%~dp0seed_premium.sql" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo %WARN% Données premium non importées, import standard...
+    !MYSQL_CMD! -u !DB_USER! -p!DB_PASS! novashop < "%~dp0seed.sql" >nul 2>&1
+)
+
+echo %SUCCESS% Base de données initialisée!
+exit /b 0
 
 :end
 echo.

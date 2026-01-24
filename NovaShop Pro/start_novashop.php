@@ -14,10 +14,10 @@ echo "╔═══════════════════════�
 echo "║           🚀 NovaShop Pro - Démarrage Automatique         ║\n";
 echo "╚════════════════════════════════════════════════════════════╝\n\n";
 
-// Configuration
-$dbHost = 'localhost';
-$dbUser = 'root';
-$dbPass = '0000';
+// Configuration - Lire depuis les variables d'environnement ou utiliser les valeurs par défaut
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbUser = getenv('DB_USER') ?: 'root';
+$dbPass = getenv('DB_PASS') ?: '0000';
 $dbName = 'novashop';
 
 // Étape 1: Créer les images locales
