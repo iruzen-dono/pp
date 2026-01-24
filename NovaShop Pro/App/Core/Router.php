@@ -52,6 +52,10 @@ class Router
                 // C'est un ID, le passer comme premier param
                 $params = array_slice($url, 1);
             }
+        } else if (!empty($url[2])) {
+            // Gestion du cas /admin/products/edit/ID
+            $methodName = $url[1] . ucfirst($url[2]);
+            $params = array_slice($url, 3);
         }
         
         $_GET['params'] = $params;

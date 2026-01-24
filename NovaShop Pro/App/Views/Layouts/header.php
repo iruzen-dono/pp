@@ -92,7 +92,7 @@
                                 <span class="nav-icon">🔓</span>
                                 <span>Connexion</span>
                             </a>
-                            <a href="/register" class="nav-link nav-link-register nav-link-highlight">
+                            <a href="/register" class="nav-link nav-link-register nav-link-primary">
                                 <span class="nav-icon">✨</span>
                                 <span>S'inscrire</span>
                             </a>

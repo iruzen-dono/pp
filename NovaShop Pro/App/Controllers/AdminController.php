@@ -157,6 +157,91 @@ class AdminController extends Controller
         exit;
     }
 
+    public function editProduct()
+    {
+        $productId = $_GET['params'][0] ?? null;
+        
+        if (!$productId) {
+            header('Location: /admin/products');
+            exit;
+        }
+        
+        $productModel = new Product();
+        $product = $productModel->getById($productId);
+        
+        if (!$product) {
+            header('Location: /admin/products?error=not_found');
+            exit;
+        }
+        
+        // Traiter la soumission du formulaire
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $imagePath = $product['image_url'];
+            
+            // Gestion de l'upload d'image si une nouvelle image est fournie
+            if (!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES['image'];
+                $uploadDir = __DIR__ . '/../../Public/Assets/Images/products/';
+                
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+                
+                $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($finfo, $file['tmp_name']);
+                finfo_close($finfo);
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    header('Location: /admin/products/edit/' . $productId . '?error=invalid_image_type');
+                    exit;
+                }
+                
+                if ($file['size'] > 5 * 1024 * 1024) {
+                    header('Location: /admin/products/edit/' . $productId . '?error=image_too_large');
+                    exit;
+                }
+                
+                $fileName = 'product_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filePath = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($file['tmp_name'], $filePath)) {
+                    $imagePath = '/Assets/Images/products/' . $fileName;
+                }
+            }
+            
+            $productModel->update(
+                $productId,
+                $_POST['name'] ?? $product['name'],
+                $_POST['description'] ?? $product['description'],
+                (float)($_POST['price'] ?? $product['price']),
+                (int)($_POST['category_id'] ?? $product['category_id'])
+            );
+            
+            // Mettre à jour l'image si modifiée
+            if ($imagePath !== $product['image_url']) {
+                // Utiliser une connexion PDO directe pour éviter les méthodes protégées
+                try {
+                    $db = new \mysqli('localhost', 'root', '0000', 'novashop');
+                    $stmt = $db->prepare("UPDATE products SET image_url = ? WHERE id = ?");
+                    if ($stmt) {
+                        $stmt->bind_param('si', $imagePath, $productId);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                    $db->close();
+                } catch (\Exception $e) {
+                    // Ignorer les erreurs de mise à jour d'image
+                }
+            }
+            
+            header('Location: /admin/products?success=updated');
+            exit;
+        }
+        
+        $this->adminView('admin/edit_product', ['product' => $product]);
+    }
+
     public function deleteOrder()
     {
         $orderId = $_GET['params'][0] ?? null;
