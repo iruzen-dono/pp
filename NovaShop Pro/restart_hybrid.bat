@@ -1,6 +1,6 @@
 @echo off
 REM ==========================================
-REM NovaShop Pro - Auto-Install PHP & MariaDB
+REM NovaShop Pro - Hybrid Install (Manual + Auto)
 REM ==========================================
 
 cls
@@ -15,25 +15,28 @@ set "WARN=[ATTENTION]"
 cls
 echo.
 echo ╔════════════════════════════════════════════════════════════════╗
-echo ║    🌟 NovaShop Pro - Installation Automatique 🌟              ║
+echo ║   🌟 NovaShop Pro - Installation Hybride 🌟                   ║
 echo ╚════════════════════════════════════════════════════════════════╝
 echo.
 
 REM Admin check
 net session >nul 2>&1
 if errorlevel 1 (
-    echo %ERROR% Admin requis!
+    echo %ERROR% Admin required!
     pause
     endlocal
     exit /b 1
 )
+
+echo %SUCCESS% Admin rights OK
+echo.
 
 REM Check PHP
 if exist "C:\php-8.2\php.exe" (
     echo %SUCCESS% PHP trouvé
     set "PHP_OK=1"
 ) else (
-    echo %WARN% PHP manquant - Installation automatique...
+    echo %WARN% PHP manquant
     set "PHP_OK=0"
 )
 
@@ -42,7 +45,7 @@ if exist "C:\Program Files\MariaDB\bin\mysql.exe" (
     echo %SUCCESS% MariaDB trouvé
     set "MYSQL_OK=1"
 ) else (
-    echo %WARN% MariaDB manquant - Installation automatique...
+    echo %WARN% MariaDB manquant
     set "MYSQL_OK=0"
 )
 
@@ -50,7 +53,7 @@ echo.
 
 REM Install PHP if needed
 if "!PHP_OK!"=="0" (
-    call :install_php
+    call :install_php_hybrid
     if errorlevel 1 (
         echo %ERROR% PHP installation failed
         pause
@@ -61,7 +64,7 @@ if "!PHP_OK!"=="0" (
 
 REM Install MySQL if needed
 if "!MYSQL_OK!"=="0" (
-    call :install_mysql
+    call :install_mysql_hybrid
     if errorlevel 1 (
         echo %ERROR% MySQL installation failed
         pause
@@ -69,6 +72,9 @@ if "!MYSQL_OK!"=="0" (
         exit /b 1
     )
 )
+
+echo %SUCCESS% Installation complete!
+echo.
 
 REM Ask credentials
 echo %INFO% Identifiants MySQL
@@ -109,6 +115,8 @@ goto menu
 
 :reset
 echo Resetting DB...
+mysql -u !DB_USER! -p!DB_PASS! -e "DROP DATABASE IF EXISTS novashop"
+mysql -u !DB_USER! -p!DB_PASS! -e "CREATE DATABASE novashop CHARACTER SET utf8mb4"
 mysql -u !DB_USER! -p!DB_PASS! novashop < "%~dp0setup.sql"
 mysql -u !DB_USER! -p!DB_PASS! novashop < "%~dp0seed_premium.sql"
 pause
@@ -127,49 +135,57 @@ goto menu
 
 :fullreset
 echo Full reset...
-mysql -u !DB_USER! -p!DB_PASS! -e "DROP DATABASE novashop"
+mysql -u !DB_USER! -p!DB_PASS! -e "DROP DATABASE IF EXISTS novashop"
 pause
 goto menu
 
 REM ==========================================
-REM INSTALL PHP
+REM INSTALL PHP - Hybrid (Auto + Manual)
 REM ==========================================
-:install_php
+:install_php_hybrid
 setlocal enabledelayedexpansion
 
-echo %INFO% Installing PHP 8.2...
+echo %INFO% Installation de PHP 8.2...
+echo.
 
-REM Create folder
 if not exist "C:\php-8.2" mkdir "C:\php-8.2"
 
-REM Download with certutil (more reliable)
-echo %INFO% Downloading PHP... (this may take 1-2 minutes)
-
+echo %INFO% Tentative 1: Téléchargement automatique...
 certutil -urlcache -split -f "https://windows.php.net/downloads/releases/php-8.2.21-nts-Win32-x64.zip" "C:\php-8.2.zip" >nul 2>&1
 
-if not exist "C:\php-8.2.zip" (
-    echo %ERROR% Download failed - trying alternate URL
-    certutil -urlcache -split -f "https://windows.php.net/downloads/releases/php-8.1.27-nts-Win32-x64.zip" "C:\php-8.2.zip" >nul 2>&1
+if exist "C:\php-8.2.zip" (
+    echo %SUCCESS% Téléchargement réussi
+    goto extract_php
 )
 
+echo %WARN% Téléchargement échoué - Mode manuel requis
+echo.
+echo %INFO% Téléchargement manuel de PHP:
+echo  1. Ouvrez: https://windows.php.net/download/
+echo  2. Téléchargez: php-8.2-nts-Win32-x64.zip
+echo  3. Placez le fichier: C:\php-8.2.zip
+echo  4. Appuyez sur une touche pour continuer...
+pause
+
 if not exist "C:\php-8.2.zip" (
-    echo %ERROR% Download failed
+    echo %ERROR% Fichier non trouvé!
     endlocal
     exit /b 1
 )
 
-echo %INFO% Extracting...
+:extract_php
+echo %INFO% Extraction...
 
-REM Using tar (available on Windows 10+)
-tar -xf "C:\php-8.2.zip" -C "C:\php-8.2" 2>nul
+REM Try tar first
+tar -xf "C:\php-8.2.zip" -C "C:\php-8.2" >nul 2>&1
 
 if errorlevel 1 (
-    REM Fallback to PowerShell
-    powershell -NoProfile -Command "Expand-Archive -Path 'C:\php-8.2.zip' -DestinationPath 'C:\php-8.2' -Force" 2>nul
+    REM Try PowerShell
+    powershell -NoProfile -Command "Expand-Archive -Path 'C:\php-8.2.zip' -DestinationPath 'C:\php-8.2' -Force" >nul 2>&1
 )
 
 if errorlevel 1 (
-    echo %ERROR% Extract failed
+    echo %ERROR% Extraction failed!
     del "C:\php-8.2.zip"
     endlocal
     exit /b 1
@@ -177,64 +193,78 @@ if errorlevel 1 (
 
 del "C:\php-8.2.zip"
 
-REM Add to PATH
 echo %INFO% Adding to PATH...
-setx PATH "%PATH%;C:\php-8.2"
+setx PATH "%PATH%;C:\php-8.2" >nul 2>&1
 
 echo %SUCCESS% PHP installed!
 endlocal
 exit /b 0
 
 REM ==========================================
-REM INSTALL MYSQL
+REM INSTALL MYSQL - Hybrid (Auto + Manual)
 REM ==========================================
-:install_mysql
+:install_mysql_hybrid
 setlocal enabledelayedexpansion
 
-echo %INFO% Installing MariaDB 10.5...
+echo %INFO% Installation de MariaDB 10.5...
+echo.
 
 if not exist "C:\mariadb-install" mkdir "C:\mariadb-install"
 cd /d "C:\mariadb-install"
 
-echo %INFO% Downloading MariaDB... (this may take 2-3 minutes)
-
+echo %INFO% Tentative 1: Téléchargement automatique...
 certutil -urlcache -split -f "https://downloads.mariadb.org/interstitial/mariadb-10.5.23/binaries/mariadb-10.5.23-winx64.zip" "mariadb.zip" >nul 2>&1
 
+if exist "mariadb.zip" (
+    echo %SUCCESS% Téléchargement réussi
+    goto extract_mysql
+)
+
+echo %WARN% Téléchargement échoué - Mode manuel requis
+echo.
+echo %INFO% Téléchargement manuel de MariaDB:
+echo  1. Ouvrez: https://mariadb.org/download/
+echo  2. Téléchargez: mariadb-10.5-winx64.zip
+echo  3. Placez le fichier: C:\mariadb-install\mariadb.zip
+echo  4. Appuyez sur une touche pour continuer...
+pause
+
 if not exist "mariadb.zip" (
-    echo %ERROR% Download failed
+    echo %ERROR% Fichier non trouvé!
     cd /d "%~dp0"
     endlocal
     exit /b 1
 )
 
-echo %INFO% Extracting...
-tar -xf "mariadb.zip" -C "." 2>nul
+:extract_mysql
+echo %INFO% Extraction...
+
+REM Try tar first
+tar -xf "mariadb.zip" -C "." >nul 2>&1
 
 if errorlevel 1 (
-    REM Fallback to PowerShell
-    powershell -NoProfile -Command "Expand-Archive -Path 'mariadb.zip' -DestinationPath '.' -Force" 2>nul
+    REM Try PowerShell
+    powershell -NoProfile -Command "Expand-Archive -Path 'mariadb.zip' -DestinationPath '.' -Force" >nul 2>&1
 )
 
-REM Find extracted folder
+if errorlevel 1 (
+    echo %ERROR% Extraction failed!
+    cd /d "%~dp0"
+    endlocal
+    exit /b 1
+)
+
+REM Find extracted folder and copy
 for /d %%D in (mariadb-*) do (
-    echo %INFO% Found: %%D
     if not exist "C:\Program Files\MariaDB" mkdir "C:\Program Files\MariaDB"
-    xcopy "%%D\*" "C:\Program Files\MariaDB" /E /I /Y >nul
-    if errorlevel 1 (
-        echo %ERROR% Copy failed
-        cd /d "%~dp0"
-        endlocal
-        exit /b 1
-    )
+    xcopy "%%D\*" "C:\Program Files\MariaDB" /E /I /Y >nul 2>&1
 )
 
-REM Clean
 cd /d "%~dp0"
-rmdir /s /q "C:\mariadb-install" 2>nul
+rmdir /s /q "C:\mariadb-install" >nul 2>&1
 
-REM Add to PATH
 echo %INFO% Adding to PATH...
-setx PATH "%PATH%;C:\Program Files\MariaDB\bin"
+setx PATH "%PATH%;C:\Program Files\MariaDB\bin" >nul 2>&1
 
 echo %SUCCESS% MariaDB installed!
 endlocal
