@@ -13,6 +13,13 @@ set "ERROR=[ERREUR]"
 set "INFO=[INFO]"
 set "WARN=[ATTENTION]"
 
+REM Variables globales
+set "FOUND_PHP=0"
+set "FOUND_MYSQL=0"
+set "MYSQL_PATH="
+set "DB_USER="
+set "DB_PASS="
+
 cls
 echo.
 echo ╔════════════════════════════════════════════════════════════════╗
@@ -45,14 +52,16 @@ echo.
 where php.exe >nul 2>&1
 if !errorlevel! equ 0 (
     echo %SUCCESS% PHP est déjà installé
-    set FOUND_PHP=1
+    set "FOUND_PHP=1"
     goto check_mysql
 )
 
 echo %WARN% PHP non trouvé! Installation automatique...
 echo.
 call :install_php
-if !errorlevel! neq 0 (
+if !errorlevel! equ 0 (
+    set "FOUND_PHP=1"
+) else (
     echo %ERROR% Impossible d'installer PHP
     pause
     exit /b 1
@@ -66,21 +75,18 @@ REM ==========================================
 echo %INFO% Vérification de MariaDB/MySQL...
 echo.
 
-set MYSQL_PATH=
-set FOUND_MYSQL=0
-
 where mysql.exe >nul 2>&1
 if !errorlevel! equ 0 (
     echo %SUCCESS% MySQL/MariaDB est déjà installé
-    set FOUND_MYSQL=1
+    set "FOUND_MYSQL=1"
     goto ask_credentials
 )
 
 for /d %%G in ("C:\Program Files\MariaDB*") do (
     if exist "%%G\bin\mysql.exe" (
         echo %SUCCESS% MariaDB trouvé: %%G
-        set FOUND_MYSQL=1
-        set "MYSQL_PATH=%%G"
+        set "FOUND_MYSQL=1"
+        set "MYSQL_PATH=%%G\bin"
         goto ask_credentials
     )
 )
@@ -88,7 +94,9 @@ for /d %%G in ("C:\Program Files\MariaDB*") do (
 echo %WARN% MariaDB non trouvé! Installation automatique...
 echo.
 call :install_mariadb
-if !errorlevel! neq 0 (
+if !errorlevel! equ 0 (
+    set "FOUND_MYSQL=1"
+) else (
     echo %ERROR% Impossible d'installer MariaDB
     pause
     exit /b 1
@@ -106,7 +114,6 @@ set /p DB_USER="Nom d'utilisateur MySQL (défaut: root): "
 if "!DB_USER!"=="" set "DB_USER=root"
 
 set /p DB_PASS="Mot de passe MySQL (défaut: vide): "
-if "!DB_PASS!"=="" set "DB_PASS="
 
 echo.
 echo %INFO% Identifiants configurés: !DB_USER!
@@ -224,8 +231,7 @@ if !FOUND_PHP! equ 1 (
     cd /d "%~dp0Public"
     php -S localhost:8000 router.php
 ) else (
-    echo %WARN% PHP non disponible. Impossible de démarrer le serveur.
-    echo Installez PHP avec setup_auto.bat
+    echo %WARN% PHP non disponible. Installation terminée!
     pause
 )
 goto end
@@ -247,7 +253,7 @@ echo Appuyez sur Ctrl+C pour arrêter le serveur
 echo.
 pause
 
-cd /d "%~dp0\Public"
+cd /d "%~dp0Public"
 php -S localhost:8000 router.php
 goto end
 
@@ -317,7 +323,7 @@ echo %INFO% Serveur sur: http://localhost:8000
 echo.
 pause
 
-cd /d "%~dp0\Public"
+cd /d "%~dp0Public"
 php -S localhost:8000 router.php
 goto end
 
@@ -336,16 +342,16 @@ echo %INFO% Destination: Public/Assets/Images/products/
 echo.
 pause
 
-php "%~dp0Public/Assets/Images/download_images.php"
-if errorlevel 1 (
-    echo %ERROR% Erreur lors du téléchargement
-    echo %INFO% Assurez-vous d'avoir une connexion internet
-    pause
-    goto end
+if !FOUND_PHP! equ 1 (
+    php "%~dp0Public/Assets/Images/download_images.php"
+) else (
+    echo %WARN% PHP non disponible. Téléchargement manuel:
+    echo Visitez: https://loremflickr.com/640/480/product
+    echo Sauvegardez 35 images dans: Public/Assets/Images/products/
 )
 
 echo.
-echo %SUCCESS% 35 images téléchargées avec succès!
+echo %SUCCESS% Prêt!
 echo.
 pause
 goto end
@@ -412,9 +418,9 @@ echo %INFO% Reset en cours...
 echo.
 
 REM Supprimer les images locales
-if exist "%~dp0\Public\Assets\Images\products\*" (
+if exist "%~dp0Public\Assets\Images\products\*" (
     echo %INFO% Suppression des images téléchargées...
-    del /q "%~dp0\Public\Assets\Images\products\*" >nul 2>&1
+    del /q "%~dp0Public\Assets\Images\products\*" >nul 2>&1
 )
 
 REM Réinitialiser BD
@@ -458,153 +464,8 @@ echo.
 echo %INFO% Démarrage du serveur...
 pause
 
-cd /d "%~dp0\Public"
+cd /d "%~dp0Public"
 php -S localhost:8000 router.php
-goto end
-
-REM ==========================================
-REM FIN
-REM ==========================================
-:end
-echo.
-echo À bientôt!
-echo.
-pause
-exit /b 0
-for /d %%G in ("C:\Program Files (x86)\MySQL*") do (
-    if exist "%%G\bin\mysql.exe" (
-        set MYSQL_PATH=%%G\bin\mysql.exe
-        goto found_mysql
-    )
-)
-
-REM Pas trouve - afficher erreur
-echo.
-echo [ERREUR] MySQL/MariaDB non trouve!
-echo.
-echo Solutions:
-echo 1. Installer MariaDB: https://mariadb.org/download
-echo 2. Ou installer MySQL: https://dev.mysql.com/downloads/mysql/
-echo 3. Assurez-vous que le chemin d'installation est standard
-echo    (C:\Program Files\MariaDB* ou C:\Program Files\MySQL*)
-echo.
-pause
-goto end
-
-:found_mysql
-echo [OK] Trouve: !MYSQL_PATH!
-echo.
-
-echo.
-echo [NETTOYAGE] Nettoyage et redemarrage de NovaShop Pro...
-echo.
-
-REM Option 1: Reset BD complete
-echo Quelle action voulez-vous faire?
-echo 1. Redemarrer serveur (recommande)
-echo 2. Reinitialiser la BD complete
-echo 3. Effacer cache navigateur et redemarrer
-echo 4. Tout effacer et repartir de zero
-echo.
-
-set /p choice="Choisissez (1-4): "
-
-if "%choice%"=="1" goto restart_server
-if "%choice%"=="2" goto reset_db
-if "%choice%"=="3" goto clear_cache
-if "%choice%"=="4" goto full_reset
-
-goto invalid
-
-:restart_server
-echo.
-echo [OK] Redemarrage du serveur...
-echo Assurez-vous que le serveur n'est PAS deja lance
-echo (Si oui: appuyez sur Ctrl+C pour l'arreter d'abord)
-echo.
-pause
-
-cd /d "%~dp0\Public"
-php -S localhost:8000 router.php
-goto end
-
-:reset_db
-echo.
-echo [TRAITEMENT] Reinitialisation complete avec donnees premium...
-echo.
-
-php "%~dp0start_novashop.php"
-if errorlevel 1 (
-    echo.
-    echo [ERREUR] Erreur lors de l'initialisation
-    pause
-    goto end
-)
-
-echo.
-echo [OK] Demarrage du serveur...
-echo.
-pause
-
-cd /d "%~dp0\Public"
-php -S localhost:8000 router.php
-goto end
-
-:clear_cache
-echo.
-echo [NETTOYAGE] Instructions de nettoyage navigateur:
-echo.
-echo 1. Ouvrez http://localhost:8000
-echo 2. Appuyez sur F12 (DevTools)
-echo 3. Application - Cookies - http://localhost:8000 - Delete All
-echo 4. Application - LocalStorage - Delete All
-echo 5. Fermez DevTools (F12)
-echo 6. Appuyez sur Ctrl+Shift+R (hard refresh)
-echo.
-echo [OK] Cache efface!
-echo Maintenant relancez le serveur...
-echo.
-pause
-
-cd /d "%~dp0\Public"
-php -S localhost:8000 router.php
-goto end
-
-:full_reset
-echo.
-echo [ATTENTION] Cela reinitialisant TOUT avec donnees premium
-echo.
-
-echo Continuez? (Y/N)
-set /p confirm="Confirmer: "
-if /i not "%confirm%"=="Y" goto end
-
-echo.
-echo [TRAITEMENT] Reset complet...
-echo.
-
-php "%~dp0start_novashop.php"
-if errorlevel 1 (
-    echo.
-    echo [ERREUR] Erreur lors de l'initialisation
-    pause
-    goto end
-)
-
-echo.
-echo [OK] Demarrage du serveur...
-echo.
-pause
-
-cd /d "%~dp0\Public"
-php -S localhost:8000 router.php
-goto end
-
-:invalid
-echo.
-echo [ERREUR] Choix invalide
-echo.
-pause
 goto end
 
 REM ==========================================
@@ -616,7 +477,7 @@ setlocal enabledelayedexpansion
 echo %INFO% Initialisation de la BD avec MySQL CLI...
 
 if defined MYSQL_PATH (
-    set "MYSQL_CMD=!MYSQL_PATH!"
+    set "MYSQL_CMD=!MYSQL_PATH!\mysql.exe"
 ) else (
     set "MYSQL_CMD=mysql.exe"
 )
@@ -673,7 +534,6 @@ if !errorlevel! equ 0 (
     choco install php -y >nul 2>&1
     if !errorlevel! equ 0 (
         echo %SUCCESS% PHP installé avec Chocolatey!
-        set FOUND_PHP=1
         exit /b 0
     )
 )
@@ -685,22 +545,20 @@ REM Télécharger PHP avec plusieurs URLs de secours
 echo %INFO% Téléchargement de PHP 8.2 (cette opération peut prendre quelques minutes)...
 echo.
 
-set "PHP_URLS[0]=https://windows.php.net/downloads/releases/php-8.2.21-nts-Win32-x64.zip"
-set "PHP_URLS[1]=https://windows.php.net/downloads/releases/php-8.1.27-nts-Win32-x64.zip"
-set "PHP_URLS[2]=https://windows.php.net/downloads/releases/php-8.0.30-nts-Win32-x64.zip"
-
 set "DOWNLOAD_SUCCESS=0"
 
 for /l %%i in (0,1,2) do (
     if !DOWNLOAD_SUCCESS! equ 0 (
         echo %INFO% Tentative %%i (essai de téléchargement)...
         
+        if %%i equ 0 set "PHP_URL=https://windows.php.net/downloads/releases/php-8.2.21-nts-Win32-x64.zip"
+        if %%i equ 1 set "PHP_URL=https://windows.php.net/downloads/releases/php-8.1.27-nts-Win32-x64.zip"
+        if %%i equ 2 set "PHP_URL=https://windows.php.net/downloads/releases/php-8.0.30-nts-Win32-x64.zip"
+        
         powershell -NoProfile -ExecutionPolicy Bypass -Command ^
         "try { ^
             $ProgressPreference = 'SilentlyContinue'; ^
-            $url = '!PHP_URLS[%%i]!'; ^
-            $dest = 'C:\php-8.2.zip'; ^
-            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
+            Invoke-WebRequest -Uri '!PHP_URL!' -OutFile 'C:\php-8.2.zip' -ErrorAction Stop; ^
             exit 0; ^
         } catch { ^
             exit 1; ^
@@ -718,7 +576,7 @@ if !DOWNLOAD_SUCCESS! equ 0 (
     echo.
     echo %INFO% Téléchargement manuel:
     echo   1. Visitez: https://windows.php.net/download/
-    echo   2. Téléchargez: php-8.2.x-nts-Win32-x64.zip (ou version 8.0+)
+    echo   2. Téléchargez: php-8.2.x-nts-Win32-x64.zip
     echo   3. Créez dossier: C:\php-8.2
     echo   4. Extraire le ZIP dedans
     echo   5. Relancez ce script
@@ -732,9 +590,7 @@ echo %INFO% Extraction de PHP...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 "try { ^
     Expand-Archive -Path 'C:\php-8.2.zip' -DestinationPath 'C:\php-8.2' -Force; ^
-    Write-Host '[OK] Extraction terminée'; ^
 } catch { ^
-    Write-Host '[ERREUR] Impossible d''extraire PHP'; ^
     exit 1; ^
 }"
 
@@ -757,13 +613,11 @@ echo %INFO% Vérification de PHP...
 php --version >nul 2>&1
 if errorlevel 1 (
     echo %WARN% PHP détecté mais PATH nécessite un redémarrage
-    echo Veuillez relancer ce script après redémarrage de l'invite de commandes
     pause
     exit /b 0
 )
 
 echo %SUCCESS% PHP 8.2 installé avec succès!
-set FOUND_PHP=1
 exit /b 0
 
 REM ==========================================
@@ -782,7 +636,6 @@ if !errorlevel! equ 0 (
     choco install mariadb -y >nul 2>&1
     if !errorlevel! equ 0 (
         echo %SUCCESS% MariaDB installé avec Chocolatey!
-        set FOUND_MYSQL=1
         exit /b 0
     )
 )
@@ -794,22 +647,20 @@ REM Télécharger MariaDB avec URLs de secours
 echo %INFO% Téléchargement de MariaDB (cette opération peut prendre quelques minutes)...
 echo.
 
-set "MARIADB_URLS[0]=https://archive.mariadb.org/mariadb-10.11.6/winx64-packages/mariadb-10.11.6-winx64.zip"
-set "MARIADB_URLS[1]=https://archive.mariadb.org/mariadb-10.6.15/winx64-packages/mariadb-10.6.15-winx64.zip"
-set "MARIADB_URLS[2]=https://archive.mariadb.org/mariadb-10.5.22/winx64-packages/mariadb-10.5.22-winx64.zip"
-
 set "DOWNLOAD_SUCCESS=0"
 
 for /l %%i in (0,1,2) do (
     if !DOWNLOAD_SUCCESS! equ 0 (
         echo %INFO% Tentative %%i (essai de téléchargement)...
         
+        if %%i equ 0 set "MARIADB_URL=https://archive.mariadb.org/mariadb-10.11.6/winx64-packages/mariadb-10.11.6-winx64.zip"
+        if %%i equ 1 set "MARIADB_URL=https://archive.mariadb.org/mariadb-10.6.15/winx64-packages/mariadb-10.6.15-winx64.zip"
+        if %%i equ 2 set "MARIADB_URL=https://archive.mariadb.org/mariadb-10.5.22/winx64-packages/mariadb-10.5.22-winx64.zip"
+        
         powershell -NoProfile -ExecutionPolicy Bypass -Command ^
         "try { ^
             $ProgressPreference = 'SilentlyContinue'; ^
-            $url = '!MARIADB_URLS[%%i]!'; ^
-            $dest = 'C:\mariadb-install\mariadb.zip'; ^
-            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop; ^
+            Invoke-WebRequest -Uri '!MARIADB_URL!' -OutFile 'C:\mariadb-install\mariadb.zip' -ErrorAction Stop; ^
             exit 0; ^
         } catch { ^
             exit 1; ^
@@ -827,10 +678,9 @@ if !DOWNLOAD_SUCCESS! equ 0 (
     echo.
     echo %INFO% Téléchargement manuel:
     echo   1. Visitez: https://mariadb.org/download/
-    echo   2. Téléchargez MariaDB MSI (version 10.5+)
+    echo   2. Téléchargez MariaDB MSI
     echo   3. Installez avec chemin standard: C:\Program Files\MariaDB
-    echo   4. Configurez avec utilisateur: root, mot de passe: vide
-    echo   5. Relancez ce script
+    echo   4. Relancez ce script
     echo.
     pause
     exit /b 1
@@ -844,13 +694,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     $folders = Get-ChildItem 'C:\mariadb-install' -Directory; ^
     foreach ($folder in $folders) { ^
         if ($folder.Name -match 'mariadb') { ^
+            if (!(Test-Path 'C:\Program Files\MariaDB')) { mkdir 'C:\Program Files\MariaDB' }; ^
             Copy-Item -Path $folder.FullName\* -Destination 'C:\Program Files\MariaDB' -Recurse -Force -ErrorAction SilentlyContinue; ^
-            Remove-Item -Path $folder.FullName -Recurse -Force -ErrorAction SilentlyContinue; ^
         } ^
     } ^
-    Write-Host '[OK] Extraction terminée'; ^
 } catch { ^
-    Write-Host '[ERREUR] Impossible d''extraire MariaDB'; ^
     exit 1; ^
 }"
 
@@ -873,17 +721,19 @@ echo %INFO% Vérification de MariaDB...
 mysql --version >nul 2>&1
 if errorlevel 1 (
     echo %WARN% MariaDB détecté mais PATH nécessite un redémarrage
-    echo Veuillez relancer ce script après redémarrage de l'invite de commandes
     pause
     exit /b 0
 )
 
 echo %SUCCESS% MariaDB installé avec succès!
-set FOUND_MYSQL=1
 exit /b 0
 
+REM ==========================================
+REM FIN
+REM ==========================================
 :end
 echo.
-echo Au revoir!
+echo À bientôt!
 echo.
 pause
+exit /b 0
