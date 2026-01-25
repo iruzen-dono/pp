@@ -30,7 +30,7 @@ class OrderController extends Controller
     {
         AuthMiddleware::check();
 
-        $orderId = $_GET['id'] ?? null;
+        $orderId = $_GET['id'] ?? $_GET['params'][0] ?? null;
 
         if (!$orderId) {
             header("Location: /orders");
@@ -82,7 +82,7 @@ class OrderController extends Controller
             // Vider le panier
             unset($_SESSION['cart']);
 
-            header("Location: /orders/show?id=$orderId");
+            header("Location: /order/$orderId");
             exit;
         }
 

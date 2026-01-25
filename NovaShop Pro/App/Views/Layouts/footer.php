@@ -52,6 +52,9 @@
         <p>&copy; <?= date('Y') ?> NovaShop — Tous droits réservés. Fait avec ❤️ pour les aventuriers.</p>
     </footer>
 
-    <script src="/assets/js/main.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/Assets/Js/main.js"></script>
 </body>
 </html>

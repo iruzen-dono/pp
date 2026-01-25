@@ -58,7 +58,7 @@ INSERT INTO products (name, description, image_url, price, category_id, stock, c
 -- Électronique - Ordinateurs
 ('MacBook Pro 16" M3 Max', 'Ordinateur portable professionnel avec processeur Apple M3 Max, 18 cœurs GPU, 36GB RAM, 1TB SSD. Écran Retina 3456x2234 pixels. Batterie 22h. Design premium en aluminium. Idéal pour les créatifs et développeurs.', '/Assets/Images/products/macbook_pro.png', 3499.99, 1, 8, NOW()),
 ('Dell XPS 13 Plus', 'Ultrabook ultra-léger 13.3" OLED 3K (120Hz), processeur Intel Core i7-13700H, 32GB RAM, 512GB SSD. Poids 2.7kg. Design futuriste sans bouton clavier. Parfait pour la mobilité.', '/Assets/Images/products/macbook_pro.png', 1899.99, 1, 5, NOW()),
-('Lenovo ThinkPad X1 Carbon', 'Laptop affaires robuste 14" FHD, processeur Intel Core i7, 16GB RAM, 512GB SSD. Clavier mécanica premium. Certifié MIL-STD-810H. Batterie 15h. Parfait pour les professionnels.', '/Assets/Images/products/wireless_headphones.png', 1699.99, 1, 12, NOW()),
+('Lenovo ThinkPad X1 Carbon', 'Laptop affaires robuste 14\" FHD, processeur Intel Core i7, 16GB RAM, 512GB SSD. Clavier mécanica premium. Certifié MIL-STD-810H. Batterie 15h. Parfait pour les professionnels.', '/Assets/Images/products/macbook_pro.png', 1699.99, 1, 12, NOW()),
 
 -- Électronique - Montres Intelligentes
 ('Apple Watch Ultra', 'Montre intelligente ultra-durable avec écran Retina LTPO OLED 49mm, batterie 36h, résistant aux chocs et l\'eau jusqu\'à 100m. Capteurs multiples: fréquence cardiaque, SPO2, température. Connectivité LTE.', '/Assets/Images/products/smartwatch.png', 899.99, 1, 15, NOW()),
@@ -76,6 +76,10 @@ INSERT INTO products (name, description, image_url, price, category_id, stock, c
 ('Logitech Brio 4K', 'Webcam 4K Ultra HD 1080p60fps, autofocus avancé, correction auto-éclairage. Microphone intégré à réduction de bruit. Champ vision 90°. RightLight 3 avec HDR. Compatible tous les OS.', '/Assets/Images/products/usb_hub.png', 199.99, 1, 22, NOW()),
 ('Shure SM7B', 'Microphone dynamique professionnel studio avec filtre anti-pop. Réponse fréquence 50Hz-20kHz. Rapport signal/bruit excellent. Bras articulé inclus. Standard industrie pour podcasts/studio.', '/Assets/Images/products/usb_hub.png', 399.99, 1, 10, NOW()),
 
+-- Électronique - Autres accessoires
+('Portable Charger 50000mAh', 'Batterie externe ultra-capacité 50000mAh, 2 ports USB + 1 USB-C. Charge rapide 65W. Écran LED. Compatible tous téléphones/tablettes. Poids 630g. Garantie 2 ans.', '/Assets/Images/products/portable_charger.png', 49.99, 1, 35, NOW()),
+('Tablet Samsung Galaxy Tab', 'Tablette 12.9" AMOLED 2K, Snapdragon 8 Gen 2, 12GB RAM, 256GB stockage. Écran 90Hz. Batterie 13h. Stylet S Pen inclus. Haut-parleurs stéréo Dolby Atmos.', '/Assets/Images/products/tablet.png', 799.99, 1, 8, NOW()),
+
 -- ==========================================
 -- 5. INSÉRER LES PRODUITS - MODE & VÊTEMENTS
 -- ==========================================
@@ -89,6 +93,10 @@ INSERT INTO products (name, description, image_url, price, category_id, stock, c
 ('Sneakers Blanches Design', 'Baskets minimalistes cuir blanc premium avec détails gris. Semelle épaisse confortable EVA. Lacets contrastants. Design épuré. Tailles 36-46. Légères (290g pair).', '/Assets/Images/products/running_shoes.png', 149.99, 2, 40, NOW()),
 ('Accessoires Mode Ceinture', 'Ceinture en cuir noir premium boucle acier brossé. Largeur 3.5cm. Coutures renforcées. Tailles 75cm-130cm. Design intemporel classique.', '/Assets/Images/products/sunglasses_style.png', 69.99, 2, 50, NOW()),
 
+-- Mode & Vêtements - Accessoires supplémentaires
+('Montre Designer Homme', 'Montre de luxe boîtier acier inoxydable 42mm, mouvement suisse, bracelet en cuir italien. Cadran noir mat. Résistant 100m. Garantie 5 ans.', '/Assets/Images/products/designer_watch.png', 399.99, 2, 12, NOW()),
+('Lunettes Soleil Aviateur', 'Lunettes de soleil aviateur verres polarisés anti-UV, monture acier doré, verre dégradé. Design classique intemporel. Protection 100% UV400.', '/Assets/Images/products/sunglasses_style.png', 89.99, 2, 32, NOW()),
+
 -- ==========================================
 -- 6. INSÉRER LES PRODUITS - LIVRES & PUBLICATIONS
 -- ==========================================
@@ -101,6 +109,9 @@ INSERT INTO products (name, description, image_url, price, category_id, stock, c
 ('Zero to One - Peter Thiel', 'Créer l\'avenir en partant de zéro. Stratégie startup & innovation. 506 pages. Fondateur PayPal. Lessons de 20 ans entrepreneuriat. Édition 2014.', '/Assets/Images/products/clean_code.png', 35.99, 3, 25, NOW()),
 
 ('Python for Data Science', 'Maîtriser pandas, numpy, scikit-learn. 450 pages. Jupyter notebooks inclus. Data visualization avancée. Machine Learning fondamentals. Python 3.10+.', '/Assets/Images/products/clean_code.png', 59.99, 3, 16, NOW()),
+
+-- Livres - Supplémentaires
+('Web Development with React', 'Maîtriser React, Redux, et Next.js. Projets fullstack pratiques. 520 pages. Exemples E-commerce réaliste. Pour débutants à avancés.', '/Assets/Images/products/web_development.png', 49.99, 3, 19, NOW()),
 
 -- ==========================================
 -- 7. INSÉRER LES PRODUITS - MAISON & DÉCOR
@@ -154,12 +165,12 @@ INSERT INTO order_items (order_id, product_id, quantity, price) VALUES
 -- ==========================================
 
 SELECT '✅ DONNÉES PREMIUM INSÉRÉES AVEC SUCCÈS!' AS Status;
-SELECT '---' AS Separator;
+SELECT '---' AS Separation;
 SELECT CONCAT(COUNT(*), ' utilisateurs') AS Statistics FROM users;
 SELECT CONCAT(COUNT(*), ' catégories') AS Statistics FROM categories;
 SELECT CONCAT(COUNT(*), ' produits') AS Statistics FROM products;
 SELECT CONCAT(COUNT(*), ' commandes') AS Statistics FROM orders;
 SELECT CONCAT('€', FORMAT(SUM(total), 2), ' de ventes') AS Statistics FROM orders WHERE status IN ('delivered', 'shipped', 'confirmed');
-SELECT '---' AS Separator;
+SELECT '---' AS Separation;
 SELECT '📊 Produits par catégorie:' AS Summary;
 SELECT c.name, COUNT(p.id) as count FROM categories c LEFT JOIN products p ON c.id = p.category_id GROUP BY c.id, c.name;

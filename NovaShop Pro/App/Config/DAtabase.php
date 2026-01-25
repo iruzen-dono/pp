@@ -24,8 +24,8 @@ class Database
                     $options
                 );
                 self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                // Force compatibility avec MariaDB 12+
-                self::$instance->exec("SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
+                // Compatibility with MariaDB 12+ - relaxed strict mode to avoid NULL issues
+                self::$instance->exec("SET SESSION sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
             } catch (PDOException $e) {
                 die("Erreur DB : " . $e->getMessage());
             }

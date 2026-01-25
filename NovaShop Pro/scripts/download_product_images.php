@@ -1,12 +1,259 @@
 <?php
 /**
- * Script de téléchargement des images produits
- * Télécharge les images Unsplash et les stocke localement
+ * Script de Téléchargement des Images Produits
+ * Télécharge les images depuis Unsplash avec retry automatique
+ * Usage: php scripts/download_product_images.php
  */
+
+set_time_limit(600); // 10 minutes timeout
+
+echo "\n";
+echo "╔═════════════════════════════════════════════════════════════╗\n";
+echo "║   📸 TÉLÉCHARGEMENT DES IMAGES PRODUITS (v2.0)              ║\n";
+echo "╚═════════════════════════════════════════════════════════════╝\n\n";
 
 // Configuration
 $imagesDir = __DIR__ . '/../Public/Assets/Images/products';
-$baseUrl = 'https://images.unsplash.com/photo-';
+$retryMax = 3; // Nombre de tentatives par image
+
+// Créer le répertoire s'il n'existe pas
+if (!is_dir($imagesDir)) {
+    if (!@mkdir($imagesDir, 0755, true)) {
+        die("❌ ERREUR: Impossible de créer le répertoire $imagesDir\n");
+    }
+    echo "✅ Répertoire créé: $imagesDir\n\n";
+}
+
+// Liste des images avec URLs de fallback (primary + backup)
+$images = [
+    // Électronique
+    'macbook_pro.jpg' => [
+        'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80',
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80',
+    ],
+    'wireless_headphones.jpg' => [
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
+        'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=500&q=80',
+    ],
+    'tablet.jpg' => [
+        'https://images.unsplash.com/photo-1552820728-8016266d5a27?w=500&q=80',
+        'https://images.unsplash.com/photo-1580522539313-552107fabf5b?w=500&q=80',
+    ],
+    'portable_charger.jpg' => [
+        'https://images.unsplash.com/photo-1609042231671-bc09e37ddc74?w=500&q=80',
+        'https://images.unsplash.com/photo-1591290621749-2127ba37f058?w=500&q=80',
+    ],
+    'smartwatch.jpg' => [
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80',
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80',
+    ],
+    'gaming_mouse.jpg' => [
+        'https://images.unsplash.com/photo-1527814050087-3793815479db?w=500&q=80',
+        'https://images.unsplash.com/photo-1527814050087-3793815479db?w=500&q=80',
+    ],
+    'usb_hub.jpg' => [
+        'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&q=80',
+        'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&q=80',
+    ],
+    'monitor_gaming.jpg' => [
+        'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500&q=80',
+        'https://images.unsplash.com/photo-1527814050087-3793815479db?w=500&q=80',
+    ],
+    
+    // Mode & Vêtements
+    'leather_jacket.jpg' => [
+        'https://images.unsplash.com/photo-1551028719-00167b16ebc5?w=500&q=80',
+        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80',
+    ],
+    'classic_jeans.jpg' => [
+        'https://images.unsplash.com/photo-1542272604-787c62e32fc9?w=500&q=80',
+        'https://images.unsplash.com/photo-1542272604-787c62e32fc9?w=500&q=80',
+    ],
+    'dress_elegant.jpg' => [
+        'https://images.unsplash.com/photo-1589749235044-85a37490e46a?w=500&q=80',
+        'https://images.unsplash.com/photo-1545887917-b2dee8428efb?w=500&q=80',
+    ],
+    'sneakers_premium.jpg' => [
+        'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80',
+        'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80',
+    ],
+    'designer_watch.jpg' => [
+        'https://images.unsplash.com/photo-1523170335684-f1b5aef169d3?w=500&q=80',
+        'https://images.unsplash.com/photo-1523170335684-f1b5aef169d3?w=500&q=80',
+    ],
+    'sunglasses_style.jpg' => [
+        'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80',
+        'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80',
+    ],
+    'scarf_silk.jpg' => [
+        'https://images.unsplash.com/photo-1599203166276-c41e15d45adb?w=500&q=80',
+        'https://images.unsplash.com/photo-1599203166276-c41e15d45adb?w=500&q=80',
+    ],
+    'running_shoes.jpg' => [
+        'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80',
+        'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=500&q=80',
+    ],
+    
+    // Livres
+    'design_patterns.jpg' => [
+        'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&q=80',
+        'https://images.unsplash.com/photo-1507842591343-583f20051fa3?w=500&q=80',
+    ],
+    'clean_code.jpg' => [
+        'https://images.unsplash.com/photo-1507842591343-583f20051fa3?w=500&q=80',
+        'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=500&q=80',
+    ],
+    'web_development.jpg' => [
+        'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=500&q=80',
+        'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&q=80',
+    ],
+    'javascript_book.jpg' => [
+        'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&q=80',
+        'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=500&q=80',
+    ],
+    'psychology_book.jpg' => [
+        'https://images.unsplash.com/photo-1507842591343-583f20051fa3?w=500&q=80',
+        'https://images.unsplash.com/photo-1507842591343-583f20051fa3?w=500&q=80',
+    ],
+    'business_strategy.jpg' => [
+        'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80',
+        'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80',
+    ],
+    
+    // Maison & Décor
+    'modern_lamp.jpg' => [
+        'https://images.unsplash.com/photo-1565636192335-14c46fa15602?w=500&q=80',
+        'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=500&q=80',
+    ],
+    'decorative_mirror.jpg' => [
+        'https://images.unsplash.com/photo-1576228104129-a2d3e75f3ded?w=500&q=80',
+        'https://images.unsplash.com/photo-1578926078328-123e987b1bca?w=500&q=80',
+    ],
+    'designer_chair.jpg' => [
+        'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80',
+        'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80',
+    ],
+    'persian_rug.jpg' => [
+        'https://images.unsplash.com/photo-1571733280207-d56e6a79a7e2?w=500&q=80',
+        'https://images.unsplash.com/photo-1578926078328-123e987b1bca?w=500&q=80',
+    ],
+    
+    // Sports
+    'gravel_bike.jpg' => [
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80',
+        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500&q=80',
+    ],
+    'dumbbells_set.jpg' => [
+        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80',
+        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80',
+    ],
+    'yoga_mat.jpg' => [
+        'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&q=80',
+        'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&q=80',
+    ],
+];
+
+// Fonction de téléchargement avec retry
+function downloadImage($urls, $filepath, $filename, $retryMax) {
+    $successCount = 0;
+    $failCount = 0;
+    
+    foreach ($urls as $attempt => $imageUrl) {
+        $imageData = @file_get_contents($imageUrl, false, stream_context_create([
+            'http' => [
+                'timeout' => 15,
+                'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'follow_location' => 1,
+                'max_redirects' => 5,
+            ],
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+            ]
+        ]));
+        
+        if ($imageData !== false && strlen($imageData) > 1000) {
+            if (@file_put_contents($filepath, $imageData)) {
+                echo "✅ OK (" . filesize($filepath) . " bytes)\n";
+                return true;
+            }
+        }
+    }
+    
+    echo "❌ ÉCHEC\n";
+    return false;
+}
+
+// Télécharger les images
+$successCount = 0;
+$failCount = 0;
+$skipCount = 0;
+
+echo "Téléchargement avec retry automatique...\n";
+echo str_repeat("-", 60) . "\n";
+
+foreach ($images as $filename => $urls) {
+    $filepath = $imagesDir . '/' . $filename;
+    
+    // Vérifier si le fichier existe déjà
+    if (file_exists($filepath)) {
+        echo "⏭️  EXISTE : $filename (" . filesize($filepath) . " bytes)\n";
+        $skipCount++;
+        continue;
+    }
+    
+    // Télécharger l'image
+    echo "📥 Téléchargement: $filename ... ";
+    
+    if (downloadImage($urls, $filepath, $filename, $retryMax)) {
+        $successCount++;
+    } else {
+        $failCount++;
+    }
+    
+    // Rate limiting
+    usleep(200000); // 200ms
+}
+
+// Résumé
+echo "\n" . str_repeat("-", 60) . "\n";
+echo "📊 RÉSUMÉ DU TÉLÉCHARGEMENT\n";
+echo str_repeat("-", 60) . "\n";
+echo "✅ Succès: $successCount images\n";
+echo "⏭️  Existantes: $skipCount images\n";
+echo "❌ Erreurs: $failCount images\n";
+echo "📁 Dossier: $imagesDir\n";
+echo str_repeat("-", 60) . "\n\n";
+
+// Vérifier le total
+$totalFiles = count(glob($imagesDir . '/*.{jpg,jpeg,png}', GLOB_BRACE));
+echo "🖼️  Total des images disponibles: $totalFiles\n\n";
+
+if ($failCount > 0) {
+    echo "⚠️  $failCount images n'ont pas pu être téléchargées.\n";
+    echo "   Exécutez la génération PNG de fallback:\n";
+    echo "   php scripts/generate_images.php\n\n";
+}
+
+if ($successCount + $skipCount > 0) {
+    echo "✅ Téléchargement terminé!\n";
+}
+
+exit(0);
+?>
+echo "🖼️  Total des images disponibles: $totalFiles\n\n";
+
+if ($failCount > 0) {
+    echo "⚠️  Attention: Certaines images n'ont pas pu être téléchargées.\n";
+    echo "   Vous pouvez télécharger manuellement les images ou utiliser\n";
+    echo "   les images PNG de fallback qui existent déjà.\n\n";
+}
+
+echo "✅ Téléchargement des images terminé!\n";
+echo "Les images sont disponibles dans: /Public/Assets/Images/products/\n\n";
+
+exit(0);
+?>
 
 // Créer le répertoire s'il n'existe pas
 if (!is_dir($imagesDir)) {
