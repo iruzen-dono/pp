@@ -3,51 +3,55 @@ namespace App\Models;
 
 use App\Core\Model;
 
-require_once __DIR__ . '/../Core/Model.php';
-
 class Order extends Model
 {
-    public function getAll()
+    public function getAll(): array
     {
-        $stmt = $this->prepare("SELECT * FROM orders");
-        $this->execute($stmt);
-        return $this->fetchAll($stmt);
-    }
-
-    public function getById($id)
-    {
-        $stmt = $this->prepare("SELECT * FROM orders WHERE id = ? LIMIT 1");
-        $this->execute($stmt, [$id]);
-        return $this->fetch($stmt);
-    }
-
-    public function getByUserId($userId)
-    {
-        $stmt = $this->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
-        $this->execute($stmt, [$userId]);
-        return $this->fetchAll($stmt);
-    }
-
-    public function create($userId, $total = 0)
-    {
-        $stmt = $this->prepare(
-            "INSERT INTO orders (user_id, total, status) VALUES (?, ?, 'pending')"
+        return $this->run(
+            "SELECT * FROM orders ORDER BY created_at DESC"
         );
-        $this->execute($stmt, [$userId, $total]);
-        return $this->db->lastInsertId();
     }
 
-    public function update($id, $status, $total)
+    public function getById(int $id): ?array
     {
-        $stmt = $this->prepare(
-            "UPDATE orders SET status = ?, total = ? WHERE id = ?"
+        return $this->run(
+            "SELECT * FROM orders WHERE id = ? LIMIT 1",
+            [$id],
+            true
         );
-        return $this->execute($stmt, [$status, $total, $id]);
     }
 
-    public function delete($id)
+    public function getByUserId(int $userId): array
     {
-        $stmt = $this->prepare("DELETE FROM orders WHERE id = ?");
-        return $this->execute($stmt, [$id]);
+        return $this->run(
+            "SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC",
+            [$userId]
+        );
+    }
+
+    public function create(int $userId, float $total = 0): int
+    {
+        $this->run(
+            "INSERT INTO orders (user_id, total, status) VALUES (?, ?, 'pending')",
+            [$userId, $total]
+        );
+
+        return (int) $this->db->lastInsertId();
+    }
+
+    public function update(int $id, string $status, float $total): int
+    {
+        return $this->run(
+            "UPDATE orders SET status = ?, total = ? WHERE id = ?",
+            [$status, $total, $id]
+        );
+    }
+
+    public function delete(int $id): int
+    {
+        return $this->run(
+            "DELETE FROM orders WHERE id = ?",
+            [$id]
+        );
     }
 }

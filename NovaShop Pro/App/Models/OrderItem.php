@@ -3,28 +3,42 @@ namespace App\Models;
 
 use App\Core\Model;
 
-require_once __DIR__ . '/../Core/Model.php';
-
 class OrderItem extends Model
 {
-    public function getByOrderId($orderId)
+    public function getByOrderId(int $orderId): array
     {
-        $stmt = $this->prepare("SELECT * FROM order_items WHERE order_id = ?");
-        $this->execute($stmt, [$orderId]);
-        return $this->fetchAll($stmt);
-    }
-
-    public function create($orderId, $productId, $quantity, $price)
-    {
-        $stmt = $this->prepare(
-            "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)"
+        return $this->run(
+            "SELECT * FROM order_items WHERE order_id = ?",
+            [$orderId]
         );
-        return $this->execute($stmt, [$orderId, $productId, $quantity, $price]);
     }
 
-    public function delete($id)
+    public function create(
+        int $orderId,
+        int $productId,
+        int $quantity,
+        float $price
+    ): int {
+        return $this->run(
+            "INSERT INTO order_items (order_id, product_id, quantity, price)
+             VALUES (?, ?, ?, ?)",
+            [$orderId, $productId, $quantity, $price]
+        );
+    }
+
+    public function delete(int $id): int
     {
-        $stmt = $this->prepare("DELETE FROM order_items WHERE id = ?");
-        return $this->execute($stmt, [$id]);
+        return $this->run(
+            "DELETE FROM order_items WHERE id = ?",
+            [$id]
+        );
+    }
+
+    public function deleteByOrderId(int $orderId): int
+    {
+        return $this->run(
+            "DELETE FROM order_items WHERE order_id = ?",
+            [$orderId]
+        );
     }
 }

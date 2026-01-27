@@ -1,8 +1,6 @@
 <?php
 namespace App\Core;
 
-require_once __DIR__ . '/../Config/Database.php';
-
 use App\Config\Database;
 use PDO;
 
@@ -15,23 +13,21 @@ class Model
         $this->db = Database::getConnection();
     }
 
-    protected function prepare($query)
+    protected function run(string $sql, array $params = [], bool $single = false)
     {
-        return $this->db->prepare($query);
-    }
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
 
-    protected function execute($stmt, $params = [])
-    {
-        return $stmt->execute($params);
-    }
+            if (stripos(trim($sql), 'SELECT') === 0) {
+                return $single
+                    ? $stmt->fetch(PDO::FETCH_ASSOC)
+                    : $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
 
-    protected function fetch($stmt)
-    {
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    protected function fetchAll($stmt)
-    {
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->rowCount();
+        } catch (\PDOException $e) {
+            throw new \Exception("Erreur SQL : " . $e->getMessage());
+        }
     }
 }

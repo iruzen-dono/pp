@@ -3,38 +3,37 @@ namespace App\Models;
 
 use App\Core\Model;
 
-require_once __DIR__ . '/../Core/Model.php';
-
 class User extends Model
 {
-    public function getAll()
+    public function getAll(): array
     {
-        $stmt = $this->prepare("SELECT * FROM users ORDER BY created_at DESC");
-        $this->execute($stmt);
-        return $this->fetchAll($stmt);
-    }
-
-    public function delete($id)
-    {
-        $stmt = $this->prepare("DELETE FROM users WHERE id = ?");
-        return $this->execute($stmt, [$id]);
-    }
-
-    public function create($name, $email, $password)
-    {
-        $stmt = $this->prepare(
-            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
+        return $this->run(
+            "SELECT * FROM users ORDER BY created_at DESC"
         );
-
-        return $this->execute($stmt, [$name, $email, $password]);
     }
 
-    public function findByEmail($email)
+    public function findByEmail(string $email): ?array
     {
-        $stmt = $this->prepare(
-            "SELECT * FROM users WHERE email = ? LIMIT 1"
+        return $this->run(
+            "SELECT * FROM users WHERE email = ? LIMIT 1",
+            [$email],
+            true
         );
-        $this->execute($stmt, [$email]);
-        return $this->fetch($stmt);
+    }
+
+    public function create(string $name, string $email, string $password): int
+    {
+        return $this->run(
+            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+            [$name, $email, $password]
+        );
+    }
+
+    public function delete(int $id): int
+    {
+        return $this->run(
+            "DELETE FROM users WHERE id = ?",
+            [$id]
+        );
     }
 }

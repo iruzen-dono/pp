@@ -1,17 +1,17 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../Core/Controller.php';
-require_once __DIR__ . '/../middleware/AdminMiddleware.php';
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Models/Product.php';
-require_once __DIR__ . '/../Models/Order.php';
-
 use App\Core\Controller;
 use App\Middleware\AdminMiddleware;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
+
+require_once __DIR__ . '/../Core/Controller.php';
+require_once __DIR__ . '/../Middleware/AdminMiddleware.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Models/Product.php';
+require_once __DIR__ . '/../Models/Order.php';
 
 class AdminController extends Controller
 {
@@ -22,154 +22,116 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        // Récupérer les statistiques
         $userModel = new User();
         $productModel = new Product();
         $orderModel = new Order();
-        
+
         $stats = [
-            'users_count' => count($userModel->getAll()),
+            'users_count'    => count($userModel->getAll()),
             'products_count' => count($productModel->getAll()),
-            'orders_count' => count($orderModel->getAll())
+            'orders_count'   => count($orderModel->getAll())
         ];
-        
+
         $this->adminView('admin/dashboard', $stats);
     }
 
     public function users()
     {
-        $userModel = new User();
-        $users = $userModel->getAll();
-        $this->adminView('admin/users', ['users' => $users]);
+        $users = (new User())->getAll();
+        $this->adminView('admin/users', compact('users'));
     }
 
     public function products()
     {
-        // Gestion des actions POST (création, édition, suppression)
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $action = $_POST['action'] ?? '';
-            
-            if ($action === 'create') {
-                $imagePath = '';
-                
-                // Gestion de l'upload d'image
+
+            if (($_POST['action'] ?? '') === 'create') {
+
+                $imagePath = null;
+
                 if (!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $file = $_FILES['image'];
-                    $uploadDir = __DIR__ . '/../../Public/Assets/Images/products/';
-                    
-                    // Créer le dossier s'il n'existe pas
-                    if (!is_dir($uploadDir)) {
-                        mkdir($uploadDir, 0755, true);
-                    }
-                    
-                    // Vérifier le type MIME
+
                     $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                    $mimeType = finfo_file($finfo, $file['tmp_name']);
+                    $mime = finfo_file($finfo, $_FILES['image']['tmp_name']);
                     finfo_close($finfo);
-                    
-                    if (!in_array($mimeType, $allowedMimes)) {
-                        // Type non autorisé
-                        header('Location: /admin/products?error=invalid_image_type');
+
+                    if (!in_array($mime, $allowedMimes)) {
+                        header('Location: /admin/products?error=invalid_image');
                         exit;
                     }
-                    
-                    // Vérifier la taille (5MB max)
-                    if ($file['size'] > 5 * 1024 * 1024) {
+
+                    if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
                         header('Location: /admin/products?error=image_too_large');
                         exit;
                     }
-                    
-                    // Générer un nom de fichier unique
-                    $fileName = 'product_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $filePath = $uploadDir . $fileName;
-                    
-                    // Déplacer le fichier
-                    if (move_uploaded_file($file['tmp_name'], $filePath)) {
-                        // Utiliser le chemin relatif pour la base de données
-                        $imagePath = '/Assets/Images/products/' . $fileName;
+
+                    $uploadDir = dirname(__DIR__, 2) . '/public/assets/images/products/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
                     }
+
+                    $fileName = uniqid('product_', true) . '.' . pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+                    move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName);
+
+                    $imagePath = '/assets/images/products/' . $fileName;
                 }
-                
-                $productModel = new Product();
-                $productModel->create([
-                    'name' => $_POST['name'] ?? '',
-                    'description' => $_POST['description'] ?? '',
-                    'image_url' => $imagePath,
-                    'price' => (float)($_POST['price'] ?? 0),
+
+                (new Product())->create([
+                    'name'        => trim($_POST['name'] ?? ''),
+                    'description' => trim($_POST['description'] ?? ''),
+                    'image_url'   => $imagePath,
+                    'price'       => (float)($_POST['price'] ?? 0),
                     'category_id' => (int)($_POST['category_id'] ?? 1),
-                    'stock' => (int)($_POST['stock'] ?? 0)
+                    'stock'       => (int)($_POST['stock'] ?? 0)
                 ]);
-                // Rediriger après création
+
                 header('Location: /admin/products?success=1');
                 exit;
             }
         }
-        
-        // Afficher la liste des produits
-        $productModel = new Product();
-        $products = $productModel->getAll();
-        $this->adminView('admin/products', ['products' => $products]);
+
+        $products = (new Product())->getAll();
+        $this->adminView('admin/products', compact('products'));
     }
 
     public function orders()
     {
-        $orderModel = new Order();
-        $orders = $orderModel->getAll();
-        $this->adminView('admin/orders', ['orders' => $orders]);
+        $orders = (new Order())->getAll();
+        $this->adminView('admin/orders', compact('orders'));
     }
 
     public function deleteUser()
     {
-        $userId = $_GET['params'][0] ?? null;
-        
-        if (!$userId) {
-            header('Location: /admin/users?error=no_id');
+        $userId = (int)($_GET['params'][0] ?? 0);
+
+        if ($userId <= 0 || $userId === ($_SESSION['user']['id'] ?? 0)) {
+            header('Location: /admin/users?error=invalid');
             exit;
         }
-        
-        // Éviter la suppression de l'admin actuel
-        if (isset($_SESSION['user']) && $userId == $_SESSION['user']['id']) {
-            header('Location: /admin/users?error=cannot_delete_self');
-            exit;
-        }
-        
-        $userModel = new User();
-        $userModel->delete($userId);
-        
+
+        (new User())->delete($userId);
         header('Location: /admin/users?success=deleted');
         exit;
     }
 
     public function deleteProduct()
     {
-        $productId = $_GET['params'][0] ?? null;
-        
-        if (!$productId) {
-            header('Location: /admin/products');
-            exit;
+        $id = (int)($_GET['params'][0] ?? 0);
+        if ($id > 0) {
+            (new Product())->delete($id);
         }
-        
-        $productModel = new Product();
-        $productModel->delete($productId);
-        
-        header('Location: /admin/products?success=deleted');
+        header('Location: /admin/products');
         exit;
     }
 
     public function deleteOrder()
     {
-        $orderId = $_GET['params'][0] ?? null;
-        
-        if (!$orderId) {
-            header('Location: /admin/orders');
-            exit;
+        $id = (int)($_GET['params'][0] ?? 0);
+        if ($id > 0) {
+            (new Order())->delete($id);
         }
-        
-        $orderModel = new Order();
-        $orderModel->delete($orderId);
-        
-        header('Location: /admin/orders?success=deleted');
+        header('Location: /admin/orders');
         exit;
     }
 }

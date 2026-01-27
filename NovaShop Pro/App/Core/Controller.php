@@ -3,20 +3,38 @@ namespace App\Core;
 
 class Controller
 {
-    protected function view($view, $data = [])
+    protected function view(string $view, array $data = [])
     {
-        extract($data);
-        require_once __DIR__ . '/../Views/Layouts/header.php';
-        require_once __DIR__ . '/../Views/' . $view . '.php';
-        require_once __DIR__ . '/../Views/Layouts/footer.php';
+        extract($data, EXTR_SKIP);
+
+        $header = __DIR__ . '/../Views/Layouts/header.php';
+        $viewFile = __DIR__ . '/../Views/' . $view . '.php';
+        $footer = __DIR__ . '/../Views/Layouts/footer.php';
+
+        if (!file_exists($viewFile)) {
+            die("Vue introuvable : $viewFile");
+        }
+
+        require_once $header;
+        require_once $viewFile;
+        require_once $footer;
     }
 
-    protected function adminView($view, $data = [])
+    protected function adminView(string $view, array $data = [])
     {
-        extract($data);
+        extract($data, EXTR_SKIP);
+
+        $viewFile = __DIR__ . '/../Views/' . $view . '.php';
+        $layout = __DIR__ . '/../Views/Admin/layout.php';
+
+        if (!file_exists($viewFile) || !file_exists($layout)) {
+            die("Vue admin introuvable");
+        }
+
         ob_start();
-        require __DIR__ . '/../Views/' . $view . '.php';
+        require $viewFile;
         $GLOBALS['admin_content'] = ob_get_clean();
-        require __DIR__ . '/../Views/Admin/layout.php';
+
+        require $layout;
     }
 }

@@ -1,35 +1,34 @@
 <?php
 namespace App\Controllers;
 
-require_once __DIR__ . '/../Models/Product.php';
-require_once __DIR__ . '/../Core/Controller.php';
-
 use App\Core\Controller;
 use App\Models\Product;
+
+require_once __DIR__ . '/../Core/Controller.php';
+require_once __DIR__ . '/../Models/Product.php';
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $productModel = new Product();
-        $products = $productModel->getAll();
+        $products = (new Product())->getAll();
         $this->view('products/index', compact('products'));
     }
 
     public function show()
     {
-        $productId = $_GET['params'][0] ?? $_GET['id'] ?? null;
+        $productId = (int)($_GET['params'][0] ?? $_GET['id'] ?? 0);
 
-        if (!$productId) {
+        if ($productId <= 0) {
             header("Location: /products");
             exit;
         }
 
-        $productModel = new Product();
-        $product = $productModel->getById($productId);
+        $product = (new Product())->getById($productId);
 
         if (!$product) {
-            die("❌ Produit non trouvé (ID: $productId)");
+            http_response_code(404);
+            die("Produit introuvable");
         }
 
         $this->view('products/show', compact('product'));

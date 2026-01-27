@@ -3,43 +3,45 @@ namespace App\Models;
 
 use App\Core\Model;
 
-require_once __DIR__ . '/../Core/Model.php';
-
 class Category extends Model
 {
-    public function getAll()
+    public function getAll(): array
     {
-        $stmt = $this->prepare("SELECT * FROM categories");
-        $this->execute($stmt);
-        return $this->fetchAll($stmt);
-    }
-
-    public function getById($id)
-    {
-        $stmt = $this->prepare("SELECT * FROM categories WHERE id = ? LIMIT 1");
-        $this->execute($stmt, [$id]);
-        return $this->fetch($stmt);
-    }
-
-    public function create($name, $description)
-    {
-        $stmt = $this->prepare(
-            "INSERT INTO categories (name, description) VALUES (?, ?)"
+        return $this->run(
+            "SELECT * FROM categories ORDER BY name ASC"
         );
-        return $this->execute($stmt, [$name, $description]);
     }
 
-    public function update($id, $name, $description)
+    public function findById(int $id): ?array
     {
-        $stmt = $this->prepare(
-            "UPDATE categories SET name = ?, description = ? WHERE id = ?"
+        return $this->run(
+            "SELECT * FROM categories WHERE id = ? LIMIT 1",
+            [$id],
+            true
         );
-        return $this->execute($stmt, [$name, $description, $id]);
     }
 
-    public function delete($id)
+    public function create(string $name, ?string $description = null): int
     {
-        $stmt = $this->prepare("DELETE FROM categories WHERE id = ?");
-        return $this->execute($stmt, [$id]);
+        return $this->run(
+            "INSERT INTO categories (name, description) VALUES (?, ?)",
+            [$name, $description]
+        );
+    }
+
+    public function update(int $id, string $name, ?string $description = null): int
+    {
+        return $this->run(
+            "UPDATE categories SET name = ?, description = ? WHERE id = ?",
+            [$name, $description, $id]
+        );
+    }
+
+    public function delete(int $id): int
+    {
+        return $this->run(
+            "DELETE FROM categories WHERE id = ?",
+            [$id]
+        );
     }
 }
