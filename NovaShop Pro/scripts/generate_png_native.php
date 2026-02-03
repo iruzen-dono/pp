@@ -6,13 +6,11 @@
  * 100% fiable et rapide
  */
 
-$imagesDir = './Public/Assets/Images/products';
+$imagesDir = __DIR__ . '/../Public/Assets/Images/products';
 
-$db = new PDO('mysql:host=localhost;dbname=novashop', 'root', '0000');
-$stmt = $db->query("
-    SELECT SUBSTRING_INDEX(image_url, '/', -1) as filename 
-    FROM products ORDER BY filename
-");
+require_once __DIR__ . '/../App/Config/Database.php';
+$db = \App\Config\Database::getConnection();
+$stmt = $db->query("SELECT SUBSTRING_INDEX(image_url, '/', -1) as filename FROM products ORDER BY filename");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo "\n╔════════════════════════════════════════════════════════════╗\n";

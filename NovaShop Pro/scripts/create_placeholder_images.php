@@ -13,17 +13,13 @@ echo "\n╔═══════════════════════
 echo "║ 🖼️  GÉNÉRATION IMAGES - Service Placeholder Stable           ║\n";
 echo "╚════════════════════════════════════════════════════════════╝\n\n";
 
-$imagesDir = './Public/Assets/Images/products';
 
-// Connexion BDD
-$db = new PDO('mysql:host=localhost;dbname=novashop', 'root', '0000');
+$imagesDir = __DIR__ . '/../Public/Assets/Images/products';
+require_once __DIR__ . '/../App/Config/Database.php';
+$db = \App\Config\Database::getConnection();
 
 // Récupérer tous les produits manquants
-$stmt = $db->query("
-    SELECT id, name, SUBSTRING_INDEX(image_url, '/', -1) as filename, category_id 
-    FROM products 
-    ORDER BY id
-");
+$stmt = $db->query("SELECT id, name, SUBSTRING_INDEX(image_url, '/', -1) as filename, category_id FROM products ORDER BY id");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $colors = [

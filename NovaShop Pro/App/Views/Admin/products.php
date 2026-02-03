@@ -58,6 +58,12 @@
             <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif">
         </div>
 
+        <div class="form-group">
+            <label>Variantes (séparées par des virgules)</label>
+            <textarea name="variants" placeholder="Ex: S, M, L, XL&#10;ou: Noir, Blanc, Gris&#10;ou: 256GB, 512GB, 1TB" style="font-family: monospace; font-size: 0.9rem; min-height: 60px;"></textarea>
+            <small style="color: #999; font-size: 0.85rem; margin-top: 0.5rem; display: block;">💡 Entrez les options disponibles pour ce produit (ex: tailles, couleurs, capacités)</small>
+        </div>
+
         <button type="submit" class="btn btn-primary" style="width: 100%;">✅ Ajouter le Produit</button>
     </form>
 </div>
@@ -75,6 +81,7 @@
                     <th>Prix</th>
                     <th>Catégorie</th>
                     <th>Stock</th>
+                    <th>Variantes</th>
                     <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
@@ -107,6 +114,22 @@
                             <span style="background: <?php echo ($product['stock'] ?? 0) > 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'; ?>; color: <?php echo ($product['stock'] ?? 0) > 0 ? '#86efac' : '#fca5a5'; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem;">
                                 <?php echo $product['stock'] ?? 0; ?> unités
                             </span>
+                        </td>
+                        <td>
+                            <small style="color: #a0aec0; font-family: monospace;">
+                                <?php 
+                                    $variants = $product['variants'] ?? '';
+                                    if (!empty($variants)) {
+                                        $variantList = array_map('trim', explode(',', $variants));
+                                        echo htmlspecialchars(count($variantList)) . ' option' . (count($variantList) > 1 ? 's' : '');
+                                        echo '<br/>';
+                                        echo htmlspecialchars(implode(', ', array_slice($variantList, 0, 2)));
+                                        if (count($variantList) > 2) echo '...';
+                                    } else {
+                                        echo '<em style="color: #64748b;">Aucune</em>';
+                                    }
+                                ?>
+                            </small>
                         </td>
                         <td style="text-align: center;">
                             <a href="/admin/products/edit/<?php echo $product['id']; ?>" class="btn btn-warning" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;">✏️</a>

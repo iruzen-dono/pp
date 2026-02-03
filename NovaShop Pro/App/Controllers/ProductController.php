@@ -11,13 +11,28 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = (new Product())->getAll();
-        $this->view('products/index', compact('products'));
+        $searchQuery = $_GET['q'] ?? $_POST['q'] ?? '';
+        $products = [];
+        
+        if (!empty($searchQuery)) {
+            // Utiliser la recherche si une requête est fournie
+            $products = (new Product())->search($searchQuery);
+        } else {
+            // Sinon afficher tous les produits
+            $products = (new Product())->getAll();
+        }
+        
+        $this->view('products/index', compact('products', 'searchQuery'));
     }
 
-    public function show()
+    public function show($productId = null)
     {
-        $productId = (int)($_GET['params'][0] ?? $_GET['id'] ?? 0);
+        // Get product ID from parameter or GET
+        if ($productId === null) {
+            $productId = (int)($_GET['id'] ?? 0);
+        } else {
+            $productId = (int)$productId;
+        }
 
         if ($productId <= 0) {
             header("Location: /products");

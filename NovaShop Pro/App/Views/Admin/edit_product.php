@@ -1,124 +1,116 @@
-<div class="admin-container">
-    <div class="admin-header">
-        <h1>Éditer le produit</h1>
-        <a href="/admin/products" class="btn btn-secondary">← Retour</a>
-    </div>
+<h1>✏️ Éditer le Produit</h1>
 
-    <?php if (isset($_GET['error'])): ?>
+<a href="/admin/products" class="btn btn-secondary" style="margin-bottom: 1.5rem;">← Retour</a>
+
+<?php if (isset($_GET['error'])): ?>
     <div class="alert alert-danger">
         <?php 
         switch ($_GET['error']) {
             case 'invalid_image_type':
-                echo 'Type d\'image non autorisé. Utilisez JPG, PNG, WebP ou GIF.';
+                echo '❌ Type d\'image non autorisé. Utilisez JPG, PNG, WebP ou GIF.';
                 break;
             case 'image_too_large':
-                echo 'L\'image est trop volumineuse (max 5MB).';
+                echo '❌ L\'image est trop volumineuse (max 5MB).';
                 break;
             default:
-                echo 'Une erreur est survenue.';
+                echo '❌ Une erreur est survenue.';
         }
         ?>
     </div>
-    <?php endif; ?>
+<?php endif; ?>
 
-    <div class="admin-form-container">
-        <form method="POST" enctype="multipart/form-data" class="admin-form">
-            <input type="hidden" name="action" value="edit">
-            
+<!-- FORMULAIRE ÉDITION PRODUIT -->
+<div class="admin-form">
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="edit">
+        
+        <div class="form-grid">
             <div class="form-group">
-                <label for="name">Nom du produit *</label>
+                <label>Nom du Produit</label>
                 <input 
                     type="text" 
-                    id="name" 
                     name="name" 
                     value="<?= htmlspecialchars($product['name']) ?>" 
                     required
-                    class="form-control"
                 >
             </div>
-
             <div class="form-group">
-                <label for="description">Description *</label>
-                <textarea 
-                    id="description" 
-                    name="description" 
+                <label>Prix (€)</label>
+                <input 
+                    type="number" 
+                    name="price" 
+                    value="<?= htmlspecialchars($product['price']) ?>" 
+                    step="0.01"
                     required
-                    rows="6"
-                    class="form-control"
-                ><?= htmlspecialchars($product['description']) ?></textarea>
+                >
             </div>
+        </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="price">Prix (€) *</label>
-                    <input 
-                        type="number" 
-                        id="price" 
-                        name="price" 
-                        value="<?= htmlspecialchars($product['price']) ?>" 
-                        step="0.01"
-                        required
-                        class="form-control"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="category_id">Catégorie *</label>
-                    <select id="category_id" name="category_id" required class="form-control">
-                        <option value="1" <?= $product['category_id'] == 1 ? 'selected' : '' ?>>Électronique</option>
-                        <option value="2" <?= $product['category_id'] == 2 ? 'selected' : '' ?>>Mode</option>
-                        <option value="3" <?= $product['category_id'] == 3 ? 'selected' : '' ?>>Livres</option>
-                        <option value="4" <?= $product['category_id'] == 4 ? 'selected' : '' ?>>Maison</option>
-                        <option value="5" <?= $product['category_id'] == 5 ? 'selected' : '' ?>>Sports</option>
-                    </select>
-                </div>
-            </div>
-
+        <div class="form-grid">
             <div class="form-group">
-                <label for="image">Image du produit</label>
-                <div class="image-preview-section">
-                    <?php if (!empty($product['image_url'])): ?>
-                    <div class="current-image">
-                        <p class="preview-label">Image actuelle:</p>
-                        <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="preview-img">
-                    </div>
-                    <?php endif; ?>
-                    
-                    <div class="form-group">
-                        <input 
-                            type="file" 
-                            id="image" 
-                            name="image" 
-                            accept="image/*"
-                            class="form-control"
-                        >
-                        <small class="text-muted">Laissez vide pour garder l'image actuelle. Max 5MB (JPG, PNG, WebP, GIF)</small>
-                    </div>
-                </div>
+                <label>Catégorie</label>
+                <select name="category_id" required>
+                    <option value="1" <?= $product['category_id'] == 1 ? 'selected' : '' ?>>Électronique</option>
+                    <option value="2" <?= $product['category_id'] == 2 ? 'selected' : '' ?>>Vêtements</option>
+                    <option value="3" <?= $product['category_id'] == 3 ? 'selected' : '' ?>>Livres</option>
+                    <option value="4" <?= $product['category_id'] == 4 ? 'selected' : '' ?>>Maison</option>
+                </select>
             </div>
+            <div class="form-group">
+                <label>Stock</label>
+                <input 
+                    type="number" 
+                    name="stock" 
+                    value="<?= htmlspecialchars($product['stock'] ?? 0) ?>" 
+                    min="0"
+                    required
+                >
+            </div>
+        </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
-                <a href="/admin/products" class="btn btn-secondary">Annuler</a>
-            </div>
-        </form>
-    </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" required><?= htmlspecialchars($product['description']) ?></textarea>
+        </div>
+
+        <?php if (!empty($product['image_url'])): ?>
+        <div class="form-group">
+            <label>Image actuelle:</label>
+            <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="max-width: 200px; border-radius: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <?php endif; ?>
+
+        <div class="form-group">
+            <label>Image (JPG, PNG, WebP, GIF - Max 5MB)</label>
+            <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif">
+            <small style="color: #999; font-size: 0.85rem; margin-top: 0.5rem; display: block;">Laissez vide pour garder l'image actuelle</small>
+        </div>
+
+        <div class="form-group">
+            <label>Variantes (séparées par des virgules)</label>
+            <textarea name="variants" placeholder="Ex: S, M, L, XL&#10;ou: Noir, Blanc, Gris&#10;ou: 256GB, 512GB, 1TB" style="font-family: monospace; font-size: 0.9rem; min-height: 60px;"><?= htmlspecialchars($product['variants'] ?? '') ?></textarea>
+            <small style="color: #999; font-size: 0.85rem; margin-top: 0.5rem; display: block;">💡 Entrez les options disponibles pour ce produit (ex: tailles, couleurs, capacités)</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Enregistrer les Modifications</button>
+    </form>
 </div>
 
 <style>
-.admin-form-container {
-    background: white;
-    border-radius: 8px;
+.admin-form {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.7), rgba(30, 41, 59, 0.7));
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 0.75rem;
     padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    max-width: 800px;
-    margin-top: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
 }
 
-.admin-form {
-    display: flex;
-    flex-direction: column;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group {
@@ -127,74 +119,48 @@
     gap: 0.5rem;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
 .form-group label {
+    color: #f0a76d;
     font-weight: 600;
-    color: #333;
     font-size: 0.95rem;
 }
 
-.form-control {
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 0.5rem;
     padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+    color: white;
     font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
 }
 
-.form-control:focus {
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(148, 163, 184, 0.5);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
-    border-color: #d4a574;
-    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+    border-color: #f0a76d;
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 3px rgba(240, 167, 109, 0.1);
 }
 
-textarea.form-control {
+.form-group textarea {
+    min-height: 150px;
     resize: vertical;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.image-preview-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.current-image {
-    padding: 1rem;
-    background: #f5f5f0;
-    border-radius: 6px;
-}
-
-.preview-label {
-    margin: 0 0 0.5rem 0;
-    color: #666;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.preview-img {
-    max-width: 200px;
-    height: auto;
-    border-radius: 4px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
 }
 
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 4px;
+    border-radius: 0.5rem;
     cursor: pointer;
     font-weight: 600;
     text-decoration: none;
@@ -203,52 +169,58 @@ textarea.form-control {
     justify-content: center;
     gap: 0.5rem;
     transition: all 0.3s ease;
+    font-size: 1rem;
 }
 
 .btn-primary {
-    background: #d4a574;
+    background: linear-gradient(135deg, #f0a76d, #e89a5c);
     color: white;
+    border: none;
 }
 
 .btn-primary:hover {
-    background: #c99463;
+    background: linear-gradient(135deg, #f5b584, #f0a76d);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+    box-shadow: 0 8px 16px rgba(240, 167, 109, 0.3);
 }
 
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: rgba(100, 116, 139, 0.5);
+    color: #e2e8f0;
+    border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .btn-secondary:hover {
-    background: #5a6268;
+    background: rgba(100, 116, 139, 0.8);
+    border-color: rgba(148, 163, 184, 0.5);
 }
 
 .alert {
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
 }
 
 .alert-danger {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
 }
 
-.text-muted {
-    color: #999;
-    font-size: 0.85rem;
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #86efac;
 }
 
 @media (max-width: 768px) {
-    .form-row {
+    .form-grid {
         grid-template-columns: 1fr;
     }
     
-    .admin-form-container {
-        padding: 1rem;
+    .admin-form {
+        padding: 1.5rem;
     }
 }
 </style>

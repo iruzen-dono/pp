@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initDarkMode();
     initScrollAnimations();
     initCarousel();
-    initWishlist();
     initNewsletterPopup();
     initFilterModal();
     initSmoothScroll();
@@ -300,43 +299,6 @@ function initCarousel() {
 
         // Auto-play carousel
         setInterval(() => goToSlide(currentIndex + 1), 5000);
-    });
-}
-
-// ============================================
-// WISHLIST
-// ============================================
-
-function initWishlist() {
-    const wishlistBtns = document.querySelectorAll('.wishlist-btn');
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-
-    wishlistBtns.forEach(btn => {
-        const productId = btn.dataset.productId;
-        
-        if (wishlist.includes(productId)) {
-            btn.classList.add('active');
-            btn.textContent = '❤️';
-        }
-
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const idx = wishlist.indexOf(productId);
-            
-            if (idx > -1) {
-                wishlist.splice(idx, 1);
-                this.classList.remove('active');
-                this.textContent = '🤍';
-                showNotification('Supprimé de la wishlist');
-            } else {
-                wishlist.push(productId);
-                this.classList.add('active');
-                this.textContent = '❤️';
-                showNotification('Ajouté à la wishlist !');
-            }
-            
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-        });
     });
 }
 

@@ -26,6 +26,7 @@
 
             <!-- Login Form -->
             <form method="POST" id="loginForm">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
                 <!-- Email -->
                 <div class="form-group mb-4">
                     <label for="email" class="form-label">
@@ -81,7 +82,7 @@
                             Se souvenir de moi
                         </label>
                     </div>
-                    <a href="#" class="text-primary text-decoration-none fw-500">
+                    <a href="/forgot" class="text-primary text-decoration-none fw-500">
                         <i class="fas fa-key me-1"></i>Mot de passe oublié ?
                     </a>
                 </div>
@@ -151,16 +152,20 @@
 
 .auth-content {
     width: 100%;
-    max-width: 480px;
+    /* Allow a wider layout on large screens while remaining responsive */
+    max-width: 720px;
     padding: 20px;
 }
 
 .auth-card {
     background: white;
     border-radius: 20px;
-    padding: 60px 40px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
+    padding: 40px 36px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(6px);
+    /* keep the card reasonably narrow and centered inside the wider auth-content */
+    max-width: 520px;
+    margin: 0 auto;
 }
 
 .logo-circle {

@@ -24,11 +24,8 @@ if (!is_dir($imagesDir)) {
 
 // Connexion BDD
 try {
-    $db = new PDO(
-        'mysql:host=localhost;dbname=novashop;charset=utf8mb4',
-        'root',
-        '0000'
-    );
+    require_once __DIR__ . '/../App/Config/Database.php';
+    $db = \App\Config\Database::getConnection();
 } catch (Exception $e) {
     die("❌ ERREUR BDD: " . $e->getMessage() . "\n");
 }

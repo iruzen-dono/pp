@@ -12,8 +12,13 @@
 
     <!-- Search Bar -->
     <div class="search-bar">
-        <input type="search" placeholder="🔍 Rechercher un produit..." aria-label="Rechercher">
-        <button type="button">Chercher</button>
+        <form class="inline-search-form" method="GET" action="/products">
+            <div class="input-with-icon">
+                <span class="search-icon">🔎</span>
+                <input type="search" name="q" placeholder="Rechercher un produit, catégorie..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
+            </div>
+            <button type="submit" class="btn">Rechercher</button>
+        </form>
     </div>
 </div>
 
@@ -23,7 +28,6 @@
         <?php foreach ($products as $product): ?>
         <a href="/products/<?= $product['id'] ?>" class="product-card">
             <div class="product-card-inner">
-                <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>" aria-label="Ajouter aux favoris" type="button" tabindex="-1">🤍</button>
                 <div class="product-card-image">
                     <?php if (!empty($product['image_url'])): ?>
                         <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
@@ -52,22 +56,4 @@
 </div>
 <?php endif; ?>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Wishlist button handling
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const productId = this.dataset.productId;
-            const isFilled = this.textContent === '❤️';
-            
-            this.textContent = isFilled ? '🤍' : '❤️';
-            this.style.transform = 'scale(1.2)';
-            setTimeout(() => { this.style.transform = 'scale(1)'; }, 200);
-            
-            // TODO: Send AJAX request to add/remove from wishlist
-        });
-    });
-});
-</script>
+<!-- wishlist removed -->

@@ -44,9 +44,9 @@
             
             <div class="hero-image-wrapper">
                 <div class="hero-image-placeholder">
-                    <div class="floating-card">📦 Produits premium</div>
-                    <div class="floating-card" style="animation-delay: 0.5s;">🚚 Livraison rapide</div>
-                    <div class="floating-card" style="animation-delay: 1s;">✨ Qualité garantie</div>
+                    <div class="floating-card"><i class="fas fa-box"></i> Produits premium</div>
+                    <div class="floating-card" style="animation-delay: 0.5s;"><i class="fas fa-truck"></i> Livraison rapide</div>
+                    <div class="floating-card" style="animation-delay: 1s;"><i class="fas fa-sparkles"></i> Qualité garantie</div>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@
                 <?php if (!empty($product['image_url'])): ?>
                     <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                 <?php else: ?>
-                    <div class="placeholder-large">📦</div>
+                    <div class="placeholder-large"><i class="fas fa-box fa-3x"></i></div>
                 <?php endif; ?>
             </div>
             
@@ -84,15 +84,15 @@
                 
                 <div class="featured-product-features">
                     <div class="feature-item">
-                        <span class="feature-icon">✓</span>
+                        <span class="feature-icon"><i class="fas fa-check"></i></span>
                         <span>Qualité certifiée</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">✓</span>
+                        <span class="feature-icon"><i class="fas fa-check"></i></span>
                         <span>Livraison gratuite</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">✓</span>
+                        <span class="feature-icon"><i class="fas fa-check"></i></span>
                         <span>Retour sans frais</span>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
         
         <div class="benefits-grid">
             <div class="benefit-card animate-on-scroll">
-                <div class="benefit-icon">🌍</div>
+                <div class="benefit-icon"><i class="fas fa-globe fa-2x"></i></div>
                 <h3 class="benefit-title">Sélection Mondiale</h3>
                 <p class="benefit-description">
                     Produits sélectionnés avec soin du monde entier, garantissant qualité et authenticité
@@ -132,7 +132,7 @@
             </div>
             
             <div class="benefit-card animate-on-scroll">
-                <div class="benefit-icon">⚡</div>
+                <div class="benefit-icon"><i class="fas fa-bolt fa-2x"></i></div>
                 <h3 class="benefit-title">Livraison Express</h3>
                 <p class="benefit-description">
                     Commandes traitées en 24h et livrées rapidement. Suivi en temps réel inclus
@@ -140,7 +140,7 @@
             </div>
             
             <div class="benefit-card animate-on-scroll">
-                <div class="benefit-icon">🔒</div>
+                <div class="benefit-icon"><i class="fas fa-lock fa-2x"></i></div>
                 <h3 class="benefit-title">100% Sécurisé</h3>
                 <p class="benefit-description">
                     Paiements cryptés et données protégées. Retours gratuits sous 30 jours
@@ -148,7 +148,7 @@
             </div>
             
             <div class="benefit-card animate-on-scroll">
-                <div class="benefit-icon">💰</div>
+                <div class="benefit-icon"><i class="fas fa-dollar-sign fa-2x"></i></div>
                 <h3 class="benefit-title">Meilleurs Prix</h3>
                 <p class="benefit-description">
                     Prix compétitifs et réductions régulières. Programme de fidélité exclusif
@@ -156,7 +156,7 @@
             </div>
             
             <div class="benefit-card animate-on-scroll">
-                <div class="benefit-icon">📞</div>
+                <div class="benefit-icon"><i class="fas fa-headset fa-2x"></i></div>
                 <h3 class="benefit-title">Support 24/7</h3>
                 <p class="benefit-description">
                     Équipe réactive et disponible. Réponses rapides à vos questions
@@ -164,7 +164,7 @@
             </div>
             
             <div class="benefit-card animate-on-scroll">
-                <div class="benefit-icon">⭐</div>
+                <div class="benefit-icon"><i class="fas fa-star fa-2x"></i></div>
                 <h3 class="benefit-title">Qualité Garantie</h3>
                 <p class="benefit-description">
                     Tous produits testés et approuvés. Satisfaction garantie ou remboursement
@@ -187,7 +187,7 @@
                 <p class="step-description">
                     Explorez notre vaste sélection de produits premium soigneusement curés
                 </p>
-                <div class="step-icon">🔍</div>
+                <div class="step-icon"><i class="fas fa-search fa-2x"></i></div>
             </div>
             
             <div class="step-arrow">→</div>
@@ -198,7 +198,7 @@
                 <p class="step-description">
                     Sélectionnez vos produits préférés et ajoutez-les au panier
                 </p>
-                <div class="step-icon">🛒</div>
+                <div class="step-icon"><i class="fas fa-cart-plus fa-2x"></i></div>
             </div>
             
             <div class="step-arrow">→</div>
@@ -209,7 +209,7 @@
                 <p class="step-description">
                     Paiement sécurisé avec plusieurs options disponibles
                 </p>
-                <div class="step-icon">💳</div>
+                <div class="step-icon"><i class="fas fa-credit-card fa-2x"></i></div>
             </div>
             
             <div class="step-arrow">→</div>
@@ -220,7 +220,7 @@
                 <p class="step-description">
                     Livraison rapide avec suivi en temps réel
                 </p>
-                <div class="step-icon">📦</div>
+                <div class="step-icon"><i class="fas fa-box fa-2x"></i></div>
             </div>
         </div>
     </div>
@@ -235,28 +235,28 @@
         <div class="trust-grid">
             <!-- Chiffres clés -->
             <div class="trust-stat-card animate-on-scroll">
-                <div class="stat-icon">👥</div>
+                <div class="stat-icon"><i class="fas fa-users fa-2x"></i></div>
                 <div class="stat-number">847K+</div>
                 <div class="stat-label">Clients actifs</div>
                 <p class="stat-description">Une communauté en croissance constante depuis 2020</p>
             </div>
             
             <div class="trust-stat-card animate-on-scroll">
-                <div class="stat-icon">📦</div>
+                <div class="stat-icon"><i class="fas fa-box fa-2x"></i></div>
                 <div class="stat-number">2.3M+</div>
                 <div class="stat-label">Commandes livrées</div>
                 <p class="stat-description">99.2% de satisfaction client documentée</p>
             </div>
             
             <div class="trust-stat-card animate-on-scroll">
-                <div class="stat-icon">⭐</div>
+                <div class="stat-icon"><i class="fas fa-star fa-2x"></i></div>
                 <div class="stat-number">4.8/5</div>
                 <div class="stat-label">Note moyenne</div>
                 <p class="stat-description">Basée sur 156K+ avis vérifiés</p>
             </div>
             
             <div class="trust-stat-card animate-on-scroll">
-                <div class="stat-icon">🛡️</div>
+                <div class="stat-icon"><i class="fas fa-shield fa-2x"></i></div>
                 <div class="stat-number">100%</div>
                 <div class="stat-label">Sécurisé</div>
                 <p class="stat-description">SSL certifié + Paiements cryptés</p>
@@ -268,25 +268,25 @@
             <h3 class="certifications-title">Certifications & Garanties</h3>
             <div class="certifications-grid">
                 <div class="cert-badge animate-on-scroll">
-                    <div class="cert-icon">✓</div>
+                    <div class="cert-icon"><i class="fas fa-check"></i></div>
                     <div class="cert-name">Paiements 100% sécurisés</div>
                     <p class="cert-description">Chiffrement SSL et protection PCI-DSS</p>
                 </div>
                 
                 <div class="cert-badge animate-on-scroll">
-                    <div class="cert-icon">✓</div>
+                    <div class="cert-icon"><i class="fas fa-check"></i></div>
                     <div class="cert-name">Retours gratuits 30j</div>
                     <p class="cert-description">Satisfait ou remboursé, sans questions</p>
                 </div>
                 
                 <div class="cert-badge animate-on-scroll">
-                    <div class="cert-icon">✓</div>
+                    <div class="cert-icon"><i class="fas fa-check"></i></div>
                     <div class="cert-name">Livraison Express</div>
                     <p class="cert-description">Suivi en temps réel garanti</p>
                 </div>
                 
                 <div class="cert-badge animate-on-scroll">
-                    <div class="cert-icon">✓</div>
+                    <div class="cert-icon"><i class="fas fa-check"></i></div>
                     <div class="cert-name">Support 24/7</div>
                     <p class="cert-description">Réponse en moins de 2h</p>
                 </div>

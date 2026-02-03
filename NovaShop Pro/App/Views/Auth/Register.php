@@ -26,6 +26,7 @@
 
             <!-- Register Form -->
             <form method="POST" id="registerForm">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
                 <!-- Full Name -->
                 <div class="form-group mb-3">
                     <label for="name" class="form-label">
@@ -193,18 +194,23 @@
 
 .auth-content {
     width: 100%;
-    max-width: 480px;
+    /* Allow a wider layout on large screens while remaining responsive */
+    max-width: 720px;
     padding: 20px;
 }
 
 .auth-card {
     background: white;
     border-radius: 20px;
-    padding: 60px 40px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
-    max-height: 90vh;
-    overflow-y: auto;
+    padding: 40px 36px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(6px);
+    /* Allow page to scroll normally instead of forcing an inner scrollbar */
+    max-height: none;
+    overflow: visible;
+    /* keep the card reasonably narrow and centered inside the wider auth-content */
+    max-width: 520px;
+    margin: 0 auto;
 }
 
 .logo-circle {

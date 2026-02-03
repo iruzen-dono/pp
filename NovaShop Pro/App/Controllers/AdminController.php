@@ -12,6 +12,7 @@ require_once __DIR__ . '/../Middleware/AdminMiddleware.php';
 require_once __DIR__ . '/../Models/User.php';
 require_once __DIR__ . '/../Models/Product.php';
 require_once __DIR__ . '/../Models/Order.php';
+require_once __DIR__ . '/../Middleware/CsrfMiddleware.php';
 
 class AdminController extends Controller
 {
@@ -44,6 +45,7 @@ class AdminController extends Controller
     public function products()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            \App\Middleware\CsrfMiddleware::checkPost();
 
             if (($_POST['action'] ?? '') === 'create') {
 
@@ -66,15 +68,22 @@ class AdminController extends Controller
                         exit;
                     }
 
-                    $uploadDir = dirname(__DIR__, 2) . '/public/assets/images/products/';
+                    $uploadDir = dirname(__DIR__, 2) . '/Public/Assets/Images/products/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0755, true);
                     }
 
-                    $fileName = uniqid('product_', true) . '.' . pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+                    $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+                    $allowedExt = ['jpg','jpeg','png','webp','gif'];
+                    if (!in_array($ext, $allowedExt)) {
+                        header('Location: /admin/products?error=invalid_image');
+                        exit;
+                    }
+
+                    $fileName = uniqid('product_', true) . '.' . $ext;
                     move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName);
 
-                    $imagePath = '/assets/images/products/' . $fileName;
+                    $imagePath = '/Assets/Images/products/' . $fileName;
                 }
 
                 (new Product())->create([
@@ -83,7 +92,8 @@ class AdminController extends Controller
                     'image_url'   => $imagePath,
                     'price'       => (float)($_POST['price'] ?? 0),
                     'category_id' => (int)($_POST['category_id'] ?? 1),
-                    'stock'       => (int)($_POST['stock'] ?? 0)
+                    'stock'       => (int)($_POST['stock'] ?? 0),
+                    'variants'    => trim($_POST['variants'] ?? '')
                 ]);
 
                 header('Location: /admin/products?success=1');
@@ -101,23 +111,38 @@ class AdminController extends Controller
         $this->adminView('admin/orders', compact('orders'));
     }
 
-    public function deleteUser()
+    public function deleteUser($userId = null)
     {
-        $userId = (int)($_GET['params'][0] ?? 0);
+        if ($userId === null) {
+            $userId = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $userId = (int)$userId;
+        }
 
         if ($userId <= 0 || $userId === ($_SESSION['user']['id'] ?? 0)) {
             header('Location: /admin/users?error=invalid');
             exit;
         }
 
-        (new User())->delete($userId);
+        $userModel = new User();
+        $ok = $userModel->deleteWithCleanup($userId);
+
+        if (!$ok) {
+            header('Location: /admin/users?error=delete_failed');
+            exit;
+        }
         header('Location: /admin/users?success=deleted');
         exit;
     }
 
-    public function deleteProduct()
+    public function deleteProduct($id = null)
     {
-        $id = (int)($_GET['params'][0] ?? 0);
+        if ($id === null) {
+            $id = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $id = (int)$id;
+        }
+        
         if ($id > 0) {
             (new Product())->delete($id);
         }
@@ -125,9 +150,11 @@ class AdminController extends Controller
         exit;
     }
 
-    public function editProduct()
+    public function editProduct($productId = null)
     {
-        $productId = $_GET['params'][0] ?? null;
+        if ($productId === null) {
+            $productId = $_GET['params'][0] ?? null;
+        }
         
         if (!$productId) {
             header('Location: /admin/products');
@@ -144,6 +171,7 @@ class AdminController extends Controller
         
         // Traiter la soumission du formulaire
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            \App\Middleware\CsrfMiddleware::checkPost();
             $imagePath = $product['image_url'];
             
             // Gestion de l'upload d'image si une nouvelle image est fournie
@@ -170,7 +198,14 @@ class AdminController extends Controller
                     exit;
                 }
                 
-                $fileName = 'product_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
+                $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                $allowedExt = ['jpg','jpeg','png','webp','gif'];
+                if (!in_array($ext, $allowedExt)) {
+                    header('Location: /admin/products/edit/' . $productId . '?error=invalid_image_type');
+                    exit;
+                }
+
+                $fileName = 'product_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                 $filePath = $uploadDir . $fileName;
                 
                 if (move_uploaded_file($file['tmp_name'], $filePath)) {
@@ -180,24 +215,22 @@ class AdminController extends Controller
             
             $productModel->update(
                 $productId,
-                $_POST['name'] ?? $product['name'],
-                $_POST['description'] ?? $product['description'],
-                (float)($_POST['price'] ?? $product['price']),
-                (int)($_POST['category_id'] ?? $product['category_id'])
+                [
+                    'name' => $_POST['name'] ?? $product['name'],
+                    'description' => $_POST['description'] ?? $product['description'],
+                    'price' => (float)($_POST['price'] ?? $product['price']),
+                    'category_id' => (int)($_POST['category_id'] ?? $product['category_id']),
+                    'stock' => (int)($_POST['stock'] ?? $product['stock']),
+                    'variants' => trim($_POST['variants'] ?? $product['variants'] ?? '')
+                ]
             );
             
             // Mettre à jour l'image si modifiée
             if ($imagePath !== $product['image_url']) {
-                // Utiliser une connexion PDO directe pour éviter les méthodes protégées
                 try {
-                    $db = new \mysqli('localhost', 'root', '0000', 'novashop');
-                    $stmt = $db->prepare("UPDATE products SET image_url = ? WHERE id = ?");
-                    if ($stmt) {
-                        $stmt->bind_param('si', $imagePath, $productId);
-                        $stmt->execute();
-                        $stmt->close();
-                    }
-                    $db->close();
+                    $pdo = \App\Config\Database::getConnection();
+                    $stmt = $pdo->prepare("UPDATE products SET image_url = ? WHERE id = ?");
+                    $stmt->execute([$imagePath, $productId]);
                 } catch (\Exception $e) {
                     // Ignorer les erreurs de mise à jour d'image
                 }
@@ -210,9 +243,14 @@ class AdminController extends Controller
         $this->adminView('admin/edit_product', ['product' => $product]);
     }
 
-    public function deleteOrder()
+    public function deleteOrder($id = null)
     {
-        $id = (int)($_GET['params'][0] ?? 0);
+        if ($id === null) {
+            $id = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $id = (int)$id;
+        }
+        
         if ($id > 0) {
             (new Order())->delete($id);
         }

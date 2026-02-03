@@ -20,9 +20,12 @@ class Model
             $stmt->execute($params);
 
             if (stripos(trim($sql), 'SELECT') === 0) {
-                return $single
-                    ? $stmt->fetch(PDO::FETCH_ASSOC)
-                    : $stmt->fetchAll(PDO::FETCH_ASSOC);
+                if ($single) {
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                    return $row === false ? null : $row;
+                }
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
             return $stmt->rowCount();

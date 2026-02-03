@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Registration</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .box { background: #f0f0f0; padding: 20px; border-radius: 8px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Tester la Vérification Email</h1>
+    <div class="box">
+        <h2>Créer un compte pour test</h2>
+        <form method="POST" action="/register" style="display:flex; flex-direction:column; gap:10px; max-width:300px;">
+            <input type="text" name="name" placeholder="Nom" required>
+            <input type="email" name="email" placeholder="Email" required value="testuser-<?php echo time(); ?>@test.com">
+            <input type="password" name="password" placeholder="Mot de passe" value="password123" required>
+            <button type="submit">S'inscrire</button>
+        </form>
+    </div>
+    
+    <div class="box info">
+        <h3>ℹ️ Après l'inscription:</h3>
+        <ol>
+            <li>Ouvre <strong>logs/email_verification.log</strong></li>
+            <li>Copie le lien de vérification</li>
+            <li>Colle-le dans le navigateur</li>
+            <li>Cela devrait afficher "Email vérifié avec succès!"</li>
+        </ol>
+    </div>
+</body>
+</html>

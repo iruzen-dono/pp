@@ -1,0 +1,62 @@
+# Environment Configuration
+.env
+.env.local
+.env.*.local
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# Dependencies
+vendor/
+node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# Cache & Logs
+*.log
+logs/
+tmp/
+cache/
+.cache/
+
+# Build & Distribution
+dist/
+build/
+*.min.js
+*.min.css
+
+# OS
+.DS_Store
+.env.local.php
+.env.*.php
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*~
+
+# User uploads (non-version-controlled)
+Public/Assets/Images/products/
+Public/uploads/
+storage/uploads/
+
+# Test Coverage
+coverage/
+.coverage
+clover.xml
+
+# PHP Unit
+phpunit.xml
+.phpunit.result.cache

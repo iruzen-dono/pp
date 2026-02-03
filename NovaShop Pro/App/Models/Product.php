@@ -24,15 +24,16 @@ class Product extends Model
     public function create(array $data)
     {
         return $this->run(
-            "INSERT INTO products (name, description, image_url, price, category_id, stock)
-             VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO products (name, description, image_url, price, category_id, stock, variants)
+             VALUES (?, ?, ?, ?, ?, ?, ?)",
             [
                 $data['name'] ?? '',
                 $data['description'] ?? '',
                 $data['image_url'] ?? '',
                 $data['price'] ?? 0,
                 $data['category_id'] ?? 1,
-                $data['stock'] ?? 0
+                $data['stock'] ?? 0,
+                $data['variants'] ?? ''
             ]
         );
     }
@@ -41,7 +42,7 @@ class Product extends Model
     {
         return $this->run(
             "UPDATE products 
-             SET name = ?, description = ?, price = ?, category_id = ?, stock = ? 
+             SET name = ?, description = ?, price = ?, category_id = ?, stock = ?, variants = ? 
              WHERE id = ?",
             [
                 $data['name'] ?? '',
@@ -49,6 +50,7 @@ class Product extends Model
                 $data['price'] ?? 0,
                 $data['category_id'] ?? 1,
                 $data['stock'] ?? 0,
+                $data['variants'] ?? '',
                 $id
             ]
         );
@@ -59,6 +61,24 @@ class Product extends Model
         return $this->run(
             "DELETE FROM products WHERE id = ?",
             [$id]
+        );
+    }
+
+    public function search(string $query)
+    {
+        if (empty($query)) {
+            return [];
+        }
+
+        $query = trim($query);
+        $searchTerm = '%' . $query . '%';
+        
+        return $this->run(
+            "SELECT * FROM products 
+             WHERE name LIKE ? OR description LIKE ?
+             ORDER BY name ASC
+             LIMIT 50",
+            [$searchTerm, $searchTerm]
         );
     }
 }

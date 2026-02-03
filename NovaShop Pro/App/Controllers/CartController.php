@@ -19,18 +19,36 @@ class CartController extends Controller
         $products = [];
         $total = 0;
 
-        if (!empty($cart)) {
-            $productModel = new Product();
+        $productModel = new Product();
 
-            foreach ($cart as $productId => $item) {
-                $product = $productModel->getById($productId);
+        foreach ($cart as $productId => $item) {
+            $product = $productModel->getById((int)$productId);
+            if (!$product) {
+                continue;
+            }
 
-                if ($product) {
-                    $product['quantity'] = $item['quantity'];
-                    $product['subtotal'] = $item['quantity'] * $item['price'];
-                    $total += $product['subtotal'];
-                    $products[] = $product;
+            // New structure: ['variants' => ['VariantName' => ['quantity'=>x,'price'=>y], ...]]
+            if (isset($item['variants']) && is_array($item['variants'])) {
+                foreach ($item['variants'] as $variantName => $vdata) {
+                    $row = $product;
+                    $row['variant'] = $variantName;
+                    $row['quantity'] = (int)($vdata['quantity'] ?? 1);
+                    $row['subtotal'] = $row['quantity'] * (float)($vdata['price'] ?? $product['price']);
+                    $total += $row['subtotal'];
+                    $products[] = $row;
                 }
+            } elseif (isset($item['quantity'])) {
+                // Legacy support: product => ['quantity'=>x,'price'=>y]
+                $product['quantity'] = (int)$item['quantity'];
+                $product['subtotal'] = $product['quantity'] * (float)($item['price'] ?? $product['price']);
+                $total += $product['subtotal'];
+                $products[] = $product;
+            } elseif (is_numeric($item)) {
+                // Very old format: productId => quantity
+                $product['quantity'] = (int)$item;
+                $product['subtotal'] = $product['quantity'] * $product['price'];
+                $total += $product['subtotal'];
+                $products[] = $product;
             }
         }
 
@@ -51,6 +69,7 @@ class CartController extends Controller
 
         $productId = (int)($_POST['product_id'] ?? 0);
         $quantity  = (int)($_POST['quantity'] ?? 1);
+        $variant = trim((string)($_POST['variant'] ?? 'Standard')) ?: 'Standard';
 
         if ($productId <= 0 || $quantity <= 0) {
             header("Location: /");
@@ -71,13 +90,17 @@ class CartController extends Controller
             $_SESSION['cart'] = [];
         }
 
-        if (isset($_SESSION['cart'][$productId])) {
-            $_SESSION['cart'][$productId]['quantity'] += $quantity;
-        } else {
-            $_SESSION['cart'][$productId] = [
+        if (!isset($_SESSION['cart'][$productId]) || !is_array($_SESSION['cart'][$productId])) {
+            $_SESSION['cart'][$productId] = ['variants' => []];
+        }
+
+        if (!isset($_SESSION['cart'][$productId]['variants'][$variant])) {
+            $_SESSION['cart'][$productId]['variants'][$variant] = [
                 'quantity' => $quantity,
                 'price' => $product['price']
             ];
+        } else {
+            $_SESSION['cart'][$productId]['variants'][$variant]['quantity'] += $quantity;
         }
 
         header("Location: /cart");
@@ -89,9 +112,18 @@ class CartController extends Controller
         AuthMiddleware::check();
 
         $productId = (int)($_GET['id'] ?? 0);
+        $variant = $_GET['variant'] ?? null;
 
         if ($productId > 0 && isset($_SESSION['cart'][$productId])) {
-            unset($_SESSION['cart'][$productId]);
+            if ($variant && isset($_SESSION['cart'][$productId]['variants'][$variant])) {
+                unset($_SESSION['cart'][$productId]['variants'][$variant]);
+                // If no variants remain, remove the product entry
+                if (empty($_SESSION['cart'][$productId]['variants'])) {
+                    unset($_SESSION['cart'][$productId]);
+                }
+            } else {
+                unset($_SESSION['cart'][$productId]);
+            }
         }
 
         header("Location: /cart");

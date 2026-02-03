@@ -12,9 +12,10 @@ $total_revenue = 0;
 
 if (!empty($orders) && is_array($orders)) {
     foreach ($orders as $order) {
-        if (($order['status'] ?? '') === 'EN ATTENTE') {
+        $status = strtolower($order['status'] ?? 'pending');
+        if ($status === 'pending') {
             $pending_count++;
-        } elseif (($order['status'] ?? '') === 'COMPLÉTÉE') {
+        } elseif ($status === 'completed') {
             $completed_count++;
         }
         $total_revenue += (float)($order['total'] ?? 0);
@@ -65,12 +66,13 @@ if (!empty($orders) && is_array($orders)) {
                         </td>
                         <td>
                             <?php 
-                            $status = $order['status'] ?? 'EN ATTENTE';
-                            $statusColor = $status === 'COMPLÉTÉE' ? '#86efac' : '#fbbf24';
-                            $statusBg = $status === 'COMPLÉTÉE' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(251, 191, 36, 0.2)';
+                            $status = strtolower($order['status'] ?? 'pending');
+                            $status_label = $status === 'completed' ? '✅ Complétée' : '⏳ En Attente';
+                            $statusColor = $status === 'completed' ? '#86efac' : '#fbbf24';
+                            $statusBg = $status === 'completed' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(251, 191, 36, 0.2)';
                             ?>
                             <span style="background: <?php echo $statusBg; ?>; color: <?php echo $statusColor; ?>; padding: 0.4rem 0.8rem; border-radius: 0.3rem; font-weight: 600; font-size: 0.85rem;">
-                                <?php echo htmlspecialchars($status); ?>
+                                <?php echo htmlspecialchars($status_label); ?>
                             </span>
                         </td>
                         <td style="color: #a0a0a0; font-size: 0.9rem;">

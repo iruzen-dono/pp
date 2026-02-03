@@ -2185,28 +2185,7 @@ textarea {
 /* ============================================
    WISHLIST
    ============================================ */
-
-.wishlist-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: var(--transition);
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 5;
-}
-
-.wishlist-btn.active {
-    animation: heartBeat 0.3s ease;
-}
-
-@keyframes heartBeat {
-    0%, 100% { transform: scale(1); }
-    25% { transform: scale(1.2); }
-    50% { transform: scale(1); }
-}
+/* wishlist styles removed */
 
 /* ============================================
    MODAL & POPUP
@@ -3012,41 +2991,7 @@ tbody tr:hover {
 /* ============================================
    WISHLIST BUTTON
    ============================================ */
-
-.wishlist-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: white;
-    border: 2px solid var(--secondary-dark);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.3rem;
-    cursor: pointer;
-    z-index: 5;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-}
-
-.wishlist-btn:hover {
-    background: var(--secondary);
-    border-color: var(--accent);
-    transform: scale(1.1);
-}
-
-.wishlist-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    animation: heartBeat 0.6s ease-in-out;
-}
-
-@keyframes heartBeat {
-    0% { transform: scale(1); }
-    10%, 30% { transform: scale(0.9); }
-    20%, 40%, 60%, 80%, 100% { transform: scale(1); }
-    50%, 70% { transform: scale(1.1); }
-}
+/* wishlist styles removed */
 
 /* ============================================
    SEARCH BAR
@@ -3427,36 +3372,7 @@ tbody tr:hover {
 }
 
 /* Wishlist Button */
-.wishlist-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid var(--secondary-dark);
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.wishlist-btn:hover {
-    transform: scale(1.2);
-    background: var(--white);
-    border-color: var(--danger);
-    box-shadow: 0 6px 16px rgba(199, 65, 54, 0.2);
-}
-
-.wishlist-btn.filled {
-    background: rgba(199, 65, 54, 0.1);
-    border-color: var(--danger);
-}
+/* wishlist styles removed */
 
 /* No Products State */
 .no-products {
