@@ -18,7 +18,7 @@ if (file_exists($envPath)) {
 
 return [
     'db_host' => getenv('DB_HOST') ?: 'localhost',
-    'db_name' => getenv('DB_NAME') ?: 'novashop',
+    'db_name' => getenv('DB_NAME') ?: 'novashop_db',
     'db_user' => getenv('DB_USER') ?: 'root',
     'db_pass' => getenv('DB_PASS') ?: '0000',
 ];

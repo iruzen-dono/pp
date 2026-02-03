@@ -164,13 +164,14 @@ if "%db_user%"=="" set db_user=root
 set /p db_pass="Mot de passe MySQL (par defaut: 0000): "
 if "%db_pass%"=="" set db_pass=0000
 
-set /p db_name="Nom de la base de donnees (par defaut: novashop): "
-if "%db_name%"=="" set db_name=novashop
+set /p db_name="Nom de la base de donnees (par defaut: novashop_db): "
+if "%db_name%"=="" set db_name=novashop_db
 
 REM Test connection
 echo.
 echo [ACTION] Test de connexion a MySQL/MariaDB...
-mysql -h %db_host% -u %db_user% -p%db_pass% -e "SELECT 1;" >nul 2>&1
+echo   Host: %db_host%, User: %db_user%
+mysql -h %db_host% -u %db_user% --password=%db_pass% -e "SELECT 1;" >nul 2>&1
 
 if errorlevel 1 (
     echo [ERROR] Impossible de se connecter a MySQL/MariaDB
@@ -187,7 +188,7 @@ echo [OK] Connexion reussie
 
 echo.
 echo [ACTION] Creation de la base de donnees...
-mysql -h %db_host% -u %db_user% -p%db_pass% -e "CREATE DATABASE IF NOT EXISTS %db_name% CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>nul
+mysql -h %db_host% -u %db_user% --password=%db_pass% -e "CREATE DATABASE IF NOT EXISTS %db_name% CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>nul
 
 if errorlevel 1 (
     echo [ERROR] Impossible de creer la base de donnees
@@ -241,7 +242,7 @@ if not exist "setup.sql" (
     echo [ACTION] Importation du schema depuis setup.sql...
 )
 
-mysql -h %db_host% -u %db_user% -p%db_pass% %db_name% < %sql_file% 2>nul
+mysql -h %db_host% -u %db_user% --password=%db_pass% %db_name% < %sql_file% 2>nul
 
 if errorlevel 1 (
     echo [ERROR] Erreur lors de l'importation du schema
@@ -252,11 +253,38 @@ if errorlevel 1 (
 echo [OK] Schema importe avec succes
 
 REM Verify tables were created
-mysql -h %db_host% -u %db_user% -p%db_pass% %db_name% -e "SHOW TABLES;" >nul 2>&1
+mysql -h %db_host% -u %db_user% --password=%db_pass% %db_name% -e "SHOW TABLES;" >nul 2>&1
 if errorlevel 1 (
     echo [WARNING] Impossible de verifier les tables
 ) else (
     echo [OK] Tables creees avec succes
+)
+
+REM Import seed data if present
+if exist "seed_premium.sql" (
+    echo.
+    echo [ACTION] Fichier de seed trouve: seed_premium.sql - import en cours...
+    mysql -h %db_host% -u %db_user% --password=%db_pass% %db_name% < "seed_premium.sql"
+    if errorlevel 1 (
+        echo [WARNING] Import du seed a echoue. Verifiez le fichier seed_premium.sql
+    ) else (
+        echo [OK] Donnees de seed importe avec succes
+        echo.
+        echo [INFO] Statistiques apres import:
+        mysql -h %db_host% -u %db_user% --password=%db_pass% -D %db_name% -e "SELECT COUNT(*) AS total_users FROM users; SELECT COUNT(*) AS total_products FROM products; SELECT COUNT(*) AS total_categories FROM categories;"
+    )
+)
+
+REM Run image URL fix script if present
+if exist "scripts\fix_image_urls.sql" (
+    echo.
+    echo [ACTION] Correction des image_url via scripts\fix_image_urls.sql...
+    mysql -h %db_host% -u %db_user% --password=%db_pass% %db_name% < "scripts\fix_image_urls.sql"
+    if errorlevel 1 (
+        echo [WARNING] Echec de la correction des image_url
+    ) else (
+        echo [OK] image_url mis a jour
+    )
 )
 
 echo.
@@ -306,13 +334,14 @@ if "%db_user%"=="" set db_user=root
 set /p db_pass="Mot de passe MySQL (par defaut: 0000): "
 if "%db_pass%"=="" set db_pass=0000
 
-set /p db_name="Nom de la base de donnees a supprimer (par defaut: novashop): "
-if "%db_name%"=="" set db_name=novashop
+set /p db_name="Nom de la base de donnees a supprimer (par defaut: novashop_db): "
+if "%db_name%"=="" set db_name=novashop_db
 
 REM Test connection
 echo.
 echo [ACTION] Test de connexion a MySQL/MariaDB...
-mysql -h %db_host% -u %db_user% -p%db_pass% -e "SELECT 1;" >nul 2>&1
+echo   Host: %db_host%, User: %db_user%
+mysql -h %db_host% -u %db_user% --password=%db_pass% -e "SELECT 1;" >nul 2>&1
 
 if errorlevel 1 (
     echo [ERROR] Impossible de se connecter a MySQL/MariaDB
@@ -324,7 +353,7 @@ echo [OK] Connexion reussie
 
 REM Check if database exists
 echo [ACTION] Verification de l'existence de la BD...
-mysql -h %db_host% -u %db_user% -p%db_pass% -e "USE %db_name%;" >nul 2>&1
+mysql -h %db_host% -u %db_user% --password=%db_pass% -e "USE %db_name%;" >nul 2>&1
 
 if errorlevel 1 (
     echo [ERROR] La base de donnees '%db_name%' n'existe pas
@@ -347,7 +376,7 @@ if /i not "%confirm%"=="OUI" (
 )
 
 echo [ACTION] Suppression de la base de donnees...
-mysql -h %db_host% -u %db_user% -p%db_pass% -e "DROP DATABASE %db_name%;" 2>nul
+mysql -h %db_host% -u %db_user% --password=%db_pass% -e "DROP DATABASE %db_name%;" 2>nul
 
 if errorlevel 1 (
     echo [ERROR] Erreur lors de la suppression

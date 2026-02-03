@@ -3,10 +3,8 @@
 -- ==========================================
 -- Exécuter ce script pour initialiser la base de données
 
--- Créer la base de données
-DROP DATABASE IF EXISTS novashop;
-CREATE DATABASE novashop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE novashop;
+-- Schema SQL (la création de la base est gérée par setup.bat)
+-- Importez ce fichier directement dans la base choisie par le script d'initialisation.
 
 -- ==========================================
 -- TABLE: Utilisateurs
