@@ -21,6 +21,8 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('user', 'admin') DEFAULT 'user',
+    is_active BOOLEAN DEFAULT FALSE,
+    email_verified_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -47,6 +49,7 @@ CREATE TABLE products (
     price DECIMAL(10, 2) NOT NULL,
     category_id INT,
     stock INT DEFAULT 0,
+    variants TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
@@ -89,9 +92,9 @@ CREATE TABLE order_items (
 -- ==========================================
 
 -- Insérer des utilisateurs admin et test
-INSERT INTO users (name, email, password, role) VALUES
-('Admin NovaShop', 'admin@novashop.local', '$2y$10$ioclv8MtI9/7d/PCuak2AuD62.0FFY8Rq6pVG3Ccr79GD4rXV0Dmi', 'admin'),
-('Client Test', 'user@novashop.local', '$2y$10$njIGZ/pnkst9/ihIIysVGuR3dfRN4r1Xr17gPqgAf8mxF6G8fc9cq', 'user');
+INSERT INTO users (name, email, password, role, is_active, email_verified_at) VALUES
+('Admin NovaShop', 'admin@novashop.local', '$2y$10$ioclv8MtI9/7d/PCuak2AuD62.0FFY8Rq6pVG3Ccr79GD4rXV0Dmi', 'admin', TRUE, NOW()),
+('Client Test', 'user@novashop.local', '$2y$10$njIGZ/pnkst9/ihIIysVGuR3dfRN4r1Xr17gPqgAf8mxF6G8fc9cq', 'user', TRUE, NOW());
 
 -- Insérer des catégories
 INSERT INTO categories (name, description) VALUES

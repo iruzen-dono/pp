@@ -5,7 +5,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     initHeaderInteractions();
     initAuthInteractions();
-    initDarkMode();
     initScrollAnimations();
     initCarousel();
     initNewsletterPopup();
@@ -123,33 +122,6 @@ function updateCartBadge() {
         cartBadge.textContent = cartCount;
         cartBadge.style.display = 'inline-flex';
     }
-}
-
-// ============================================
-// DARK MODE TOGGLE - ENHANCED
-// ============================================
-
-function initDarkMode() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (!darkModeToggle) return;
-
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
-    
-    if (isDarkMode) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    }
-
-    darkModeToggle.addEventListener('click', function() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        
-        if (isDark) {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('darkMode', 'false');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('darkMode', 'true');
-        }
-    });
 }
 
 // ============================================

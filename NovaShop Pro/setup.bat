@@ -260,19 +260,23 @@ if errorlevel 1 (
     echo [OK] Tables creees avec succes
 )
 
-REM Import seed data if present
+REM Auto-import seed_premium.sql after schema creation
+echo.
+echo [ACTION] Importation automatique des donnees premium...
 if exist "seed_premium.sql" (
-    echo.
-    echo [ACTION] Fichier de seed trouve: seed_premium.sql - import en cours...
-    mysql -h %db_host% -u %db_user% --password=%db_pass% %db_name% < "seed_premium.sql"
+    mysql -h %db_host% -u %db_user% --password=%db_pass% %db_name% < "seed_premium.sql" 2>nul
     if errorlevel 1 (
-        echo [WARNING] Import du seed a echoue. Verifiez le fichier seed_premium.sql
+        echo [WARNING] Import automatique du seed a echoue. Verifiez le fichier seed_premium.sql
     ) else (
-        echo [OK] Donnees de seed importe avec succes
+        echo [OK] Donnees premium importees automatiquement!
         echo.
         echo [INFO] Statistiques apres import:
-        mysql -h %db_host% -u %db_user% --password=%db_pass% -D %db_name% -e "SELECT COUNT(*) AS total_users FROM users; SELECT COUNT(*) AS total_products FROM products; SELECT COUNT(*) AS total_categories FROM categories;"
+        mysql -h %db_host% -u %db_user% --password=%db_pass% -D %db_name% -e "SELECT COUNT(*) AS total_users FROM users; SELECT COUNT(*) AS total_products FROM products; SELECT COUNT(*) AS total_categories FROM categories;" 2>nul
     )
+) else (
+    echo [WARNING] Fichier seed_premium.sql non trouve
+    echo.
+    echo [INFO] Donnees de test minimales inserees depuis setup.sql
 )
 
 REM Run image URL fix script if present

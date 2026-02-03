@@ -14,12 +14,23 @@ class ProductController extends Controller
         $searchQuery = $_GET['q'] ?? $_POST['q'] ?? '';
         $products = [];
         
-        if (!empty($searchQuery)) {
-            // Utiliser la recherche si une requête est fournie
-            $products = (new Product())->search($searchQuery);
-        } else {
-            // Sinon afficher tous les produits
-            $products = (new Product())->getAll();
+        try {
+            if (!empty($searchQuery)) {
+                // Utiliser la recherche si une requête est fournie
+                $products = (new Product())->search($searchQuery);
+            } else {
+                // Sinon afficher tous les produits
+                $products = (new Product())->getAll();
+            }
+            
+            // S'assurer que $products est toujours un array
+            if (!is_array($products)) {
+                $products = [];
+            }
+        } catch (\Exception $e) {
+            // En cas d'erreur, on garde le tableau vide
+            $products = [];
+            error_log("Erreur ProductController::index(): " . $e->getMessage());
         }
         
         $this->view('products/index', compact('products', 'searchQuery'));
