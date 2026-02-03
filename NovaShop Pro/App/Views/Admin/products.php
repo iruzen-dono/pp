@@ -109,6 +109,7 @@
                             </span>
                         </td>
                         <td style="text-align: center;">
+                            <a href="/admin/products/edit/<?php echo $product['id']; ?>" class="btn btn-warning" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;">✏️</a>
                             <a href="/admin/deleteProduct/<?php echo $product['id']; ?>" onclick="return confirm('⚠️ Confirmer la suppression ?')" class="btn btn-danger" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">🗑️</a>
                         </td>
                     </tr>

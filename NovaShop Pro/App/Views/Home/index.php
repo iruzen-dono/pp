@@ -2,272 +2,341 @@
 // App/Views/Home/index.php
 ?>
 
-<!-- HERO SECTION -->
-<section class="hero" data-parallax="true">
-    <div class="hero-content">
-        <h1>Bienvenue chez <span>NovaShop</span></h1>
-        <p>Découvrez une sélection curatée de produits premium pour vos aventures du quotidien</p>
-        <div class="hero-buttons">
-            <a href="/products" class="btn btn-primary">Découvrir les produits</a>
-            <a href="#features" class="btn btn-secondary">En savoir plus</a>
+<!-- ===== HERO SECTION ===== -->
+<section class="hero-large">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="hero-content-wrapper">
+                <h1 class="hero-title">
+                    Shopping de <span class="gradient-text">qualité premium</span><br>
+                    sans compromis
+                </h1>
+                <p class="hero-subtitle">
+                    Découvrez une sélection mondiale de produits soigneusement choisis.<br>
+                    Qualité garantie. Livraison rapide. Satisfaction 100%.
+                </p>
+                <div class="hero-buttons">
+                    <a href="/products" class="btn btn-primary btn-large">
+                        Découvrir nos produits
+                        <span class="btn-arrow">→</span>
+                    </a>
+                    <a href="#how-it-works" class="btn btn-secondary btn-large">
+                        Comment ça marche
+                    </a>
+                </div>
+                
+                <!-- Trust Signals -->
+                <div class="trust-signals">
+                    <div class="trust-item">
+                        <span class="trust-number">10k+</span>
+                        <span class="trust-label">Clients satisfaits</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-number">5k+</span>
+                        <span class="trust-label">Produits premium</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-number">4.8★</span>
+                        <span class="trust-label">Note moyenne</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image-wrapper">
+                <div class="hero-image-placeholder">
+                    <div class="floating-card">📦 Produits premium</div>
+                    <div class="floating-card" style="animation-delay: 0.5s;">🚚 Livraison rapide</div>
+                    <div class="floating-card" style="animation-delay: 1s;">✨ Qualité garantie</div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- FEATURED CAROUSEL -->
+<!-- ===== FEATURED PRODUCTS SECTION (Alternating Layout) ===== -->
 <?php if (isset($products) && count($products) > 0): ?>
-<div class="featured-carousel">
-    <div class="carousel-container">
-        <button class="carousel-arrow carousel-arrow-left" id="prevBtn">❮</button>
+<section class="featured-products-section" id="featured">
+    <div class="container">
+        <h2 class="section-title-large">Nos sélections vedettes</h2>
+        <p class="section-subtitle-large">Les produits les plus appréciés par nos clients</p>
         
-        <div class="carousel-viewer">
-            <div class="carousel-slides" id="productsGrid">
-                <?php foreach (array_slice($products, 0, min(8, count($products))) as $index => $product): ?>
-                <div class="carousel-slide" data-index="<?= $index ?>">
-                    <div class="featured-product">
-                        <div class="featured-product-image">
-                            <?php if (!empty($product['image_url'])): ?>
-                                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                            <?php else: ?>
-                                <div style="font-size: 5rem;">📦</div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="featured-product-content">
-                            <h3 class="featured-product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
-                            <div class="featured-product-price"><?php echo number_format($product['price'], 2, ',', ' '); ?>€</div>
-                            <p class="featured-product-desc"><?php echo htmlspecialchars(substr($product['description'], 0, 150) . '...'); ?></p>
-                            <div class="featured-product-actions">
-                                <a href="/product/<?= $product['id'] ?>" class="btn btn-primary">Voir détails</a>
-                            </div>
-                        </div>
+        <?php 
+        $featured = array_slice($products, 0, 3);
+        foreach ($featured as $index => $product):
+            $isEven = $index % 2 === 0;
+        ?>
+        
+        <div class="featured-product-section <?= $isEven ? 'layout-left' : 'layout-right' ?> animate-on-scroll">
+            <div class="featured-product-image">
+                <?php if (!empty($product['image_url'])): ?>
+                    <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                <?php else: ?>
+                    <div class="placeholder-large">📦</div>
+                <?php endif; ?>
+            </div>
+            
+            <div class="featured-product-info">
+                <span class="product-badge">Vedette</span>
+                <h3 class="featured-product-title"><?= htmlspecialchars($product['name']) ?></h3>
+                <p class="featured-product-description">
+                    <?= htmlspecialchars($product['description']) ?>
+                </p>
+                
+                <div class="featured-product-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Qualité certifiée</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Livraison gratuite</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Retour sans frais</span>
                     </div>
                 </div>
-                <?php endforeach; ?>
+                
+                <div class="featured-product-price">
+                    <span class="price-label">À partir de</span>
+                    <span class="price-value"><?= number_format($product['price'], 2, ',', ' ') ?>€</span>
+                </div>
+                
+                <div class="featured-product-actions">
+                    <a href="/products/<?= $product['id'] ?>" class="btn btn-primary btn-large">
+                        Voir le produit
+                        <span class="btn-arrow">→</span>
+                    </a>
+                </div>
             </div>
         </div>
         
-        <button class="carousel-arrow carousel-arrow-right" id="nextBtn">❯</button>
+        <?php endforeach; ?>
     </div>
-    
-    <div class="carousel-indicators">
-        <?php for ($i = 0; $i < min(8, count($products)); $i++): ?>
-            <button class="carousel-dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>"></button>
-        <?php endfor; ?>
-    </div>
-</div>
+</section>
 <?php endif; ?>
 
-<!-- FEATURES SECTION -->
-<section class="features" id="features">
-    <h2 class="section-title">Pourquoi NovaShop ?</h2>
-    <p class="section-subtitle">Une expérience shopping pensée pour votre satisfaction</p>
-    
-    <div class="features-grid">
-        <div class="feature-card animate-on-scroll">
-            <div class="feature-icon">🌍</div>
-            <h3>Sélection Mondiale</h3>
-            <p>Produits sélectionnés avec soin du monde entier, garantissant qualité et authenticité</p>
-        </div>
-        
-        <div class="feature-card animate-on-scroll">
-            <div class="feature-icon">⚡</div>
-            <h3>Livraison Express</h3>
-            <p>Commandes traitées en 24h et livrées rapidement. Suivi en temps réel inclus</p>
-        </div>
-        
-        <div class="feature-card animate-on-scroll">
-            <div class="feature-icon">🔒</div>
-            <h3>100% Sécurisé</h3>
-            <p>Paiements cryptés et données protégées. Retours gratuits sous 30 jours</p>
-        </div>
-        
-        <div class="feature-card animate-on-scroll">
-            <div class="feature-icon">💰</div>
-            <h3>Meilleurs Prix</h3>
-            <p>Prix compétitifs et réductions régulières. Programme de fidélité exclusif</p>
-        </div>
-        
-        <div class="feature-card animate-on-scroll">
-            <div class="feature-icon">📞</div>
-            <h3>Support 24/7</h3>
-            <p>Équipe réactive et disponible. Réponses rapides à vos questions</p>
-        </div>
-        
-        <div class="feature-card animate-on-scroll">
-            <div class="feature-icon">⭐</div>
-            <h3>Qualité Garantie</h3>
-            <p>Tous produits testés et approuvés. Satisfaction garantie ou remboursement</p>
-        </div>
-    </div>
-</section>
-
-<!-- PRODUCTS SECTION -->
-<section class="products-section">
+<!-- ===== WHY NOVASHOP SECTION ===== -->
+<section class="why-section" id="why">
     <div class="container">
-        <h2 class="section-title">Tous nos produits</h2>
-        <p class="section-subtitle">Une large sélection pour tous vos besoins</p>
+        <h2 class="section-title-large">Pourquoi choisir NovaShop ?</h2>
+        <p class="section-subtitle-large">Une plateforme pensée pour votre satisfaction</p>
         
-        <div class="search-bar" style="margin-bottom: 2rem;">
-            <input type="search" placeholder="Rechercher un produit..." id="searchInput">
-            <button onclick="filterProductsByName()">Chercher</button>
-        </div>
-        
-        <div class="products-grid">
-            <?php if (isset($products) && count($products) > 0): ?>
-                <?php foreach ($products as $product): ?>
-                    <div class="product-card animate-on-scroll" data-product-name="<?= strtolower($product['name']) ?>">
-                        <button class="wishlist-btn" data-product-id="<?= $product['id'] ?>">🤍</button>
-                        <div class="product-image">
-                            <?php if (!empty($product['image_url'])): ?>
-                                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" loading="lazy">
-                            <?php else: ?>
-                                <div style="font-size: 4rem; display: flex; align-items: center; justify-content: center; height: 100%;">📦</div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
-                            <div class="product-price"><?php echo number_format($product['price'], 2, ',', ' '); ?>€</div>
-                            
-                            <!-- Rating Stars -->
-                            <div class="rating-container" data-rating="4">
-                                <span class="star" data-rating="1">★</span>
-                                <span class="star" data-rating="2">★</span>
-                                <span class="star" data-rating="3">★</span>
-                                <span class="star active" data-rating="4">★</span>
-                                <span class="star" data-rating="5">★</span>
-                                <span class="rating-text">(12 avis)</span>
-                            </div>
-
-                            <p class="product-description"><?php echo htmlspecialchars(substr($product['description'], 0, 100) . '...'); ?></p>
-                            <div class="product-actions">
-                                <a href="/product/<?= $product['id'] ?>" class="btn btn-primary btn-small">Voir détails</a>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-center" style="grid-column: 1/-1; padding: 2rem;">Aucun produit disponible pour le moment</p>
-            <?php endif; ?>
+        <div class="benefits-grid">
+            <div class="benefit-card animate-on-scroll">
+                <div class="benefit-icon">🌍</div>
+                <h3 class="benefit-title">Sélection Mondiale</h3>
+                <p class="benefit-description">
+                    Produits sélectionnés avec soin du monde entier, garantissant qualité et authenticité
+                </p>
+            </div>
+            
+            <div class="benefit-card animate-on-scroll">
+                <div class="benefit-icon">⚡</div>
+                <h3 class="benefit-title">Livraison Express</h3>
+                <p class="benefit-description">
+                    Commandes traitées en 24h et livrées rapidement. Suivi en temps réel inclus
+                </p>
+            </div>
+            
+            <div class="benefit-card animate-on-scroll">
+                <div class="benefit-icon">🔒</div>
+                <h3 class="benefit-title">100% Sécurisé</h3>
+                <p class="benefit-description">
+                    Paiements cryptés et données protégées. Retours gratuits sous 30 jours
+                </p>
+            </div>
+            
+            <div class="benefit-card animate-on-scroll">
+                <div class="benefit-icon">💰</div>
+                <h3 class="benefit-title">Meilleurs Prix</h3>
+                <p class="benefit-description">
+                    Prix compétitifs et réductions régulières. Programme de fidélité exclusif
+                </p>
+            </div>
+            
+            <div class="benefit-card animate-on-scroll">
+                <div class="benefit-icon">📞</div>
+                <h3 class="benefit-title">Support 24/7</h3>
+                <p class="benefit-description">
+                    Équipe réactive et disponible. Réponses rapides à vos questions
+                </p>
+            </div>
+            
+            <div class="benefit-card animate-on-scroll">
+                <div class="benefit-icon">⭐</div>
+                <h3 class="benefit-title">Qualité Garantie</h3>
+                <p class="benefit-description">
+                    Tous produits testés et approuvés. Satisfaction garantie ou remboursement
+                </p>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- CTA SECTION -->
-<section class="hero" style="margin-top: 5rem;">
-    <div class="hero-content">
-        <h2 style="font-size: 2.8rem; margin-bottom: 1rem;">Prêt pour l'aventure ?</h2>
-        <p>Rejoignez des milliers de clients satisfaits</p>
-        <div class="hero-buttons">
-            <a href="/products" class="btn btn-primary">Continuer le Shopping</a>
+<!-- ===== HOW IT WORKS SECTION ===== -->
+<section class="how-works-section" id="how-it-works">
+    <div class="container">
+        <h2 class="section-title-large">Comment ça marche</h2>
+        <p class="section-subtitle-large">Un processus simple et transparent en 4 étapes</p>
+        
+        <div class="steps-grid">
+            <div class="step-card animate-on-scroll">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Parcourir</h3>
+                <p class="step-description">
+                    Explorez notre vaste sélection de produits premium soigneusement curés
+                </p>
+                <div class="step-icon">🔍</div>
+            </div>
+            
+            <div class="step-arrow">→</div>
+            
+            <div class="step-card animate-on-scroll">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Ajouter</h3>
+                <p class="step-description">
+                    Sélectionnez vos produits préférés et ajoutez-les au panier
+                </p>
+                <div class="step-icon">🛒</div>
+            </div>
+            
+            <div class="step-arrow">→</div>
+            
+            <div class="step-card animate-on-scroll">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Payer</h3>
+                <p class="step-description">
+                    Paiement sécurisé avec plusieurs options disponibles
+                </p>
+                <div class="step-icon">💳</div>
+            </div>
+            
+            <div class="step-arrow">→</div>
+            
+            <div class="step-card animate-on-scroll">
+                <div class="step-number">4</div>
+                <h3 class="step-title">Recevoir</h3>
+                <p class="step-description">
+                    Livraison rapide avec suivi en temps réel
+                </p>
+                <div class="step-icon">📦</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SOCIAL PROOF & TRUST SECTION ===== -->
+<section class="trust-proof-section">
+    <div class="container">
+        <h2 class="section-title-large">La confiance au cœur de nos valeurs</h2>
+        <p class="section-subtitle-large">Transparence, sécurité et fiabilité garanties</p>
+        
+        <div class="trust-grid">
+            <!-- Chiffres clés -->
+            <div class="trust-stat-card animate-on-scroll">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number">847K+</div>
+                <div class="stat-label">Clients actifs</div>
+                <p class="stat-description">Une communauté en croissance constante depuis 2020</p>
+            </div>
+            
+            <div class="trust-stat-card animate-on-scroll">
+                <div class="stat-icon">📦</div>
+                <div class="stat-number">2.3M+</div>
+                <div class="stat-label">Commandes livrées</div>
+                <p class="stat-description">99.2% de satisfaction client documentée</p>
+            </div>
+            
+            <div class="trust-stat-card animate-on-scroll">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-number">4.8/5</div>
+                <div class="stat-label">Note moyenne</div>
+                <p class="stat-description">Basée sur 156K+ avis vérifiés</p>
+            </div>
+            
+            <div class="trust-stat-card animate-on-scroll">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Sécurisé</div>
+                <p class="stat-description">SSL certifié + Paiements cryptés</p>
+            </div>
+        </div>
+        
+        <!-- Certifications & Garanties -->
+        <div class="certifications-section">
+            <h3 class="certifications-title">Certifications & Garanties</h3>
+            <div class="certifications-grid">
+                <div class="cert-badge animate-on-scroll">
+                    <div class="cert-icon">✓</div>
+                    <div class="cert-name">Paiements 100% sécurisés</div>
+                    <p class="cert-description">Chiffrement SSL et protection PCI-DSS</p>
+                </div>
+                
+                <div class="cert-badge animate-on-scroll">
+                    <div class="cert-icon">✓</div>
+                    <div class="cert-name">Retours gratuits 30j</div>
+                    <p class="cert-description">Satisfait ou remboursé, sans questions</p>
+                </div>
+                
+                <div class="cert-badge animate-on-scroll">
+                    <div class="cert-icon">✓</div>
+                    <div class="cert-name">Livraison Express</div>
+                    <p class="cert-description">Suivi en temps réel garanti</p>
+                </div>
+                
+                <div class="cert-badge animate-on-scroll">
+                    <div class="cert-icon">✓</div>
+                    <div class="cert-name">Support 24/7</div>
+                    <p class="cert-description">Réponse en moins de 2h</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FINAL CTA SECTION ===== -->
+<section class="final-cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">
+                Prêt à commencer votre<br>
+                shopping <span class="gradient-text">premium</span> ?
+            </h2>
+            <p class="cta-subtitle">
+                Rejoignez des milliers de clients satisfaits et découvrez une sélection exceptionnelle
+            </p>
+            <div class="cta-buttons">
+                <a href="/products" class="btn btn-primary btn-large">
+                    Découvrir nos produits
+                    <span class="btn-arrow">→</span>
+                </a>
+                <a href="#why" class="btn btn-secondary btn-large">
+                    En savoir plus
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
 <script>
-// Featured Carousel - One product at a time
+// Wishlist functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const slidesContainer = document.getElementById('productsGrid');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const dots = document.querySelectorAll('.carousel-dot');
-    
-    if (!slidesContainer) return;
-    
-    let currentIndex = 0;
-    const slides = document.querySelectorAll('.carousel-slide');
-    const totalSlides = slides.length;
-    let autoScrollInterval = null;
-    
-    function goToSlide(index) {
-        currentIndex = (index + totalSlides) % totalSlides;
-        const offset = currentIndex * 100;
-        slidesContainer.style.transform = `translateX(-${offset}%)`;
-        
-        // Update dots
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentIndex);
-        });
-    }
-    
-    function nextSlide() {
-        goToSlide(currentIndex + 1);
-    }
-    
-    function prevSlide() {
-        goToSlide(currentIndex - 1);
-    }
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', (e) => {
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
-            prevSlide();
-            if (autoScrollInterval) {
-                clearInterval(autoScrollInterval);
-                autoScrollInterval = null;
-            }
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            nextSlide();
-            if (autoScrollInterval) {
-                clearInterval(autoScrollInterval);
-                autoScrollInterval = null;
-            }
-        });
-    }
-    
-    // Auto-scroll every 2 seconds
-    autoScrollInterval = setInterval(nextSlide, 2000);
-    
-    // Dots click
-    dots.forEach(dot => {
-        dot.addEventListener('click', function() {
-            const slideIndex = parseInt(this.getAttribute('data-slide'));
-            goToSlide(slideIndex);
-            clearInterval(autoScrollInterval);
-            autoScrollInterval = setInterval(nextSlide, 2000);
+            e.stopPropagation();
+            const productId = this.dataset.productId;
+            const isFilled = this.textContent === '❤️';
+            
+            this.textContent = isFilled ? '🤍' : '❤️';
+            this.style.transform = 'scale(1.2)';
+            setTimeout(() => { this.style.transform = 'scale(1)'; }, 200);
         });
     });
-    
-    // Pause on hover
-    slidesContainer.addEventListener('mouseenter', () => {
-        if (autoScrollInterval) {
-            clearInterval(autoScrollInterval);
-            autoScrollInterval = null;
-        }
-    });
-    
-    slidesContainer.addEventListener('mouseleave', () => {
-        autoScrollInterval = setInterval(nextSlide, 2000);
-    });
-});
-
-function filterProductsByName() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const productCards = document.querySelectorAll('.product-card[data-product-name]');
-    
-    productCards.forEach(card => {
-        const productName = card.getAttribute('data-product-name');
-        if (productName.includes(searchInput)) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-// Allow search on Enter key
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                filterProductsByName();
-            }
-        });
-    }
 });
 </script>

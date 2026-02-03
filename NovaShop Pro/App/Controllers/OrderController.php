@@ -7,9 +7,9 @@ use App\Models\OrderItem;
 use App\Middleware\AuthMiddleware;
 
 require_once __DIR__ . '/../Core/Controller.php';
+require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../Models/Order.php';
 require_once __DIR__ . '/../Models/OrderItem.php';
-require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
 
 class OrderController extends Controller
 {
@@ -57,35 +57,59 @@ class OrderController extends Controller
         }
 
         $cart = $_SESSION['cart'] ?? [];
-
         if (empty($cart)) {
             header("Location: /cart");
             exit;
         }
 
-        // Calcul du total à partir du panier
+        // Calcul du total avec support pour les variantes
         $total = 0;
-        foreach ($cart as $item) {
-            $total += $item['quantity'] * $item['price'];
+        foreach ($cart as $productId => $item) {
+            if (isset($item['variants']) && is_array($item['variants'])) {
+                // New structure with variants
+                foreach ($item['variants'] as $variantName => $vdata) {
+                    $quantity = (int)($vdata['quantity'] ?? 1);
+                    $price = (float)($vdata['price'] ?? 0);
+                    $total += $quantity * $price;
+                }
+            } elseif (isset($item['quantity'])) {
+                // Legacy structure
+                $total += (int)$item['quantity'] * (float)($item['price'] ?? 0);
+            } elseif (is_numeric($item)) {
+                // Very old format
+                $total += (int)$item;
+            }
         }
 
         $orderModel = new Order();
         $orderItemModel = new OrderItem();
 
-        // Création de la commande
         $orderId = $orderModel->create($_SESSION['user']['id'], $total);
 
-        // Création des items
         foreach ($cart as $productId => $item) {
-            $orderItemModel->create(
-                $orderId,
-                $productId,
-                $item['quantity'],
-                $item['price']
-            );
+            if (isset($item['variants']) && is_array($item['variants'])) {
+                // For variants, create an item for each variant
+                foreach ($item['variants'] as $variantName => $vdata) {
+                    $quantity = (int)($vdata['quantity'] ?? 1);
+                    $price = (float)($vdata['price'] ?? 0);
+                    $orderItemModel->create(
+                        $orderId,
+                        $productId,
+                        $quantity,
+                        $price
+                    );
+                }
+            } else {
+                // Legacy format
+                $orderItemModel->create(
+                    $orderId,
+                    $productId,
+                    $item['quantity'] ?? 1,
+                    $item['price'] ?? 0
+                );
+            }
         }
 
-        // Vider le panier
         unset($_SESSION['cart']);
 
         header("Location: /orders/show?id=" . $orderId);

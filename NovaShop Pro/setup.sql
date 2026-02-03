@@ -102,15 +102,6 @@ INSERT INTO categories (name, description) VALUES
 ('Livres', 'Littérature et éducation'),
 ('Maison', 'Articles pour la maison et décoration');
 
--- Insérer des produits
-INSERT INTO products (name, description, price, category_id, stock) VALUES
-('Laptop Pro 15"', 'Ordinateur portable haut de gamme avec processeur dernière génération', 1299.99, 1, 15),
-('Souris Wireless', 'Souris sans fil ergonomique', 29.99, 1, 50),
-('T-Shirt NovaShop', 'T-shirt collection exclusive NovaShop', 19.99, 2, 100),
-('Jeans Premium', 'Jeans confortable et durable', 79.99, 2, 40),
-('Guide PHP Moderne', 'Apprendre PHP 8+ avec exemple pratiques', 39.99, 3, 25),
-('Lampe LED', 'Lampe LED économe en énergie', 49.99, 4, 30);
-
 -- ==========================================
 -- VÉRIFICATION
 -- ==========================================

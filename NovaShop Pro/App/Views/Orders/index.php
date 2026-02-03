@@ -31,7 +31,7 @@
                         </td>
                         <td style="font-size: 14px; color: #aaa;"><?= date('d/m/Y', strtotime($order['created_at'] ?? 'now')) ?></td>
                         <td>
-                            <a href="/orders/show?id=<?= $order['id'] ?>" class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px;">Détails</a>
+                            <a href="/order/<?= $order['id'] ?>" class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px;">Détails</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
