@@ -28,7 +28,8 @@ class CsrfMiddleware
     public static function checkPost()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $token = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+            // Accept common token parameter names for compatibility
+            $token = $_POST['_csrf'] ?? $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
             if (!self::verifyToken($token)) {
                 http_response_code(400);
                 die('Invalid CSRF token');

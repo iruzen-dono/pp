@@ -32,7 +32,7 @@
                     <?php if (!empty($product['image_url'])): ?>
                         <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                     <?php else: ?>
-                        <div class="placeholder-icon">📦</div>
+                        <div class="placeholder-icon"><i class="fas fa-box"></i></div>
                     <?php endif; ?>
                 </div>
                 <div class="product-card-content">
@@ -51,7 +51,7 @@
 <?php else: ?>
 <div class="container">
     <div class="no-products">
-        <p>📦 Aucun produit trouvé</p>
+        <p><i class="fas fa-box"></i> Aucun produit trouvé</p>
     </div>
 </div>
 <?php endif; ?>

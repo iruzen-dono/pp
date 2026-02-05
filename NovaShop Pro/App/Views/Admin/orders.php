@@ -84,7 +84,7 @@ if (!empty($orders) && is_array($orders)) {
                             ?>
                         </td>
                         <td style="text-align: center;">
-                            <a href="/orders/<?php echo $order['id']; ?>" class="btn btn-info" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;">👁️</a>
+                            <a href="/admin/order/<?php echo $order['id']; ?>" class="btn btn-info" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;"><i class="fas fa-eye"></i> Voir</a>
                             <a href="/admin/deleteOrder/<?php echo $order['id']; ?>" onclick="return confirm('⚠️ Confirmer la suppression de cette commande ?')" class="btn btn-danger" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">🗑️</a>
                         </td>
                     </tr>

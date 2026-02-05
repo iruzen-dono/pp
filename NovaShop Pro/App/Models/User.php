@@ -5,10 +5,15 @@ use App\Core\Model;
 
 class User extends Model
 {
-    public function getAll(): array
+    public function getAll(string $sortBy = 'created_at', string $sortOrder = 'DESC'): array
     {
+        // Whitelist allowed sort columns to prevent SQL injection
+        $allowedColumns = ['id', 'name', 'email', 'role', 'is_active', 'created_at'];
+        $sortBy = in_array($sortBy, $allowedColumns) ? $sortBy : 'created_at';
+        $sortOrder = in_array(strtoupper($sortOrder), ['ASC', 'DESC']) ? strtoupper($sortOrder) : 'DESC';
+        
         return $this->run(
-            "SELECT * FROM users ORDER BY created_at DESC"
+            "SELECT * FROM users ORDER BY {$sortBy} {$sortOrder}"
         );
     }
 
@@ -25,7 +30,7 @@ class User extends Model
     {
         $this->run(
             "INSERT INTO users (name, email, password, is_active, email_verified_at) 
-             VALUES (?, ?, ?, FALSE, NULL)",
+             VALUES (?, ?, ?, 1, NOW())",
             [$name, $email, $password]
         );
         
@@ -45,6 +50,17 @@ class User extends Model
     }
 
     /**
+     * Changer le rôle d'un utilisateur
+     */
+    public function changeRole(int $userId, string $newRole): int
+    {
+        return $this->run(
+            "UPDATE users SET role = ? WHERE id = ?",
+            [$newRole, $userId]
+        );
+    }
+
+    /**
      * Vérifier si l'email est confirmé
      */
     public function isEmailVerified(int $userId): bool
@@ -58,6 +74,32 @@ class User extends Model
         return $user && !empty($user['email_verified_at']);
     }
 
+    /**
+     * Soft delete: Deactivate a user account (keeps history)
+     */
+    public function deactivate(int $id): int
+    {
+        return $this->run(
+            "UPDATE users SET is_active = FALSE, deactivated_at = NOW() WHERE id = ?",
+            [$id]
+        );
+    }
+
+    /**
+     * Reactivate a deactivated user
+     */
+    public function reactivate(int $id): int
+    {
+        return $this->run(
+            "UPDATE users SET is_active = TRUE, deactivated_at = NULL WHERE id = ?",
+            [$id]
+        );
+    }
+
+    /**
+     * Hard delete: Only for permanent removal (use with extreme caution)
+     * This is preserved but should only be called by super_admin
+     */
     public function delete(int $id): int
     {
         return $this->run(

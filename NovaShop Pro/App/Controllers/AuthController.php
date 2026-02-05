@@ -3,14 +3,11 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\User;
-use App\Models\EmailVerificationToken;
 use App\Models\PasswordReset;
-use App\Services\EmailService;
 
 require_once __DIR__ . '/../Core/Controller.php';
 require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Models/EmailVerificationToken.php';
-require_once __DIR__ . '/../Services/EmailService.php';
+require_once __DIR__ . '/../Models/PasswordReset.php';
 require_once __DIR__ . '/../Middleware/CsrfMiddleware.php';
 
 class AuthController extends Controller
@@ -56,16 +53,9 @@ class AuthController extends Controller
                     return $this->view('auth/register', compact('error'));
                 }
 
-                // 5. Générer un token de vérification
-                $tokenModel = new EmailVerificationToken();
-                $token = $tokenModel->create($userId);
-
-                // 6. Envoyer l'email de vérification
-                EmailService::sendVerificationEmail($email, $token, $name);
-
-                // 7. Afficher le message de confirmation
-                $message = "✅ Compte créé! Vérifiez votre email pour confirmer votre inscription.";
-                return $this->view('auth/verify-email-pending', compact('message', 'email'));
+                // 5. Compte créé et vérifié automatiquement
+                $message = "✅ Compte créé avec succès! Vous pouvez maintenant vous connecter.";
+                return $this->view('auth/register-success', compact('message', 'email', 'name'));
 
             } catch (\Exception $e) {
                 $error = "Erreur lors de la création du compte: " . ($e->getMessage() ?: 'erreur serveur');
@@ -74,45 +64,6 @@ class AuthController extends Controller
         }
 
         $this->view('auth/register');
-    }
-
-    /**
-     * Vérifier le token et activer l'email
-     */
-    public function verifyEmail()
-    {
-        $token = $_GET['token'] ?? null;
-
-        if (!$token) {
-            $error = "Token de vérification manquant.";
-            return $this->view('auth/verify-email-error', compact('error'));
-        }
-
-        try {
-            $tokenModel = new EmailVerificationToken();
-            $tokenData = $tokenModel->getByToken($token);
-
-            if (!$tokenData) {
-                $error = "Le token de vérification est invalide ou a expiré. Veuillez vous réinscrire.";
-                return $this->view('auth/verify-email-error', compact('error'));
-            }
-
-            $userId = $tokenData['user_id'];
-            $userModel = new User();
-
-            // Marquer l'email comme vérifié
-            $userModel->verifyEmail($userId);
-
-            // Supprimer tous les tokens de cet utilisateur
-            $tokenModel->deleteByUserId($userId);
-
-            $message = "✅ Email vérifié avec succès! Vous pouvez maintenant vous connecter.";
-            return $this->view('auth/verify-email-success', compact('message'));
-
-        } catch (\Exception $e) {
-            $error = "Erreur lors de la vérification: " . ($e->getMessage() ?: 'erreur serveur');
-            return $this->view('auth/verify-email-error', compact('error'));
-        }
     }
 
     public function login()
@@ -132,21 +83,21 @@ class AuthController extends Controller
             $userModel = new User();
             $user = $userModel->findByEmail($email);
 
-            // Vérifier que l'utilisateur existe ET que son email est confirmé
+            // Vérifier que l'utilisateur existe
             if (!$user) {
                 $error = "Email ou mot de passe incorrect.";
-                return $this->view('auth/login', compact('error'));
-            }
-
-            // Vérifier que l'email est confirmé
-            if (!$user['email_verified_at']) {
-                $error = "Veuillez d'abord confirmer votre email. Un email de confirmation a été envoyé.";
                 return $this->view('auth/login', compact('error'));
             }
 
             // Vérifier le mot de passe
             if (!password_verify($password, $user['password'])) {
                 $error = "Email ou mot de passe incorrect.";
+                return $this->view('auth/login', compact('error'));
+            }
+
+            // Vérifier que l'utilisateur est actif
+            if (!($user['is_active'] ?? true)) {
+                $error = "Ce compte a été désactivé. Contactez un administrateur.";
                 return $this->view('auth/login', compact('error'));
             }
 

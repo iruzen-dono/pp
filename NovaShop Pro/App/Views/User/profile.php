@@ -37,7 +37,7 @@
                                 <h5 class="text-muted">Statut du compte</h5>
                                 <p class="h6">
                                     <?php if ($user['is_active']): ?>
-                                        <span class="badge bg-success">✅ Actif</span>
+                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Actif</span>
                                     <?php else: ?>
                                         <span class="badge bg-warning">⏳ En attente de vérification</span>
                                     <?php endif; ?>
@@ -50,9 +50,9 @@
                                 <h5 class="text-muted">Vérification email</h5>
                                 <p class="h6">
                                     <?php if ($user['email_verified_at']): ?>
-                                        <span class="badge bg-success">✅ Email vérifié le <?php echo date('d/m/Y à H:i', strtotime($user['email_verified_at'])); ?></span>
+                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Email vérifié le <?php echo date('d/m/Y à H:i', strtotime($user['email_verified_at'])); ?></span>
                                     <?php else: ?>
-                                        <span class="badge bg-danger">❌ Email non vérifié</span>
+                                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Email non vérifié</span>
                                     <?php endif; ?>
                                 </p>
                             </div>
@@ -65,7 +65,7 @@
                                 ⚙️ Modifier les paramètres
                             </a>
                             <a href="/orders" class="btn btn-info">
-                                📦 Mes commandes
+                                <i class="fas fa-box"></i> Mes commandes
                             </a>
                             <a href="/home" class="btn btn-secondary">
                                 ← Retour à l'accueil

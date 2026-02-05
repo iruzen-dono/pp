@@ -18,6 +18,7 @@
 <div class="admin-form">
     <h2>➕ Ajouter un Produit</h2>
     <form method="POST" action="/admin/products" enctype="multipart/form-data">
+        <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
         <input type="hidden" name="action" value="create">
         
         <div class="form-grid">
@@ -70,6 +71,30 @@
 
 <!-- TABLEAU PRODUITS -->
 <h2>Produits (<?php echo count($products ?? []); ?>)</h2>
+
+<!-- Barre de recherche et filtres -->
+<div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(99, 102, 241, 0.1); border-radius: 0.5rem;">
+    <form method="GET" action="/admin/products" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+        <div>
+            <label for="search" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">🔍 Rechercher</label>
+            <input type="text" id="search" name="search" placeholder="Nom ou description..." value="<?php echo htmlspecialchars($search ?? ''); ?>" style="width: 100%; padding: 0.6rem; border: 1px solid #444; border-radius: 0.3rem; background: #222; color: #fff;">
+        </div>
+        <div>
+            <label for="category" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">📁 Catégorie</label>
+            <select id="category" name="category" style="width: 100%; padding: 0.6rem; border: 1px solid #444; border-radius: 0.3rem; background: #222; color: #fff;">
+                <option value="0">-- Tous --</option>
+                <option value="1" <?php echo ($category ?? 0) == 1 ? 'selected' : ''; ?>>Électronique</option>
+                <option value="2" <?php echo ($category ?? 0) == 2 ? 'selected' : ''; ?>>Vêtements</option>
+                <option value="3" <?php echo ($category ?? 0) == 3 ? 'selected' : ''; ?>>Livres</option>
+                <option value="4" <?php echo ($category ?? 0) == 4 ? 'selected' : ''; ?>>Maison</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">🔍 Chercher</button>
+            <a href="/admin/products" class="btn btn-secondary" style="padding: 0.6rem 1rem; text-decoration: none; text-align: center;">✕ Réinitialiser</a>
+        </div>
+    </form>
+</div>
 
 <?php if (!empty($products) && is_array($products)): ?>
     <div class="table-container">

@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <?php if (!empty($error)): ?>
                         <div class="alert alert-danger" role="alert">
-                            ❌ <?php echo htmlspecialchars($error); ?>
+                            <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
                         </div>
                     <?php endif; ?>
 
@@ -24,13 +24,7 @@
 
                     <?php if (!empty($user)): ?>
                         <form method="POST" class="form-group">
-                            <?php 
-                            // Token CSRF
-                            if (!isset($_SESSION['csrf_token'])) {
-                                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-                            }
-                            ?>
-                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                            <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
 
                             <!-- Section: Informations personnelles -->
                             <div class="mb-4">
@@ -106,16 +100,16 @@
                                     💾 Enregistrer les modifications
                                 </button>
                                 <a href="/profile" class="btn btn-secondary">
-                                    ← Retour au profil
+                                    <i class="fas fa-arrow-left"></i> Retour au profil
                                 </a>
                                 <a href="/home" class="btn btn-outline-secondary">
-                                    🏠 Retour à l'accueil
+                                    <i class="fas fa-home"></i> Retour à l'accueil
                                 </a>
                             </div>
                         </form>
                     <?php else: ?>
                         <div class="alert alert-warning">
-                            ⚠️ Impossible de charger vos paramètres. Veuillez vous reconnecter.
+                            <i class="fas fa-exclamation-triangle"></i> Impossible de charger vos paramètres. Veuillez vous reconnecter.
                         </div>
                         <a href="/login" class="btn btn-primary">Se connecter</a>
                     <?php endif; ?>

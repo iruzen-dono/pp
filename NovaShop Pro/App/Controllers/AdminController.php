@@ -6,12 +6,14 @@ use App\Middleware\AdminMiddleware;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\OrderItem;
 
 require_once __DIR__ . '/../Core/Controller.php';
 require_once __DIR__ . '/../Middleware/AdminMiddleware.php';
 require_once __DIR__ . '/../Models/User.php';
 require_once __DIR__ . '/../Models/Product.php';
 require_once __DIR__ . '/../Models/Order.php';
+require_once __DIR__ . '/../Models/OrderItem.php';
 require_once __DIR__ . '/../Middleware/CsrfMiddleware.php';
 
 class AdminController extends Controller
@@ -38,8 +40,10 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = (new User())->getAll();
-        $this->adminView('admin/users', compact('users'));
+        $sortBy = $_GET['sort'] ?? 'created_at';
+        $sortOrder = $_GET['order'] ?? 'DESC';
+        $users = (new User())->getAll($sortBy, $sortOrder);
+        $this->adminView('admin/users', compact('users', 'sortBy', 'sortOrder'));
     }
 
     public function products()
@@ -101,8 +105,17 @@ class AdminController extends Controller
             }
         }
 
-        $products = (new Product())->getAll();
-        $this->adminView('admin/products', compact('products'));
+        $productModel = new Product();
+        $search = trim($_GET['search'] ?? '');
+        $category = (int)($_GET['category'] ?? 0);
+        
+        if ($search !== '' || $category > 0) {
+            $products = $productModel->search($search, $category);
+        } else {
+            $products = $productModel->getAll();
+        }
+        
+        $this->adminView('admin/products', compact('products', 'search', 'category'));
     }
 
     public function orders()
@@ -111,8 +124,86 @@ class AdminController extends Controller
         $this->adminView('admin/orders', compact('orders'));
     }
 
+    public function order($orderId = null)
+    {
+        if ($orderId === null) {
+            $orderId = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $orderId = (int)$orderId;
+        }
+
+        if ($orderId <= 0) {
+            header("Location: /admin/orders");
+            exit;
+        }
+
+        $orderModel = new Order();
+        $order = $orderModel->getById($orderId);
+
+        if (!$order) {
+            http_response_code(404);
+            die("Commande introuvable");
+        }
+
+        $orderItemModel = new OrderItem();
+        $items = $orderItemModel->getByOrderId($orderId);
+
+        $this->adminView('admin/order-detail', compact('order', 'items'));
+    }
+
+    public function updateOrderStatus($orderId = null)
+    {
+        // Only admin and super_admin can update order status
+        AdminMiddleware::check();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /admin/orders");
+            exit;
+        }
+
+        \App\Middleware\CsrfMiddleware::checkPost();
+
+        if ($orderId === null) {
+            $orderId = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $orderId = (int)$orderId;
+        }
+
+        if ($orderId <= 0) {
+            header('Location: /admin/orders?error=invalid');
+            exit;
+        }
+
+        $newStatus = trim($_POST['status'] ?? '');
+        if (!in_array($newStatus, ['pending', 'completed', 'cancelled'])) {
+            header('Location: /admin/orders?error=invalid_status');
+            exit;
+        }
+
+        $orderModel = new Order();
+        $order = $orderModel->getById($orderId);
+
+        if (!$order) {
+            header('Location: /admin/orders?error=not_found');
+            exit;
+        }
+
+        // Update order status
+        $orderModel->updateStatus($orderId, $newStatus);
+
+        header('Location: /admin/order/' . $orderId . '?success=status_updated');
+        exit;
+    }
+
     public function deleteUser($userId = null)
     {
+        // Only super_admin can delete users
+        $currentUserRole = $_SESSION['user']['role'] ?? 'user';
+        if ($currentUserRole !== 'super_admin') {
+            http_response_code(403);
+            die('❌ Permission refusée: Seul un super administrateur peut supprimer des utilisateurs.');
+        }
+
         if ($userId === null) {
             $userId = (int)($_GET['params'][0] ?? 0);
         } else {
@@ -125,13 +216,70 @@ class AdminController extends Controller
         }
 
         $userModel = new User();
-        $ok = $userModel->deleteWithCleanup($userId);
+        // Use soft delete (deactivate) instead of hard delete
+        $userModel->deactivate($userId);
 
-        if (!$ok) {
-            header('Location: /admin/users?error=delete_failed');
+        header('Location: /admin/users?success=deactivated');
+        exit;
+    }
+
+    public function reactivateUser($userId = null)
+    {
+        // Only super_admin can reactivate users
+        $currentUserRole = $_SESSION['user']['role'] ?? 'user';
+        if ($currentUserRole !== 'super_admin') {
+            http_response_code(403);
+            die('❌ Permission refusée: Seul un super administrateur peut réactiver des utilisateurs.');
+        }
+
+        if ($userId === null) {
+            $userId = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $userId = (int)$userId;
+        }
+
+        if ($userId <= 0 || $userId === ($_SESSION['user']['id'] ?? 0)) {
+            header('Location: /admin/users?error=invalid');
             exit;
         }
-        header('Location: /admin/users?success=deleted');
+
+        $userModel = new User();
+        $userModel->reactivate($userId);
+
+        header('Location: /admin/users?success=reactivated');
+        exit;
+    }
+
+    public function changeRole($userId = null)
+    {
+        // Only super_admin can change roles
+        $currentUserRole = $_SESSION['user']['role'] ?? 'user';
+        if ($currentUserRole !== 'super_admin') {
+            http_response_code(403);
+            die('❌ Permission refusée: Seul un super administrateur peut changer les rôles.');
+        }
+
+        if ($userId === null) {
+            $userId = (int)($_GET['params'][0] ?? 0);
+        } else {
+            $userId = (int)$userId;
+        }
+
+        if ($userId <= 0 || $userId === ($_SESSION['user']['id'] ?? 0)) {
+            header('Location: /admin/users?error=invalid');
+            exit;
+        }
+
+        $newRole = trim($_POST['role'] ?? '');
+        if (!in_array($newRole, ['user', 'admin', 'super_admin'])) {
+            header('Location: /admin/users?error=invalid_role');
+            exit;
+        }
+
+        $userModel = new User();
+        $userModel->changeRole($userId, $newRole);
+
+        header('Location: /admin/users?success=role_changed');
         exit;
     }
 
@@ -256,5 +404,43 @@ class AdminController extends Controller
         }
         header('Location: /admin/orders');
         exit;
+    }
+
+    /**
+     * Manage user roles (super_admin only)
+     */
+    public function manageRoles()
+    {
+        \App\Middleware\AdminMiddleware::checkSuperAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            \App\Middleware\CsrfMiddleware::checkPost();
+
+            $userId = (int)($_POST['user_id'] ?? 0);
+            $newRole = trim($_POST['role'] ?? '');
+
+            if ($userId <= 0 || !in_array($newRole, ['user', 'moderator', 'admin', 'super_admin'])) {
+                header('Location: /admin/roles?error=invalid');
+                exit;
+            }
+
+            // Cannot change own role
+            if ($userId === ($_SESSION['user']['id'] ?? 0)) {
+                header('Location: /admin/roles?error=self');
+                exit;
+            }
+
+            $userModel = new User();
+            $userModel->run(
+                "UPDATE users SET role = ? WHERE id = ?",
+                [$newRole, $userId]
+            );
+
+            header('Location: /admin/roles?success=updated');
+            exit;
+        }
+
+        $users = (new User())->getAll();
+        $this->adminView('admin/manage-roles', compact('users'));
     }
 }

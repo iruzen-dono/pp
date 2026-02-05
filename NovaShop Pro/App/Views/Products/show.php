@@ -10,9 +10,9 @@
 
     <?php if (empty($product)): ?>
         <div class="alert alert-error">
-            <h2>❌ Produit non trouvé</h2>
+            <h2><i class="fas fa-times-circle"></i> Produit non trouvé</h2>
             <p>Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
-            <a href="/products" class="btn-link">← Retour aux produits</a>
+            <a href="/products" class="btn-link"><i class="fas fa-arrow-left"></i> Retour aux produits</a>
         </div>
     <?php else: ?>
         <!-- Product Main Section -->
@@ -26,7 +26,7 @@
                              class="main-product-image">
                     <?php else: ?>
                         <div class="product-image-placeholder">
-                            <span>📦</span>
+                            <i class="fas fa-box placeholder-fa"></i>
                             <p>Pas d'image disponible</p>
                         </div>
                     <?php endif; ?>
@@ -54,7 +54,13 @@
 
                     <!-- Rating & Reviews -->
                     <div class="rating-section">
-                        <div class="stars">★★★★★</div>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
                         <span class="rating-text">4.8 sur 5</span>
                         <span class="reviews-count">(247 avis)</span>
                     </div>
@@ -69,8 +75,8 @@
                     <div class="price-info">
                         <span class="stock-status" data-stock="<?= $product['stock'] ?? 0 ?>">
                             <?= ($product['stock'] ?? 0) > 0 
-                                ? '✓ En stock (' . ($product['stock'] ?? 0) . ' disponibles)' 
-                                : '✗ Rupture de stock' ?>
+                                ? '<i class="fas fa-check-circle"></i> En stock (' . ($product['stock'] ?? 0) . ' disponibles)' 
+                                : '<i class="fas fa-times-circle"></i> Rupture de stock' ?>
                         </span>
                     </div>
                 </div>
@@ -83,23 +89,24 @@
                 </div>
 
                 <!-- Quick Info Badges -->
-                <div class="info-badges">
+                    <div class="info-badges">
                     <div class="badge-item">
-                        <span class="badge-icon">🚚</span>
+                        <i class="fas fa-truck badge-fa"></i>
                         <span class="badge-label">Livraison rapide</span>
                     </div>
                     <div class="badge-item">
-                        <span class="badge-icon">🔄</span>
+                        <i class="fas fa-undo-alt badge-fa"></i>
                         <span class="badge-label">Retour 30 jours</span>
                     </div>
                     <div class="badge-item">
-                        <span class="badge-icon">🛡️</span>
+                        <i class="fas fa-shield-alt badge-fa"></i>
                         <span class="badge-label">Garantie 1 an</span>
                     </div>
                 </div>
 
                 <!-- Purchase Card -->
                 <form method="POST" action="/cart/add" class="purchase-form">
+                    <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
                     <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['id']) ?>">
 
                     <!-- Variant Selection -->
@@ -134,18 +141,18 @@
                     <!-- Action Buttons -->
                     <div class="action-buttons">
                         <button type="submit" class="btn btn-primary btn-large">
-                            <span class="btn-icon">🛒</span>
+                            <i class="fas fa-shopping-cart btn-fa"></i>
                             <span class="btn-text">Ajouter au panier</span>
                         </button>
-                        <button type="button" class="btn btn-secondary btn-large" onclick="toggleWishlist()">
-                            <span class="btn-icon">♡</span>
-                            <span class="btn-text">Ajouter aux favoris</span>
-                        </button>
+                        <a href="/products" class="btn btn-secondary btn-large" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-arrow-left btn-fa"></i>
+                            <span class="btn-text">Retour aux produits</span>
+                        </a>
                     </div>
 
                     <!-- Secure Info -->
                     <div class="secure-info">
-                        <span class="secure-icon">🔒</span>
+                        <i class="fas fa-lock secure-fa"></i>
                         <span class="secure-text">Paiement sécurisé • Données cryptées</span>
                     </div>
                 </form>
@@ -206,14 +213,26 @@
                         <div class="review-item">
                             <div class="review-header">
                                 <span class="review-author">Marie D.</span>
-                                <span class="review-rating">★★★★★</span>
+                                <span class="review-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </span>
                             </div>
                             <p class="review-text">"Excellent produit, conforme à la description. Livraison rapide !"</p>
                         </div>
                         <div class="review-item">
                             <div class="review-header">
                                 <span class="review-author">Jean P.</span>
-                                <span class="review-rating">★★★★☆</span>
+                                <span class="review-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
                             </div>
                             <p class="review-text">"Très bon rapport qualité/prix. Je recommande !"</p>
                         </div>
@@ -1041,26 +1060,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const current = parseInt(input.value);
         if (current > 1) {
             input.value = current - 1;
-        }
-    };
-
-    // ============================================
-    // WISHLIST FUNCTIONALITY
-    // ============================================
-    window.toggleWishlist = function() {
-        const btn = event.target.closest('.btn-secondary');
-        btn.classList.toggle('wishlisted');
-        const isWishlisted = btn.classList.contains('wishlisted');
-        
-        // Update button appearance
-        if (isWishlisted) {
-            btn.style.background = 'linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)';
-            btn.style.color = '#dc2626';
-            btn.style.borderColor = '#dc2626';
-        } else {
-            btn.style.background = 'white';
-            btn.style.color = '#0066cc';
-            btn.style.borderColor = '#0066cc';
         }
     };
 

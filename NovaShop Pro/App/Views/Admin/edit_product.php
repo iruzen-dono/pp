@@ -22,6 +22,7 @@
 <!-- FORMULAIRE ÉDITION PRODUIT -->
 <div class="admin-form">
     <form method="POST" enctype="multipart/form-data">
+        <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
         <input type="hidden" name="action" value="edit">
         
         <div class="form-grid">

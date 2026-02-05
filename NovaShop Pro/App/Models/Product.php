@@ -12,6 +12,23 @@ class Product extends Model
         );
     }
 
+    public function search(string $keyword, int $categoryId = null)
+    {
+        $keyword = '%' . $keyword . '%';
+        
+        if ($categoryId > 0) {
+            return $this->run(
+                "SELECT * FROM products WHERE (name LIKE ? OR description LIKE ?) AND category_id = ?",
+                [$keyword, $keyword, $categoryId]
+            );
+        }
+        
+        return $this->run(
+            "SELECT * FROM products WHERE name LIKE ? OR description LIKE ?",
+            [$keyword, $keyword]
+        );
+    }
+
     public function getById(int $id)
     {
         return $this->run(
@@ -61,24 +78,6 @@ class Product extends Model
         return $this->run(
             "DELETE FROM products WHERE id = ?",
             [$id]
-        );
-    }
-
-    public function search(string $query)
-    {
-        if (empty($query)) {
-            return [];
-        }
-
-        $query = trim($query);
-        $searchTerm = '%' . $query . '%';
-        
-        return $this->run(
-            "SELECT * FROM products 
-             WHERE name LIKE ? OR description LIKE ?
-             ORDER BY name ASC
-             LIMIT 50",
-            [$searchTerm, $searchTerm]
         );
     }
 }

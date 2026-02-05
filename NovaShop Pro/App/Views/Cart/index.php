@@ -34,6 +34,7 @@
             </div>
 
             <form method="POST" action="/orders/create" style="margin-top: 20px;">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
                 <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px;">✓ Valider la commande</button>
             </form>
         </div>

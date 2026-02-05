@@ -12,6 +12,7 @@
         </div>
 
         <form method="POST" style="display: inline-block;">
+            <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(\App\Middleware\CsrfMiddleware::generateToken()) . '">'; ?>
             <button type="submit" class="btn btn-primary" style="width: 300px; padding: 15px; font-size: 16px;">✓ Confirmer la commande</button>
         </form>
     </div>

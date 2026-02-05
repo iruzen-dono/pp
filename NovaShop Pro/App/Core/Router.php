@@ -20,6 +20,7 @@ class Router
             'cart'            => ['Cart', 'index'],
             'home'            => ['Home', 'index'],
             'orders'          => ['Order', 'index'],
+            'order'           => ['Order', 'show'],
             'profile'         => ['User', 'profile'],
             'settings'        => ['User', 'settings']
         ];
@@ -46,6 +47,12 @@ class Router
                 $methodName = $parts[1];
                 $params = array_slice($parts, 2);
             }
+            
+            // Special handling for single order by ID: /order/123
+            if ($parts[0] === 'order' && isset($parts[1]) && is_numeric($parts[1])) {
+                $methodName = 'show';
+                $params = [$parts[1]];
+            }
         } else {
             $controllerName = ucfirst($parts[0]) . 'Controller';
             $methodName = $parts[1] ?? 'index';
@@ -57,6 +64,14 @@ class Router
                 if ($parts[1] === 'products' && isset($parts[2]) && $parts[2] === 'edit' && isset($parts[3])) {
                     $methodName = 'editProduct';
                     $params = [$parts[3]];
+                } else if ($parts[1] === 'order' && isset($parts[2])) {
+                    // For /admin/order/{id}
+                    $methodName = 'order';
+                    $params = [$parts[2]];
+                } else if ($parts[1] === 'updateOrderStatus' && isset($parts[2])) {
+                    // For /admin/updateOrderStatus/{id}
+                    $methodName = 'updateOrderStatus';
+                    $params = [$parts[2]];
                 } else {
                     // For routes like /admin/deleteUser/5, /admin/deleteProduct/5, etc.
                     $methodName = $parts[1];

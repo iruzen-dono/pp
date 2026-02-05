@@ -151,3 +151,29 @@
     </a>
 </div>
 
+<script>
+    // Auto-refresh dashboard every 30 seconds (30000 ms)
+    // Change the interval value to refresh more/less frequently
+    const REFRESH_INTERVAL = 30000; // 30 seconds
+    
+    // Get current scroll position before refresh
+    let scrollPosition = 0;
+    window.addEventListener('beforeunload', function() {
+        scrollPosition = window.scrollY;
+        sessionStorage.setItem('dashboardScroll', scrollPosition);
+    });
+    
+    // Restore scroll position after refresh
+    window.addEventListener('load', function() {
+        const savedScroll = sessionStorage.getItem('dashboardScroll');
+        if (savedScroll) {
+            window.scrollTo(0, parseInt(savedScroll));
+            sessionStorage.removeItem('dashboardScroll');
+        }
+    });
+    
+    // Set up auto-refresh
+    setInterval(function() {
+        location.reload();
+    }, REFRESH_INTERVAL);
+</script>

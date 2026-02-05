@@ -23,11 +23,16 @@ class OrderController extends Controller
         $this->view('orders/index', compact('orders'));
     }
 
-    public function show()
+    public function show($orderId = null)
     {
         AuthMiddleware::check();
 
-        $orderId = (int)($_GET['id'] ?? 0);
+        if ($orderId === null) {
+            $orderId = (int)($_GET['id'] ?? 0);
+        } else {
+            $orderId = (int)$orderId;
+        }
+        
         if ($orderId <= 0) {
             header("Location: /orders");
             exit;

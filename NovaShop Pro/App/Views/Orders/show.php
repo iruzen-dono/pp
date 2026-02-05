@@ -1,5 +1,6 @@
 <div class="order-detail" style="max-width: 700px; margin: 0 auto;">
     <a href="/orders" class="btn btn-secondary" style="margin-bottom: 20px;">← Retour à mes commandes</a>
+    <a href="/products" class="btn btn-secondary" style="margin-bottom: 20px; margin-left: 10px;">← Retour aux produits</a>
 
     <?php if (empty($order)): ?>
         <div class="alert alert-danger">❌ Commande non trouvée.</div>

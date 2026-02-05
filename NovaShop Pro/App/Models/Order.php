@@ -47,6 +47,14 @@ class Order extends Model
         );
     }
 
+    public function updateStatus(int $id, string $status): int
+    {
+        return $this->run(
+            "UPDATE orders SET status = ? WHERE id = ?",
+            [$status, $id]
+        );
+    }
+
     public function delete(int $id): int
     {
         return $this->run(

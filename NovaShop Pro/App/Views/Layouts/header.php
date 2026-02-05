@@ -84,11 +84,11 @@
                                 <i class="fas fa-clipboard-list nav-icon"></i>
                                 <span>Commandes</span>
                             </a>
-                            <?php if ($_SESSION['user']['role'] === 'admin'): ?>
+                            <?php if (in_array($_SESSION['user']['role'] ?? '', ['admin', 'super_admin'])): ?>
                                 <a href="/admin/dashboard" class="nav-link nav-link-admin nav-link-special">
                                     <i class="fas fa-cog nav-icon"></i>
                                     <span>Admin</span>
-                                    <span class="admin-badge">ADMIN</span>
+                                    <span class="admin-badge"><?php echo strtoupper($_SESSION['user']['role']); ?></span>
                                 </a>
                             <?php endif; ?>
                             <button class="nav-link nav-link-logout user-menu-trigger" id="userMenuTrigger">
