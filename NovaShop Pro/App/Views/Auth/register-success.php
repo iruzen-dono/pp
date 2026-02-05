@@ -9,7 +9,7 @@
             <!-- Logo Header -->
             <div class="auth-header text-center mb-5">
                 <div class="logo-wrapper mb-4">
-                    <div class="logo-circle" style="color: #4CAF50;">✓</div>
+                    <div class="logo-circle" style="color: #4CAF50;"><i class="fas fa-check"></i></div>
                 </div>
                 <h1 class="auth-title">Inscription Réussie!</h1>
                 <p class="auth-subtitle">Bienvenue dans NovaShop Premium</p>

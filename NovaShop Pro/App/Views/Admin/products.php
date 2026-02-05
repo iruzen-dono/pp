@@ -1,3 +1,113 @@
+<style>
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    background: rgba(30, 30, 40, 0.8);
+    padding: 1rem;
+}
+
+.table-container table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+.table-container thead {
+    background: rgba(60, 60, 80, 0.9);
+}
+
+.table-container th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #e0e7ff;
+    border-bottom: 2px solid rgba(100, 100, 120, 0.5);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.table-container td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(100, 100, 120, 0.3);
+    color: #d1d5db;
+}
+
+.table-container tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-container tbody tr:hover {
+    background-color: rgba(96, 165, 250, 0.1);
+}
+
+.table-container tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-container a {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.table-container a:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.admin-actions a, .admin-actions button {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-actions a.edit {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.admin-actions a.edit:hover {
+    background: rgba(59, 130, 246, 0.3);
+}
+
+.admin-actions a.delete {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.admin-actions a.delete:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 768px) {
+    .table-container {
+        padding: 0.5rem;
+    }
+    
+    .table-container th,
+    .table-container td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.875rem;
+    }
+    
+    .admin-actions a, .admin-actions button {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+</style>
+
 <h1>📦 Gestion des Produits</h1>
 
 <?php if (isset($_GET['success'])): ?>

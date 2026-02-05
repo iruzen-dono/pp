@@ -43,7 +43,8 @@ class AdminController extends Controller
         $sortBy = $_GET['sort'] ?? 'created_at';
         $sortOrder = $_GET['order'] ?? 'DESC';
         $users = (new User())->getAll($sortBy, $sortOrder);
-        $this->adminView('admin/users', compact('users', 'sortBy', 'sortOrder'));
+        $isSuperAdmin = ($_SESSION['user']['role'] ?? '') === 'super_admin';
+        $this->adminView('admin/users', compact('users', 'sortBy', 'sortOrder', 'isSuperAdmin'));
     }
 
     public function products()
@@ -175,7 +176,8 @@ class AdminController extends Controller
         }
 
         $newStatus = trim($_POST['status'] ?? '');
-        if (!in_array($newStatus, ['pending', 'completed', 'cancelled'])) {
+        // Allowed statuses must match the DB enum: pending, confirmed, shipped, delivered, cancelled
+        if (!in_array($newStatus, ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'])) {
             header('Location: /admin/orders?error=invalid_status');
             exit;
         }

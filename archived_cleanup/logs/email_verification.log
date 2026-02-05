@@ -1,5 +1,0 @@
-[ARCHIVED on 2026-02-02] Original file: NovaShop Pro/logs/email_verification.log
-[2026-02-02 14:45:24] Email à: juleszhou00@gmail.com | Token: 43b67c36d00721b369b22dcc5301c2316438317b23c788f7b66af690238863cc | Lien: http://localhost:8000/verify-email?token=43b67c36d00721b369b22dcc5301c2316438317b23c788f7b66af690238863cc
-[2026-02-02 14:52:32] Email à: juleszhou01@gmail.com | Token: 759967b23ed64d5a183a7818b9b52c81ea7742caa78e7e05c444cab3baf74d69 | Lien: http://localhost:8000/verify-email?token=759967b23ed64d5a183a7818b9b52c81ea7742caa78e7e05c444cab3baf74d69
-[2026-02-02 14:56:43] Email à: test@gmail.com | Token: c3ac186f187830046c8a3331830a85457d496f3589c66b6944b996408f96777e | Lien: http://localhost:8000/verify-email?token=c3ac186f187830046c8a3331830a85457d496f3589c66b6944b996408f96777e
-[2026-02-02 16:34:46] Email à: 3ere@g | Token: 2534dddcf1044bdb957bb3bfa5b6ffc2b3f1bf0047e410840102e8b8f90d3081 | Lien: http://localhost:8000/verify-email?token=2534dddcf1044bdb957bb3bfa5b6ffc2b3f1bf0047e410840102e8b8f90d3081

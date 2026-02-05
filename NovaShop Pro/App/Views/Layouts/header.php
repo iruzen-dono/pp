@@ -28,9 +28,6 @@
 <body>
     <!-- Floating Utility Buttons -->
     <div class="utility-buttons">
-        <button id="darkModeToggle" class="theme-toggle" title="Mode sombre" aria-label="Basculer mode sombre">
-            <i class="fas fa-moon"></i>
-        </button>
         <button id="scrollTopBtn" title="Vers le haut" aria-label="Retour au haut" class="scroll-top-btn">
             <i class="fas fa-arrow-up"></i>
         </button>

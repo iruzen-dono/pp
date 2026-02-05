@@ -1818,95 +1818,6 @@ textarea {
    DARK MODE SUPPORT
    ============================================ */
 
-[data-theme="dark"] {
-    --text-dark: #f9f9f9;
-    --white: #0d0d0d;
-    --black: #f9f9f9;
-    --secondary: #1a1a1a;
-    --secondary-dark: #2a2a2a;
-    --accent: #ffc837;
-}
-
-[data-theme="dark"] body {
-    background: #1a1a1a;
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .navbar-header {
-    background: linear-gradient(135deg, #2a2a2a 0%, rgba(30, 30, 30, 0.8) 100%);
-    border-color: #3a3a3a;
-}
-
-[data-theme="dark"] header {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-}
-
-[data-theme="dark"] .nav-link {
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .nav-link:hover {
-    color: var(--accent);
-}
-
-[data-theme="dark"] .nav-link-special {
-    background: rgba(212, 165, 116, 0.08);
-    color: var(--accent);
-}
-
-[data-theme="dark"] .nav-link-special:hover {
-    background: rgba(212, 165, 116, 0.15);
-}
-
-[data-theme="dark"] .hamburger-menu span {
-    background: #f5f5f0;
-}
-
-[data-theme="dark"] .user-dropdown {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .dropdown-item {
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .dropdown-item:hover {
-    background: #3a3a3a;
-}
-
-[data-theme="dark"] .nav-divider {
-    background-color: #3a3a3a;
-}
-
-[data-theme="dark"] form {
-    background: #2a2a2a;
-}
-
-[data-theme="dark"] input, 
-[data-theme="dark"] textarea, 
-[data-theme="dark"] select {
-    background: #1a1a1a;
-    color: #f5f5f0;
-    border-color: #3a3a3a;
-}
-
-[data-theme="dark"] .hero {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-}
-
-[data-theme="dark"] .product-card,
-[data-theme="dark"] .feature-card {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-}
-
-[data-theme="dark"] .container h2 {
-    color: var(--accent);
-}
-
 /* ============================================
    ANIMATIONS AU SCROLL
    ============================================ */
@@ -3095,43 +3006,6 @@ tbody tr:hover {
 .feature-card:nth-child(6) { animation-delay: 0.5s; }
 
 /* ============================================
-   DARK MODE - DATA ATTRIBUTE
-   ============================================ */
-
-[data-theme="dark"] {
-    --primary: #7fdbca;
-    --accent: #ffd700;
-    --secondary: #1a1a1a;
-    --secondary-dark: #2a2a2a;
-    --text-dark: #f5f5f0;
-    --text-light: #1a1a1a;
-    --white: #0a0a0a;
-}
-
-[data-theme="dark"] body {
-    background: #0a0a0a;
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .product-card {
-    background: #1a1a1a;
-    border-color: #2a2a2a;
-}
-
-[data-theme="dark"] input,
-[data-theme="dark"] textarea,
-[data-theme="dark"] select {
-    background: #1a1a1a;
-    color: #f5f5f0;
-    border-color: #2a2a2a;
-}
-
-[data-theme="dark"] header {
-    background: #0a0a0a;
-    border-color: #2a2a2a;
-}
-
-/* ============================================
    SCROLL-TO-TOP BUTTON
    ============================================ */
 
@@ -3169,29 +3043,6 @@ tbody tr:hover {
    DARK MODE TOGGLE
    ============================================ */
 
-#darkModeToggle {
-    position: fixed;
-    bottom: 2rem;
-    left: 2rem;
-    width: 50px;
-    height: 50px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    z-index: 999;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-lg);
-}
-
-#darkModeToggle:hover {
-    background: var(--primary-dark);
-    transform: scale(1.1) rotate(20deg);
-    box-shadow: var(--shadow-xl);
-}
-
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
@@ -3210,16 +3061,13 @@ tbody tr:hover {
         width: 100%;
     }
     
-    #scrollTopBtn,
-    #darkModeToggle {
+    #scrollTopBtn {
         width: 45px;
         height: 45px;
         font-size: 1.2rem;
         bottom: 1rem;
+        right: 1rem;
     }
-    
-    #scrollTopBtn { right: 1rem; }
-    #darkModeToggle { left: 1rem; }
 }
 
 /* ============================================
@@ -3386,31 +3234,7 @@ tbody tr:hover {
     margin: 0;
 }
 
-/* Dark Mode */
-[data-theme="dark"] .products-page-header h2 {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
 
-[data-theme="dark"] .product-card-inner {
-    background: #1a1a1a;
-    border-color: #3a3a3a;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .product-card:hover .product-card-inner {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .product-card-name {
-    color: var(--accent);
-}
-
-[data-theme="dark"] .placeholder-icon {
-    color: rgba(255, 255, 255, 0.1);
-}
 
 /* Responsive Grid */
 @media (max-width: 1200px) {
@@ -3859,37 +3683,7 @@ tbody tr:hover {
     line-height: 1.8;
 }
 
-/* Dark Mode */
-[data-theme="dark"] .products-header h2 {
-    color: var(--accent);
-}
 
-[data-theme="dark"] .product-detail-card {
-    background: #1a1a1a;
-    border-color: #3a3a3a;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .carousel-product {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-}
-
-[data-theme="dark"] .product-detail-title {
-    color: var(--accent);
-}
-
-[data-theme="dark"] .product-info-box {
-    background: #2a2a2a;
-    border-color: var(--accent);
-}
-
-[data-theme="dark"] .review-item,
-[data-theme="dark"] .shipping-option,
-[data-theme="dark"] .tabs-header {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -4500,53 +4294,7 @@ tbody tr:hover {
     width: 100%;
 }
 
-/* Dark Mode Support */
-[data-theme="dark"] .auth-container {
-    background: linear-gradient(135deg, #2a2a2a 0%, rgba(212, 165, 116, 0.05) 100%);
-}
 
-[data-theme="dark"] .auth-card {
-    background: #1a1a1a;
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .form-input {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: #3a3a3a;
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .form-input:focus {
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
-}
-
-[data-theme="dark"] .form-label {
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .auth-divider span {
-    background: #1a1a1a;
-    color: #888;
-}
-
-[data-theme="dark"] .social-btn {
-    border-color: #3a3a3a;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="dark"] .social-github {
-    color: #f5f5f0;
-}
-
-[data-theme="dark"] .auth-footer {
-    border-color: #3a3a3a;
-}
-
-[data-theme="dark"] .auth-switch-text {
-    color: #888;
-}
 
 /* Mobile Responsive */
 @media (max-width: 480px) {

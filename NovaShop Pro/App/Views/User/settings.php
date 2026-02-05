@@ -57,7 +57,7 @@
 
                             <!-- Section: Changer le mot de passe -->
                             <div class="mb-4">
-                                <h4 class="border-bottom pb-2">🔐 Changer le mot de passe</h4>
+                                <h4 class="border-bottom pb-2"><i class="fas fa-lock"></i> Changer le mot de passe</h4>
                                 <p class="text-muted small">Laissez vide si vous ne souhaitez pas le changer</p>
 
                                 <div class="mb-3">

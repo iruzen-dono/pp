@@ -1,9 +1,80 @@
+<style>
+.order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    min-width: 600px;
+    overflow-x: auto;
+}
+
+.order-items-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+.order-items-table thead {
+    background: rgba(60, 60, 80, 0.9);
+}
+
+.order-items-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #e0e7ff;
+    border-bottom: 2px solid rgba(100, 100, 120, 0.5);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.order-items-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(100, 100, 120, 0.3);
+    color: #d1d5db;
+}
+
+.order-items-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.order-items-table tbody tr:hover {
+    background-color: rgba(96, 165, 250, 0.1);
+}
+
+.order-items-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.order-item-name {
+    font-weight: 500;
+    color: #f3f4f6;
+}
+
+.order-item-price {
+    color: #86efac;
+    font-weight: 600;
+}
+
+.order-item-total {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .order-items-table th,
+    .order-items-table td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
+
 <div class="admin-order-detail" style="max-width: 900px; margin: 0 auto;">
     <a href="/admin/orders" class="btn btn-secondary" style="margin-bottom: 20px;"><i class="fas fa-arrow-left"></i> Retour aux commandes</a>
 
     <?php if (isset($_GET['success'])): ?>
         <div class="alert alert-success">
-            ✅ Statut de la commande mis à jour avec succès
+            <i class="fas fa-check-circle"></i> Statut de la commande mis à jour avec succès
         </div>
     <?php endif; ?>
 
@@ -37,8 +108,23 @@
                 
                 <?php 
                 $status = strtolower($order['status'] ?? 'pending');
-                $statusLabel = $status === 'completed' ? '<i class="fas fa-check-circle"></i> Complétée' : ($status === 'cancelled' ? '<i class="fas fa-times-circle"></i> Annulée' : '<i class="fas fa-hourglass-half"></i> En Attente');
-                $statusColor = $status === 'completed' ? '#86efac' : ($status === 'cancelled' ? '#fca5a5' : '#fbbf24');
+                // Map DB statuses to human labels/colors
+                if ($status === 'cancelled') {
+                    $statusLabel = '<i class="fas fa-times-circle"></i> Annulée';
+                    $statusColor = '#fca5a5';
+                } elseif ($status === 'shipped') {
+                    $statusLabel = '<i class="fas fa-truck"></i> Expédiée';
+                    $statusColor = '#60a5fa';
+                } elseif ($status === 'confirmed') {
+                    $statusLabel = '<i class="fas fa-check"></i> Confirmée';
+                    $statusColor = '#86efac';
+                } elseif ($status === 'delivered') {
+                    $statusLabel = '<i class="fas fa-check-circle"></i> Livrée';
+                    $statusColor = '#16a34a';
+                } else {
+                    $statusLabel = '<i class="fas fa-hourglass-half"></i> En Attente';
+                    $statusColor = '#fbbf24';
+                }
                 ?>
                 
                 <p style="margin-bottom: 15px;">
@@ -53,13 +139,15 @@
                     <div>
                         <label for="status" style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #aaa; font-size: 12px;">Nouveau statut:</label>
                         <select name="status" id="status" style="padding: 0.6rem; border: 1px solid #444; border-radius: 0.3rem; background: #222; color: #fff;">
-                            <option value="pending" <?= $status === 'pending' ? 'selected' : ''; ?>>⏳ En Attente</option>
-                            <option value="completed" <?= $status === 'completed' ? 'selected' : ''; ?>>✅ Complétée</option>
-                            <option value="cancelled" <?= $status === 'cancelled' ? 'selected' : ''; ?>>❌ Annulée</option>
+                            <option value="pending" <?= $status === 'pending' ? 'selected' : ''; ?>>En Attente</option>
+                            <option value="confirmed" <?= $status === 'confirmed' ? 'selected' : ''; ?>>Confirmée</option>
+                            <option value="shipped" <?= $status === 'shipped' ? 'selected' : ''; ?>>Expédiée</option>
+                            <option value="delivered" <?= $status === 'delivered' ? 'selected' : ''; ?>>Livrée</option>
+                            <option value="cancelled" <?= $status === 'cancelled' ? 'selected' : ''; ?>>Annulée</option>
                         </select>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem;">💾 Mettre à jour</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem;"><i class="fas fa-save"></i> Mettre à jour</button>
                 </form>
             </div>
 

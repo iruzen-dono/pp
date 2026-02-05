@@ -7,7 +7,7 @@
         <div class="col-md-8 offset-md-2">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">👤 Mon Profil</h2>
+                    <h2 class="mb-0"><i class="fas fa-user-circle"></i> Mon Profil</h2>
                 </div>
                 <div class="card-body">
                     <?php if (!empty($error)): ?>
@@ -62,13 +62,13 @@
 
                         <div class="d-flex gap-2">
                             <a href="/settings" class="btn btn-warning">
-                                ⚙️ Modifier les paramètres
+                                <i class="fas fa-cog"></i> Modifier les paramètres
                             </a>
                             <a href="/orders" class="btn btn-info">
                                 <i class="fas fa-box"></i> Mes commandes
                             </a>
                             <a href="/home" class="btn btn-secondary">
-                                ← Retour à l'accueil
+                                <i class="fas fa-arrow-left"></i> Retour à l'accueil
                             </a>
                         </div>
                     <?php endif; ?>

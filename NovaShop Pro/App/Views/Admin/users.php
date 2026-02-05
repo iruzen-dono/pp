@@ -1,3 +1,97 @@
+<style>
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    background: rgba(30, 30, 40, 0.8);
+    padding: 1rem;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+}
+
+.table-container thead {
+    background: rgba(60, 60, 80, 0.9);
+    border-bottom: 2px solid rgba(100, 100, 150, 0.5);
+}
+
+.table-container th {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #e0e0e0;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.table-container td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(100, 100, 150, 0.2);
+    color: #d0d0d0;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.table-container tbody tr:hover {
+    background: rgba(100, 100, 150, 0.1);
+}
+
+.table-container tbody tr {
+    transition: background 0.2s;
+}
+
+/* Largeurs colonnes */
+.table-container th:nth-child(1),
+.table-container td:nth-child(1) { width: 5%; }
+
+.table-container th:nth-child(2),
+.table-container td:nth-child(2) { width: 15%; }
+
+.table-container th:nth-child(3),
+.table-container td:nth-child(3) { width: 20%; }
+
+.table-container th:nth-child(4),
+.table-container td:nth-child(4) { width: 15%; }
+
+.table-container th:nth-child(5),
+.table-container td:nth-child(5) { width: 12%; }
+
+.table-container th:nth-child(6),
+.table-container td:nth-child(6) { width: 18%; }
+
+.table-container th:nth-child(7),
+.table-container td:nth-child(7) { width: 20%; text-align: center; }
+
+/* Actions flexbox */
+td[style*="text-align: center; display: flex"] {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem !important;
+}
+
+td[style*="text-align: center; display: flex"] a,
+td[style*="text-align: center; display: flex"] button {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    line-height: 1.2 !important;
+}
+
+/* Liens tri */
+th a {
+    transition: color 0.2s;
+}
+
+th a:hover {
+    color: #60a5fa !important;
+}
+</style>
+
 <h1>👥 Gestion des Utilisateurs</h1>
 
 <?php if (isset($_GET['success'])): ?>
