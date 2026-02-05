@@ -75,7 +75,6 @@ html, body {
     z-index: 999;
 }
 
-.theme-toggle,
 .scroll-top-btn {
     width: 50px;
     height: 50px;
@@ -93,7 +92,6 @@ html, body {
     overflow: hidden;
 }
 
-.theme-toggle::before,
 .scroll-top-btn::before {
     content: '';
     position: absolute;
@@ -107,20 +105,17 @@ html, body {
     transition: width 0.6s, height 0.6s;
 }
 
-.theme-toggle:hover,
 .scroll-top-btn:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 25px rgba(45, 90, 61, 0.35);
     background: var(--primary-dark);
 }
 
-.theme-toggle:hover::before,
 .scroll-top-btn:hover::before {
     width: 300%;
     height: 300%;
 }
 
-.theme-toggle:active,
 .scroll-top-btn:active {
     transform: translateY(-2px);
 }
@@ -1815,10 +1810,13 @@ textarea {
 }
 
 /* ============================================
+<<<<<<< HEAD
    DARK MODE SUPPORT
    ============================================ */
 
 /* ============================================
+=======
+>>>>>>> 95d441a3afae37a0c4b81873b02b9cb66b9233a8
    ANIMATIONS AU SCROLL
    ============================================ */
 

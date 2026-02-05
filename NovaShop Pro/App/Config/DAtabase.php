@@ -21,13 +21,10 @@ class Database
                     [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                     ]
                 );
 
-                self::$instance->exec(
-                    "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'"
-                );
+                // Ne pas set le sql_mode, laisser MySQL utiliser sa configuration par défaut
 
             } catch (PDOException $e) {
                 throw new \Exception("Connexion DB impossible");

@@ -15,13 +15,19 @@
         <form class="inline-search-form" method="GET" action="/products">
             <div class="input-with-icon">
                 <span class="search-icon">🔎</span>
-                <input type="search" name="q" placeholder="Rechercher un produit, catégorie..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
+                <input type="search" name="q" placeholder="Rechercher un produit, catégorie..." value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>">
             </div>
             <button type="submit" class="btn">Rechercher</button>
         </form>
     </div>
 </div>
 
+<?php 
+// Debug temporaire
+if (empty($products)) {
+    error_log("PRODUCTS DEBUG: products is empty or not set. Type: " . gettype($products) . ", Value: " . json_encode($products));
+}
+?>
 <?php if (!empty($products)): ?>
 <div class="container">
     <div class="products-grid" id="productsGrid">

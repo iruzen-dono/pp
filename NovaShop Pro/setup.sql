@@ -21,10 +21,16 @@ CREATE TABLE users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+<<<<<<< HEAD
     role ENUM('user', 'moderator', 'admin', 'super_admin') DEFAULT 'user',
     is_active BOOLEAN DEFAULT TRUE,
     deactivated_at TIMESTAMP NULL DEFAULT NULL,
     email_verified_at TIMESTAMP NULL DEFAULT NULL,
+=======
+    role ENUM('user', 'admin') DEFAULT 'user',
+    is_active BOOLEAN DEFAULT FALSE,
+    email_verified_at TIMESTAMP NULL,
+>>>>>>> 95d441a3afae37a0c4b81873b02b9cb66b9233a8
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
@@ -111,10 +117,17 @@ CREATE TABLE password_reset_tokens (
 -- DONNÉES DE TEST
 -- ==========================================
 
+<<<<<<< HEAD
 -- Insérer des utilisateurs admin et test (avec email vérifié)
 INSERT INTO users (name, email, password, role, is_active, email_verified_at) VALUES
 ('Admin NovaShop', 'admin@novashop.local', '$2y$10$ioclv8MtI9/7d/PCuak2AuD62.0FFY8Rq6pVG3Ccr79GD4rXV0Dmi', 'super_admin', 1, NOW()),
 ('Client Test', 'user@novashop.local', '$2y$10$njIGZ/pnkst9/ihIIysVGuR3dfRN4r1Xr17gPqgAf8mxF6G8fc9cq', 'user', 1, NOW());
+=======
+-- Insérer des utilisateurs admin et test
+INSERT INTO users (name, email, password, role, is_active, email_verified_at) VALUES
+('Admin NovaShop', 'admin@novashop.local', '$2y$10$ioclv8MtI9/7d/PCuak2AuD62.0FFY8Rq6pVG3Ccr79GD4rXV0Dmi', 'admin', TRUE, NOW()),
+('Client Test', 'user@novashop.local', '$2y$10$njIGZ/pnkst9/ihIIysVGuR3dfRN4r1Xr17gPqgAf8mxF6G8fc9cq', 'user', TRUE, NOW());
+>>>>>>> 95d441a3afae37a0c4b81873b02b9cb66b9233a8
 
 -- Insérer des catégories
 INSERT INTO categories (name, description) VALUES
