@@ -433,10 +433,7 @@ class AdminController extends Controller
             }
 
             $userModel = new User();
-            $userModel->run(
-                "UPDATE users SET role = ? WHERE id = ?",
-                [$newRole, $userId]
-            );
+            $userModel->changeRole($userId, $newRole);
 
             header('Location: /admin/roles?success=updated');
             exit;
